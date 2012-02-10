@@ -1,0 +1,67 @@
+<% require "base64" %>
+user  root root;
+worker_processes  1;
+
+error_log /var/vcap/sys/log/nginx/nginx.error.log;
+pid       /var/vcap/sys/run/nginx/nginx.pid;
+
+events {
+  worker_connections  8192;
+  use epoll;
+}
+
+http {
+  include       mime.types;
+  default_type  text/html;
+  server_tokens off;
+
+  log_format main  '$host - [$time_local] '
+                   '"$request" $status $bytes_sent '
+                   '"$http_referer" "$http_user_agent" '
+                   '$remote_addr response_time:$upstream_response_time';
+
+  access_log  /var/vcap/sys/log/nginx/nginx.access.log  main;
+
+  sendfile             on;
+  tcp_nopush           on;
+  tcp_nodelay          on;
+
+  keepalive_timeout  75 20;
+
+  gzip                 on;
+  gzip_min_length      1250;
+  gzip_buffers         16 8k;
+  gzip_comp_level      2;
+  gzip_proxied         any;
+  gzip_types           text/plain text/css application/javascript application/x-javascript text/xml application/xml application/xml+rss text/javascript;
+  gzip_vary            on;
+  gzip_disable         "MSIE [1-6]\.(?!.*SV1)";
+
+  client_max_body_size 256M;
+
+  server {
+    listen       80;
+
+<% if properties.gerrit && properties.gerrit.uri %>
+    server_name  "<%= properties.gerrit.uri %>";
+<% else %>
+    server_name  "gerrit.<%= properties.domain %>";
+<% end %>
+
+    server_name_in_redirect off;
+
+    location / {
+      access_log /var/vcap/sys/log/nginx/gerrit.access.log  main;
+      proxy_buffering             off;
+      proxy_set_header            Host $host;
+      proxy_set_header            X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_redirect              off;
+      proxy_connect_timeout       10;
+      proxy_send_timeout          30;
+      proxy_read_timeout          30;
+
+      proxy_pass                   http://127.0.0.1:<%= properties.gerrit.http_port || 8443 %>;
+    }
+
+  }
+}

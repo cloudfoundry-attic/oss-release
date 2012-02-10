@@ -1,0 +1,9 @@
+---
+name: debian_nfs_server
+templates:
+  rpc_nfsd_ctl: bin/rpc_nfsd_ctl
+  rpc_mountd_ctl: bin/rpc_mountd_ctl
+  exports.erb: config/exports
+  idmapd.conf.erb: config/idmapd.conf
+packages:
+  - debian_nfs_server

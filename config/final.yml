@@ -1,0 +1,11 @@
+---
+final_name: oss_tools
+min_cli_version: 0.13.6
+blobstore:
+  provider: atmos
+  options:
+    tag: BOSH
+    url: https://172.28.3.4
+    uid: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa/user1
+    secret: P5pfGRCd9oWrxnCkS9UgnqxDxnM=
+blobstore_options: deprecated
