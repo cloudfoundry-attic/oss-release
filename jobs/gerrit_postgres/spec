@@ -1,0 +1,6 @@
+---
+name: gerrit_postgres
+templates:
+  postgres_ctl.erb: bin/postgres_ctl
+packages:
+  - postgres

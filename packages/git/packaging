@@ -1,0 +1,10 @@
+#TODO Fix this git build dependency either in stemcell or add more new packages(~7)
+
+tar xzf git/git-1.7.8.tar.gz
+(
+  cd git-1.7.8
+  ./configure --prefix=${BOSH_INSTALL_TARGET}
+  make NO_TCLTK=Yes
+  make NO_TCLTK=Yes install
+)
+

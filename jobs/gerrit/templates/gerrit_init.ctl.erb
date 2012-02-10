@@ -1,0 +1,37 @@
+#!/bin/bash
+PACKAGE_DIR=/var/vcap/packages/gerrit
+GIT_DIR=/var/vcap/packages/git
+JAVA_DIR=/var/vcap/packages/java
+JOB_DIR=/var/vcap/jobs/gerrit
+DATA_DIR=/var/vcap/store/gerrit
+CONFIG_DIR=$DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>/etc/
+
+chown vcap:vcap $PACKAGE_DIR/gerrit-2.1-SNAPSHOT.war
+
+# Use dbname as subdir for gerrit to make sure below scripts executed after dbname changed in deployment yaml.
+if [ ! -d $CONFIG_DIR ]; then
+  mkdir -p $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>
+  chown vcap:vcap $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>
+
+  #use expect to general default initilization.
+  $JOB_DIR/bin/gerrit_expect
+
+  if [ $? != 0 ]; then
+    echo "ERROR: Unable to Initialize Gerrit"
+    exit 1
+  fi
+
+  su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin:$PATH $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>/bin/gerrit.sh stop "
+fi
+
+# General Configurations
+cp -rf $JOB_DIR/config/gerrit.config $CONFIG_DIR/
+cp -rf $JOB_DIR/config/secure.config $CONFIG_DIR/
+
+# Replication setup
+cp -rf $JOB_DIR/config/replication.config $CONFIG_DIR/
+
+# Passwdless ssh key pair refresh/generation (for replication)
+rm -rf /home/vcap/.ssh/*
+$JOB_DIR/bin/ssh_expect
+
