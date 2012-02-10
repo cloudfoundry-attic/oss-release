@@ -1,0 +1,37 @@
+#!/bin/bash
+
+PACKAGE_DIR=/var/vcap/packages/gerrit
+GIT_DIR=/var/vcap/packages/git
+DATA_DIR=/var/vcap/store/gerrit
+
+export LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH 
+export PATH=$PACKAGE_DIR/bin/:$PATH
+
+expect -c "
+set timeout -1;
+spawn su - vcap -c \"LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$PATH java -jar $PACKAGE_DIR/gerrit-2.1-SNAPSHOT.war init -d $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>\"
+while {1} {
+  expect {
+    \"Create*\"                   {send \"y\r\"}
+    \"Location*\"                 {send \"\r\"}
+    \"Database server type*\"     {send \"postgresql\r\"}
+    \"Server hostname*\"          {send \"<%= properties.gerrit_postgres.address %>\r\"}
+    \"Server port*\"              {send \"<%= properties.gerrit_postgres.port %>\r\"} 
+    \"Database name*\"            {send \"<%= properties.gerrit_postgres.dbname %>\r\"}
+    \"Database username\"         {send \"<%= properties.gerrit_postgres.user %>\r\"}
+    \"*password\"                 {send \"<%= properties.gerrit_postgres.password %>\r\"}
+    \"Authentication*\"           {send \"\r\"}
+    \"SMTP*\"                     {send \"\r\"}
+    \"Run as*\"                   {send \"vcap\r\"}
+    \"Java runtime*\"             {send \"/var/vcap/packages/gerrit/\r\"}
+    \"Copy gerrit.war*\"          {send \"\r\"}
+    \"Listen on address*\"        {send \"\r\"}
+    \"Listen on port*\"           {send \"\r\"}
+    \"Download*\"                 {send \"n\r\"}
+    \"Behind*\"                   {send \"n\r\"}
+    \"Use SSL*\"                  {send \"n\r\"}
+    \"Canonical URL*\"            {send \"\r\"}
+    \"Certificate*\"              {send \"\r\"}
+    eof                         break
+  }
+}"

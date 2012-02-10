@@ -1,0 +1,8 @@
+---
+name: git
+
+dependencies:
+
+files:
+- git/git-1.7.8.tar.gz
+

@@ -1,0 +1,7 @@
+---
+name: gerrit_replication
+templates:
+ replication_ctl: bin/replication_ctl
+
+packages:
+- git

@@ -1,0 +1,17 @@
+---
+name: gerrit
+templates:
+ gerrit_ctl: bin/gerrit_ctl
+ gerrit_init.ctl.erb: bin/gerrit_init.ctl
+ gerrit_expect.erb: bin/gerrit_expect
+ ssh_expect.erb: bin/ssh_expect
+ gerrit_replication.erb: config/replication.config
+ nginx_ctl:      bin/nginx_ctl
+ mime.types:     config/mime.types
+ nginx.conf.erb: config/nginx.conf
+
+packages:
+- git
+- nginx
+- gerrit
+
