@@ -1,0 +1,27 @@
+[gerrit]
+        basePath = git
+<% if properties.gerrit && properties.gerrit.uri %>
+        canonicalWebUrl = http://<%= properties.gerrit.uri %>
+<% else %>
+        canonicalWebUrl = http://gerrit.<%= properties.domain %>
+<% end %>
+[database]
+        type = POSTGRESQL
+        hostname = <%= properties.gerrit_postgres.address %>
+        port = <%= properties.gerrit_postgres.port||2544 %>
+        database = <%= properties.gerrit_postgres.dbname %>
+        username = <%= properties.gerrit_postgres.user %>
+[auth]
+        type = OPENID
+[sendemail]
+        smtpServer = localhost
+[container]
+        user = vcap
+        javaHome = /var/vcap/packages/java/
+[sshd]
+        listenAddress = *:<%= properties.gerrit.ssh_port || 29418 %>
+[httpd]
+        listenUrl = proxy-http://127.0.0.1:<%= properties.gerrit.http_port || 8443 %>/
+[cache]
+        directory = cache
+

@@ -1,6 +1,7 @@
 #!/bin/bash
 PACKAGE_DIR=/var/vcap/packages/gerrit
 GIT_DIR=/var/vcap/packages/git
+JAVA_DIR=/var/vcap/packages/java
 JOB_DIR=/var/vcap/jobs/gerrit
 DATA_DIR=/var/vcap/store/gerrit
 RUN_DIR=/var/vcap/sys/run/gerrit
@@ -17,7 +18,7 @@ case "$1" in
       echo "ERROR: Unable to Initialize Gerrit"
       exit 1
     fi
-    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$PATH $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>/bin/gerrit.sh start "
+    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin/:$PATH $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>/bin/gerrit.sh start "
     if [ $? != 0 ]; then
       echo "ERROR: Unable to start Gerrit"
       exit 1
@@ -28,13 +29,13 @@ case "$1" in
   stop)
     echo "Stopping Gerrit "
     PID=$(head -1 $PIDFILE)
-    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$PATH $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>/bin/gerrit.sh stop "
+    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin/:$PATH $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>/bin/gerrit.sh stop "
     while [ -e /proc/$PID ]; do sleep 0.1; done
     rm -f $PIDFILE
     ;;
 
   status)
-    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$PATH $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>/bin/gerrit.sh status "
+    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin/:$PATH $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>/bin/gerrit.sh status "
     ;;
 
   *)

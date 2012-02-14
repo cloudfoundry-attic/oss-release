@@ -4,8 +4,6 @@ name: gerrit
 dependencies:
 
 files:
-- java/jre-1.6.0_24.tar.gz
-- java/jre-1.6.0_24-x86_64.tar.gz
 - misc/tcl8-1.5.11rc1-src.tar
 - misc/expect5.45.tar
 - gerrit/gerrit-2.1-SNAPSHOT.war

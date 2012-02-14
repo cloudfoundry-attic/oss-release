@@ -27,22 +27,19 @@ case $1 in
     fi
 
     su - vcap -c "mkdir -p /var/vcap/shared/gerrit_replication/<%= properties.gerrit_postgres.dbname %>"
-   
+
     #vcap ssh key repo
-    mkdir -p /home/vcap/.ssh/ 
+    mkdir -p /home/vcap/.ssh/
     chown vcap:vcap /home/vcap/.ssh/
 
     #renew vcap passwd
     pass=`perl -e 'print crypt("<%= properties.gerrit_replication.password %>", "ab")'`
     usermod -p $pass vcap
- 
     # Now nothing need watching, just give it to init
     echo 1 > $PIDFILE
-
     ;;
 
   stop)
-    
     rm -f $PIDFILE
     ;;
 

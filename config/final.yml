@@ -1,9 +1,9 @@
---- 
+---
 final_name: appcloud
-min_cli_version: "0.12"
-blobstore: 
+min_cli_version: 0.13.6
+blobstore:
   provider: atmos
-  options: 
+  options:
     tag: BOSH
     url: https://172.28.3.4
     uid: bb6a0c89ef4048a8a0f814e25385d1c5/user1
