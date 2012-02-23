@@ -1,0 +1,8 @@
+---
+name: gerrit_mysql
+templates:
+  my.cnf.erb: config/my.cnf
+  my.bootstrap.erb: bin/my.bootstrap
+packages:
+  - mysql
+

@@ -1,2 +1,7 @@
 [database]
-        password = <%= properties.gerrit_postgres.password %>
+<% if properties.gerrit_postgres %>
+  password = <%= properties.gerrit_postgres.password %>
+<% elsif properties.gerrit_mysql %>
+  password = <%= properties.gerrit_mysql.password %>
+<% end %>
+

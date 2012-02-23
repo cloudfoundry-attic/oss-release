@@ -16,3 +16,4 @@ packages:
   - nginx
   - java
   - gerrit
+  - mysqlclient
