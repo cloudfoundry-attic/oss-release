@@ -7,18 +7,24 @@ DATA_DIR=/var/vcap/store/gerrit
 RUN_DIR=/var/vcap/sys/run/gerrit
 PIDFILE=$RUN_DIR/gerrit.pid
 
+<% if properties.gerrit_postgres %>
+dbname=<%= properties.gerrit_postgres.dbname||"reviewdb"%>
+<% elsif properties.gerrit_mysql %>
+dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
+<% end %>
+
 case "$1" in
   start)
     mkdir -p $RUN_DIR
     echo $$ > $PIDFILE # Satisfy Monit for init gerrit
-
     $JOB_DIR/bin/gerrit_init.ctl
-
     if [ $? != 0 ]; then
       echo "ERROR: Unable to Initialize Gerrit"
       exit 1
     fi
-    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin/:$PATH $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>/bin/gerrit.sh start "
+    # Clean up tmp directory for gerrit with unclean shutdown/break
+    rm -rf /home/vcap/.gerritcodereview/tmp/*
+    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin/:$PATH $DATA_DIR/review_site/$dbname/bin/gerrit.sh start "
     if [ $? != 0 ]; then
       echo "ERROR: Unable to start Gerrit"
       exit 1
@@ -29,13 +35,13 @@ case "$1" in
   stop)
     echo "Stopping Gerrit "
     PID=$(head -1 $PIDFILE)
-    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin/:$PATH $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>/bin/gerrit.sh stop "
+    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin/:$PATH $DATA_DIR/review_site/$dbname/bin/gerrit.sh stop "
     while [ -e /proc/$PID ]; do sleep 0.1; done
     rm -f $PIDFILE
     ;;
 
   status)
-    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin/:$PATH $DATA_DIR/review_site/<%= properties.gerrit_postgres.dbname %>/bin/gerrit.sh status "
+    su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin/:$PATH $DATA_DIR/review_site/$dbname/bin/gerrit.sh status "
     ;;
 
   *)
