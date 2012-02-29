@@ -19,3 +19,10 @@ tar xf misc/expect5.45.tar
 )
 
 cp gerrit/gerrit-2.1-SNAPSHOT.war ${BOSH_INSTALL_TARGET}
+
+tar xf gerrit/hooks.tgz
+(
+  cp -rf hooks ${BOSH_INSTALL_TARGET}
+  cd ${BOSH_INSTALL_TARGET}/hooks/mail_notification
+  /var/vcap/packages/ruby/bin/bundle --local install --deployment
+)

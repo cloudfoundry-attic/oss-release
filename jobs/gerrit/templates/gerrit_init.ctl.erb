@@ -41,6 +41,12 @@ cp -pf $JOB_DIR/config/secure.config $CONFIG_DIR/
 # Replication setup
 cp -pf $JOB_DIR/config/replication.config $CONFIG_DIR/
 
+# Gerrit Hooks setup
+rm -rf $CONFIG_DIR/../hooks
+cp -r $PACKAGE_DIR/hooks $CONFIG_DIR/../
+cp -pf $JOB_DIR/config/gerrit_hooks.yml $CONFIG_DIR/../hooks/
+chown -R vcap:vcap $CONFIG_DIR/../hooks/
+
 # Passwdless ssh key pair refresh/generation (for replication)
 rm -rf /home/vcap/.ssh/*
 $JOB_DIR/bin/ssh_expect

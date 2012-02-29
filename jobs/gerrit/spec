@@ -8,11 +8,13 @@ templates:
   gerrit_replication.erb: config/replication.config
   gerrit_config.erb: config/gerrit.config
   gerrit_secure.erb: config/secure.config
+  gerrit_hooks.yml.erb: config/gerrit_hooks.yml
   nginx_ctl:      bin/nginx_ctl
   mime.types:     config/mime.types
   nginx.conf.erb: config/nginx.conf
 packages:
   - git
+  - ruby
   - nginx
   - java
   - gerrit
