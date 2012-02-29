@@ -1,0 +1,52 @@
+#!/bin/bash
+
+VERSION=$1
+
+# Only works(tested) on 2.2.2.1
+test "$VERSION" != '2.2.2.1' && exit 1
+
+PACKAGE_DIR=/var/vcap/packages/gerrit
+GIT_DIR=/var/vcap/packages/git
+JAVA_DIR=/var/vcap/packages/java
+DATA_DIR=/var/vcap/store/gerrit
+GERRIT_WAR=gerrit-${VERSION}.war
+
+export LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH
+export PATH=$PACKAGE_DIR/bin/:$PATH
+
+<% if properties.gerrit_postgres %>
+dbname=<%= properties.gerrit_postgres.dbname||"reviewdb" %>
+<% elsif properties.gerrit_mysql %>
+dbname=<%= properties.gerrit_mysql.dbname ||"reviewdb" %>
+<% end %>
+
+expect -c "
+set timeout -1;
+spawn su - vcap -c \"LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin/:$PATH java -jar $PACKAGE_DIR/$GERRIT_WAR init -d $DATA_DIR/review_site/$dbname\"
+while {1} {
+  expect {
+    \"Location*\"                 {send \"\r\"}
+    \"Database server type*\"     {send \"\r\"}
+    \"Server hostname*\"          {send \"\r\"}
+    \"Server port*\"              {send \"\r\"}
+    \"Database username\"         {send \"\r\"}
+    \"*password\"                 {send \"\r\"}
+    \"Database name*\"            {send \"\r\"}
+    \"Authentication*\"           {send \"\r\"}
+    \"SMTP*\"                     {send \"\r\"}
+    \"Run as*\"                   {send \"vcap\r\"}
+    \"Java runtime*\"             {send \"/var/vcap/packages/java/\r\"}
+    \"Copy gerrit.war*\"          {send \"\r\"}
+    \"Listen on address*\"        {send \"\r\"}
+    \"Listen on port*\"           {send \"\r\"}
+    \"Behind*\"                   {send \"\r\"}
+    \"Use SSL*\"                  {send \"\r\"}
+    \"Canonical URL*\"            {send \"\r\"}
+    \"Certificate*\"              {send \"\r\"}
+    \"Sub*\"                      {send \"\r\"}
+    \"Upgrade*\"                  {send \"\r\"}
+    \"Proxy*\"                    {send \"\r\"}
+    \"Execute*\"                  {send \"y\r\"}
+    eof                           break
+  }
+}"
