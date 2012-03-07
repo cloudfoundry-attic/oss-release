@@ -1,0 +1,4 @@
+---
+name: ovftool
+files:
+- misc/VMware-ovftool-2.0.1-260188-lin.x86_64.sh

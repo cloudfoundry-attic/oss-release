@@ -5,6 +5,8 @@ dependencies:
 files:
 - misc/tcl8-1.5.11rc1-src.tar
 - misc/expect5.45.tar
+- misc/review
+- misc/review.pub
 - gerrit/gerrit-2.1.7.war
 - gerrit/gerrit-2.2.2.1.war
 - gerrit/hooks.tgz

@@ -13,8 +13,6 @@ templates:
   nginx_ctl:      bin/nginx_ctl
   mime.types:     config/mime.types
   nginx.conf.erb: config/nginx.conf
-  review: config/review
-  review.pub: config/review.pub
 packages:
   - git
   - ruby
