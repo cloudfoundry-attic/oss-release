@@ -15,6 +15,7 @@ dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
 <% end %>
 
 CONFIG_DIR=$DATA_DIR/review_site/$dbname/etc/
+HOOKS_DIR=$DATA_DIR/review_site/$dbname/hooks/
 
 chown vcap:vcap $PACKAGE_DIR/*.war
 
@@ -52,11 +53,11 @@ cp -pf $JOB_DIR/config/secure.config $CONFIG_DIR/
 cp -pf $JOB_DIR/config/replication.config $CONFIG_DIR/
 
 # Gerrit Hooks setup
-rm -rf $CONFIG_DIR/../hooks
-cp -r $PACKAGE_DIR/hooks $CONFIG_DIR/../
-cp -pf $JOB_DIR/config/gerrit_hooks.yml $CONFIG_DIR/../hooks/patchset_notification/config/
-cp -pf $JOB_DIR/config/review* $CONFIG_DIR/../hooks/patchset_notification/config/
-chown -R vcap:vcap $CONFIG_DIR/../hooks/
+rm -rf $HOOKS_DIR
+cp -r $PACKAGE_DIR/hooks $HOOKS_DIR
+cp -pf $JOB_DIR/config/gerrit_hooks.yml $HOOKS_DIR/patchset_notification/config/
+cp -pf $JOB_DIR/config/review* $HOOKS_DIR/patchset_notification/config/
+chown -R vcap:vcap $HOOKS_DIR
 
 # Passwdless ssh key pair refresh/generation (for replication)
 if [ ! -f /home/vcap/.ssh/id_rsa.pub ]; then

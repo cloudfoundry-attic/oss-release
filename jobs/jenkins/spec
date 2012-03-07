@@ -1,0 +1,15 @@
+---
+name: jenkins
+templates:
+  jenkins_ctl: bin/jenkins_ctl
+  jenkins_init.ctl.erb: bin/jenkins_init.ctl
+  change_tmp: bin/change_tmp
+  ssh_expect.erb: bin/ssh_expect
+  config_head.xml: config/config_head.xml
+  config_tail.xml: config/config_tail.xml
+  config_slave.xml: config/config_slave.xml
+  nodeMonitors.xml: config/nodeMonitors.xml
+packages:
+  - java
+  - ruby
+  - jenkins

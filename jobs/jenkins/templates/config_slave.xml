@@ -1,0 +1,39 @@
+    <slave>
+      <name>SLAVE_CONFIG_NAME</name>
+      <description></description>
+      <remoteFS>/var/vcap/store/jenkins_slave/</remoteFS>
+      <numExecutors>2</numExecutors>
+      <mode>NORMAL</mode>
+      <retentionStrategy class="hudson.slaves.RetentionStrategy$Always"/>
+      <launcher class="hudson.plugins.sshslaves.SSHLauncher">
+        <host>SLAVE_CONFIG_IP</host>
+        <port>22</port>
+        <jvmOptions>-Xmx2048m</jvmOptions>
+        <javaPath>/var/vcap/packages/java/bin/java</javaPath>
+      </launcher>
+      <label></label>
+      <nodeProperties>
+        <hudson.slaves.EnvironmentVariablesNodeProperty>
+          <envVars serialization="custom">
+            <unserializable-parents/>
+            <tree-map>
+              <default>
+                <comparator class="hudson.util.CaseInsensitiveComparator"/>
+              </default>
+              <int>1</int>
+              <string>RUBY_19</string>
+              <string>/var/vcap/packages/ruby/bin/</string>
+            </tree-map>
+          </envVars>
+        </hudson.slaves.EnvironmentVariablesNodeProperty>
+        <hudson.tools.ToolLocationNodeProperty>
+          <locations>
+            <hudson.tools.ToolLocationNodeProperty_-ToolLocation>
+              <type>hudson.plugins.git.GitTool$DescriptorImpl</type>
+              <name>Default</name>
+              <home>/var/vcap/packages/git/bin/git</home>
+            </hudson.tools.ToolLocationNodeProperty_-ToolLocation>
+          </locations>
+        </hudson.tools.ToolLocationNodeProperty>
+      </nodeProperties>
+    </slave>

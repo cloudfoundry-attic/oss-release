@@ -1,0 +1,39 @@
+#!/bin/bash
+
+RUN_DIR=/var/vcap/sys/run/jenkins_slave
+LOG_DIR=/var/vcap/sys/log/jenkins_slave
+PIDFILE=$RUN_DIR/jenkins_slave.pid
+FS_ROOT=/var/vcap/store/jenkins_slave
+JOB_DIR=/var/vcap/jobs/jenkins_slave
+SSH_DIR=/home/vcap/.ssh/
+
+case $1 in
+
+  start)
+    mkdir -p $RUN_DIR $LOG_DIR $FS_ROOT $SSH_DIR
+    chown -R vcap:vcap $RUN_DIR $LOG_DIR $FS_ROOT $SSH_DIR
+
+    echo $$ > $PIDFILE
+    $JOB_DIR/bin/change_tmp
+
+    #Install fix this
+    $JOB_DIR/bin/package_install.ctl
+
+    #Renew vcap passwd
+    pass=`perl -e 'print crypt("<%= properties.jenkins_slave.password %>", "ab")'`
+    usermod -p $pass vcap
+
+    #No monit needed, pass back to init
+    echo 1 > $PIDFILE
+    ;;
+
+  stop)
+    rm -f $PIDFILE
+    ;;
+
+  *)
+  echo "Usage: jenkins_slave_ctl {start|stop}" ;;
+
+esac
+exit 0
+

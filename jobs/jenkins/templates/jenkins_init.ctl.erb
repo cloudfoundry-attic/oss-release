@@ -1,0 +1,29 @@
+#!/bin/bash
+JOB_DIR=/var/vcap/jobs/jenkins
+DATA_DIR=/var/vcap/store/jenkins
+
+# Grab all the slaves to the master config file
+cat $JOB_DIR/config/config_head.xml > $JOB_DIR/config/config.xml
+
+slave_id=1
+for ip_addr in <%= properties.jenkins_slave.slaves_ip.join(' ') %>
+do
+  cat $JOB_DIR/config/config_slave.xml|sed -e "s/SLAVE_CONFIG_NAME/jenk${slave_id}/g" -e "s/SLAVE_CONFIG_IP/${ip_addr}/g" >> $JOB_DIR/config/config.xml
+  slave_id=`expr $slave_id + 1`
+done
+
+cat $JOB_DIR/config/config_tail.xml >> $JOB_DIR/config/config.xml
+
+# Harden Secure Configurations
+chown -R vcap:vcap $JOB_DIR/config/
+chmod -R 600 $JOB_DIR/config/
+
+# Slaves configuration replacement
+cp -pf $JOB_DIR/config/config.xml $DATA_DIR/
+cp -pf $JOB_DIR/config/nodeMonitors.xml $DATA_DIR/
+
+# Passwdless ssh key pair refresh/generation (for slaves)
+if [ ! -f /home/vcap/.ssh/id_rsa.pub ]; then
+  rm -rf /home/vcap/.ssh/*
+  $JOB_DIR/bin/ssh_expect
+fi
