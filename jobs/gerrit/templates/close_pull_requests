@@ -1,0 +1,4 @@
+#!/bin/bash
+export PATH=/var/vcap/packages/ruby/bin:$PATH
+cd /var/vcap/packages/pr_bounce
+bundle exec ruby pr-bounce.rb -v /var/vcap/jobs/gerrit/config/pr_bounce.yml >> /var/vcap/sys/log/gerrit/pr_bounce.log 2>&1
