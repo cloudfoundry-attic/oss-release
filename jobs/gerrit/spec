@@ -15,6 +15,9 @@ templates:
   nginx.conf.erb: config/nginx.conf
   cla_config.yml.erb: config/cla_config.yml
   clas/sample_cla.html: config/clas/sample_cla.html
+  pr_bounce.yml.erb: config/pr_bounce.yml
+  pr_bounce/closing.html: config/pr_bounce/closing.html
+  close_pull_requests: bin/close_pull_requests
 packages:
   - git
   - ruby
@@ -23,3 +26,4 @@ packages:
   - gerrit
   - mysqlclient
   - gerrit_cla_updater
+  - pr_bounce
