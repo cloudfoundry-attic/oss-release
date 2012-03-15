@@ -1,0 +1,9 @@
+---
+<% if properties.gerrit.pr_bounce %>
+organization: <%= properties.gerrit.pr_bounce.organization %>
+username: <%= properties.gerrit.pr_bounce.username %>
+password: <%= properties.gerrit.pr_bounce.password %>
+templates:
+  closing: /var/vcap/jobs/gerrit/config/pr_bounce/closing.html
+min_pr_num: {}
+<% end %>

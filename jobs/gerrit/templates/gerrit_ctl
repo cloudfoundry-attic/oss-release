@@ -6,6 +6,7 @@ JOB_DIR=/var/vcap/jobs/gerrit
 DATA_DIR=/var/vcap/store/gerrit
 RUN_DIR=/var/vcap/sys/run/gerrit
 PIDFILE=$RUN_DIR/gerrit.pid
+LOG_DIR=/var/vcap/sys/log/gerrit
 
 <% if properties.gerrit_postgres %>
 dbname=<%= properties.gerrit_postgres.dbname||"reviewdb"%>
@@ -15,7 +16,9 @@ dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
 
 case "$1" in
   start)
+    mkdir -p $LOG_DIR
     mkdir -p $RUN_DIR
+
     echo $$ > $PIDFILE # Satisfy Monit for init gerrit
     $JOB_DIR/bin/gerrit_init.ctl
     if [ $? != 0 ]; then

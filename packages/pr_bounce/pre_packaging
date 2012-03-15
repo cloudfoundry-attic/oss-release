@@ -1,0 +1,9 @@
+set -o errexit
+set -o nounset
+
+ls
+
+mkdir -p ./pr_bounce/vendor/cache
+ruby common/fetch_gems ./pr_bounce/Gemfile ./pr_bounce/Gemfile.lock ./pr_bounce/vendor/cache
+
+rm -rf common

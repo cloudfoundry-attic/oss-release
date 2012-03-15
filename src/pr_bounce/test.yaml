@@ -1,0 +1,9 @@
+# Copyright (C) 2012 VMware, Inc. All rights reserved.
+---
+organization: 'cftesting'
+username: 'cloudfoundrybot'
+password: 'optional_and_overridden_by_environment_variable_PR_BOUNCE_PASSWORD_if_it_exists'
+templates:
+  closing: 'templates/closing.html'
+min_pr_num:
+  test: 0
