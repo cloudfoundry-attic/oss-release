@@ -22,6 +22,10 @@
 
 [auth]
   type = <%= properties.gerrit.auth_type||"OPENID" %>
+<% if (properties.gerrit.version =~ /^2\.2\./) && !properties.gerrit.clas.nil?  %>
+  contributorAgreements = true
+<% end %>
+
 [sendemail]
   smtpServer = <%= properties.gerrit.smtp_server %>
 <% if properties.gerrit.smtp_port %>
