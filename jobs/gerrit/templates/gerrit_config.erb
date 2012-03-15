@@ -22,6 +22,9 @@
 
 [auth]
   type = <%= properties.gerrit.auth_type||"OPENID" %>
+<% if (properties.gerrit.version =~ /^2\.2\./) %>
+  allowGoogleAccountUpgrade = true
+<% end %>
 <% if (properties.gerrit.version =~ /^2\.2\./) && !properties.gerrit.clas.nil?  %>
   contributorAgreements = true
 <% end %>
