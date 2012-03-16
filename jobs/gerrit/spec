@@ -18,6 +18,7 @@ templates:
   pr_bounce.yml.erb: config/pr_bounce.yml
   pr_bounce/closing.html: config/pr_bounce/closing.html
   close_pull_requests: bin/close_pull_requests
+  ssh_config: config/ssh_config
 packages:
   - git
   - ruby
