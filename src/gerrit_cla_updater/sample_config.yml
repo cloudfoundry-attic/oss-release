@@ -1,0 +1,10 @@
+---
+host: localhost
+port: 3306
+user: test
+password: test
+dbname: test
+clas:
+- shortname: example         # User visible
+  description: A sample CLA  # User visible
+  basename: example_cla.html # Should live at $site_root/static/<basename>

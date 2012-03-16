@@ -1,0 +1,7 @@
+---
+name: gerrit_cla_updater
+dependencies:
+- ruby
+- mysqlclient
+files:
+- gerrit_cla_updater/**/*

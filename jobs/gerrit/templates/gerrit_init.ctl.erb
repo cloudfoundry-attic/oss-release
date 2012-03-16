@@ -1,5 +1,6 @@
 #!/bin/bash
-PACKAGE_DIR=/var/vcap/packages/gerrit
+PACKAGE_ROOT_DIR=/var/vcap/packages
+PACKAGE_DIR=$PACKAGE_ROOT_DIR/gerrit
 GIT_DIR=/var/vcap/packages/git
 JAVA_DIR=/var/vcap/packages/java
 JOB_DIR=/var/vcap/jobs/gerrit
@@ -16,6 +17,7 @@ dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
 
 CONFIG_DIR=$DATA_DIR/review_site/$dbname/etc/
 HOOKS_DIR=$DATA_DIR/review_site/$dbname/hooks/
+STATIC_DIR=$DATA_DIR/review_site/$dbname/static
 
 chown vcap:vcap $PACKAGE_DIR/*.war
 
@@ -64,6 +66,23 @@ chown -R vcap:vcap $HOOKS_DIR
 chown vcap:vcap $PACKAGE_DIR/review*
 chmod 600 $PACKAGE_DIR/review*
 cp -pf $PACKAGE_DIR/review* $HOOKS_DIR/patchset_notification/config/
+
+rm -rf $STATIC_DIR/*
+
+# Copy any CLA files
+cp $JOB_DIR/config/clas/* $STATIC_DIR
+chown -R vcap:vcap $STATIC_DIR
+
+# Update the DB with the CLA agreements
+<% if (properties.gerrit.version =~ /^2\.2\./) %>
+(
+  set -o errexit
+  set -o nounset
+  export PATH=$PACKAGE_ROOT_DIR/ruby/bin:$PATH
+  cd $PACKAGE_ROOT_DIR/gerrit_cla_updater
+  bundle exec ruby gerrit_cla_updater.rb $JOB_DIR/config/cla_config.yml
+)
+<% end %>
 
 # Passwdless ssh key pair refresh/generation (for replication)
 if [ ! -f /home/vcap/.ssh/id_rsa.pub ]; then
