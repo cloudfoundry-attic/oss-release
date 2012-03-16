@@ -1,0 +1,9 @@
+---
+name: jenkins
+files:
+- jenkins/jenkins.war
+- jenkins/plugins.tgz
+- misc/tcl8-1.5.11rc1-src.tar
+- misc/expect5.45.tar
+- misc/review
+- misc/review.pub

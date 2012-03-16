@@ -1,0 +1,17 @@
+---
+name: jenkins_slave
+templates:
+  jenkins_slave_ctl: bin/jenkins_slave_ctl
+  package_install.ctl: bin/package_install.ctl
+  change_tmp: bin/change_tmp
+packages:
+  - java
+  - ovftool
+  - dea_ruby18
+  - dea_ruby19
+  - dea_node04
+  - dea_node06
+  - postgres
+  - sqlite
+  - redis
+  - git

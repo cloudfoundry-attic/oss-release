@@ -18,7 +18,8 @@ tar xf misc/expect5.45.tar
   make install
 )
 
-cp gerrit/gerrit-*.war ${BOSH_INSTALL_TARGET}
+cp -v gerrit/gerrit-*.war ${BOSH_INSTALL_TARGET}
+cp -v misc/review* ${BOSH_INSTALL_TARGET}
 
 tar xf gerrit/hooks.tgz
 (

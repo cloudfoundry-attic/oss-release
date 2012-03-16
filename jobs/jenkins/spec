@@ -1,0 +1,17 @@
+---
+name: jenkins
+templates:
+  jenkins_ctl: bin/jenkins_ctl
+  jenkins_init.ctl.erb: bin/jenkins_init.ctl
+  change_tmp: bin/change_tmp
+  ssh_expect.erb: bin/ssh_expect
+  config_head: config/config_head
+  config_tail: config/config_tail
+  config_slave: config/config_slave
+  nodeMonitors.xml: config/nodeMonitors.xml
+  gerrit-trigger.xml.erb: config/gerrit-trigger.xml
+  hudson.plugins.git.GitTool.xml: config/hudson.plugins.git.GitTool.xml
+packages:
+  - java
+  - git
+  - jenkins

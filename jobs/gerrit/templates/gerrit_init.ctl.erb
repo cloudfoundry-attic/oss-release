@@ -17,12 +17,15 @@ dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
 
 CONFIG_DIR=$DATA_DIR/review_site/$dbname/etc/
 STATIC_DIR=$DATA_DIR/review_site/$dbname/static
+HOOKS_DIR=$DATA_DIR/review_site/$dbname/hooks/
 
 chown vcap:vcap $PACKAGE_DIR/*.war
 
 if [ ! -d $CONFIG_DIR ]; then
-  mkdir -p $DATA_DIR/review_site/$dbname
-  chown vcap:vcap $DATA_DIR/review_site/$dbname
+  # Tmp directory link to persistent disks
+  mkdir -p $DATA_DIR/review_site/$dbname/.gerritcodereview/
+  ln -s $DATA_DIR/review_site/$dbname/.gerritcodereview /home/vcap/.gerritcodereview
+  chown -R vcap:vcap $DATA_DIR/review_site/$dbname
 
   # Use expect for DB initilization.
   $JOB_DIR/bin/gerrit_expect $VERSION
@@ -54,11 +57,15 @@ cp -pf $JOB_DIR/config/secure.config $CONFIG_DIR/
 cp -pf $JOB_DIR/config/replication.config $CONFIG_DIR/
 
 # Gerrit Hooks setup
-rm -rf $CONFIG_DIR/../hooks
-cp -r $PACKAGE_DIR/hooks $CONFIG_DIR/../
-cp -pf $JOB_DIR/config/gerrit_hooks.yml $CONFIG_DIR/../hooks/patchset_notification/config/
-cp -pf $JOB_DIR/config/review* $CONFIG_DIR/../hooks/patchset_notification/config/
-chown -R vcap:vcap $CONFIG_DIR/../hooks/
+rm -rf $HOOKS_DIR
+cp -r $PACKAGE_DIR/hooks $HOOKS_DIR
+cp -pf $JOB_DIR/config/gerrit_hooks.yml $HOOKS_DIR/patchset_notification/config/
+chown -R vcap:vcap $HOOKS_DIR
+
+# SSH keyfile for reviewbot(which setup reviewers automatically)
+chown vcap:vcap $PACKAGE_DIR/review*
+chmod 600 $PACKAGE_DIR/review*
+cp -pf $PACKAGE_DIR/review* $HOOKS_DIR/patchset_notification/config/
 
 rm -rf $STATIC_DIR/*
 

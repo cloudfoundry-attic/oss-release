@@ -13,8 +13,6 @@ templates:
   nginx_ctl:      bin/nginx_ctl
   mime.types:     config/mime.types
   nginx.conf.erb: config/nginx.conf
-  review: config/review
-  review.pub: config/review.pub
   cla_config.yml.erb: config/cla_config.yml
   clas/sample_cla.html: config/clas/sample_cla.html
 packages:
