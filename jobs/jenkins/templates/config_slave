@@ -20,9 +20,25 @@
               <default>
                 <comparator class="hudson.util.CaseInsensitiveComparator"/>
               </default>
-              <int>1</int>
-              <string>RUBY_19</string>
-              <string>/var/vcap/packages/ruby/bin/</string>
+              <int>9</int>
+              <string>CREATE_CONTAINER</string>
+              <string>/var/vcap/jobs/jenkins_slave/bin/create_container</string>
+              <string>DEA_RUBY19</string>
+              <string>/var/vcap/packages/dea_ruby19</string>
+              <string>DEA_RUBY18</string>
+              <string>/var/vcap/packages/dea_ruby18</string>
+              <string>DEA_NODE04</string>
+              <string>/var/vcap/packages/dea_node04</string>
+              <string>DEA_NODE06</string>
+              <string>/var/vcap/packages/dea_node06</string>
+              <string>DEA_JAVA</string>
+              <string>/var/vcap/packages/java</string>
+              <string>SQLITE</string>
+              <string>/var/vcap/packages/sqlite</string>
+              <string>VCAP_RUBY19</string>
+              <string>/var/vcap/packages/ruby</string>
+              <string>WARDEN_REPL</string>
+              <string>/var/vcap/packages/warden/warden/bin/warden-repl</string>
             </tree-map>
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>
