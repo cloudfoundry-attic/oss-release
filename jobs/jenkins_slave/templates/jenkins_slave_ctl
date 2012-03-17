@@ -5,6 +5,7 @@ LOG_DIR=/var/vcap/sys/log/jenkins_slave
 PIDFILE=$RUN_DIR/jenkins_slave.pid
 FS_ROOT=/var/vcap/store/jenkins_slave
 JOB_DIR=/var/vcap/jobs/jenkins_slave
+CONFIG_DIR=/var/vcap/jobs/jenkins_slave/config
 SSH_DIR=/home/vcap/.ssh/
 
 case $1 in
@@ -22,6 +23,13 @@ case $1 in
     #Renew vcap passwd
     pass=`openssl passwd -1 <%= properties.jenkins_slave.password %>`
     usermod -p $pass vcap
+
+    mkdir -p /home/vcap/.ssh
+    chmod 0700 /home/vcap/.ssh
+
+    cp $CONFIG_DIR/{id_rsa,id_rsa.pub} /home/vcap/.ssh
+    chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub}
+    chown -R vcap:vcap /home/vcap/.ssh
 
     #No monit needed, pass back to init
     echo 1 > $PIDFILE

@@ -4,6 +4,11 @@ templates:
   jenkins_slave_ctl: bin/jenkins_slave_ctl
   package_install.ctl: bin/package_install.ctl
   change_tmp: bin/change_tmp
+  warden.yml: config/warden.yml
+  warden_ctl: bin/warden_ctl
+  create_container: bin/create_container
+  id_rsa.erb: config/id_rsa
+  id_rsa.pub.erb: config/id_rsa.pub
 packages:
   - java
   - ovftool
@@ -15,3 +20,5 @@ packages:
   - sqlite
   - redis
   - git
+  - warden
+  - ruby

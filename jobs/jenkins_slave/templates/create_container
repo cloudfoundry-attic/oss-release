@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+create_args = []
+ARGV.each do |path|
+  resolved_path = File.realpath(path)
+  create_args << "bind_mount:#{resolved_path},#{resolved_path},ro"
+end
+create_args = create_args.join(" ")
+
+warden_repl_path =
+  ENV['WARDEN_REPL_PATH'] || '/var/vcap/packages/warden/warden/bin/warden-repl'
+
+output = `#{warden_repl_path} -c 'create #{create_args}'`
+
+if $?.exitstatus == 0
+  puts output.gsub(/\"/,"")
+else
+  puts output
+end
+exit $?.exitstatus
