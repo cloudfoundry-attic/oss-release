@@ -1,0 +1,9 @@
+set -o errexit
+set -o nounset
+
+ls
+
+mkdir -p ./create_batch_gerrit_account/vendor/cache
+ruby common/fetch_gems ./create_batch_gerrit_account/Gemfile ./create_batch_gerrit_account/Gemfile.lock ./create_batch_gerrit_account/vendor/cache
+
+rm -rf common

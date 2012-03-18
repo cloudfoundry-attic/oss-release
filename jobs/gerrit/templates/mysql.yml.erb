@@ -1,0 +1,6 @@
+---
+host: <%= properties.gerrit_mysql.address %>
+port: <%= properties.gerrit_mysql.port || 3306 %>
+user: <%= properties.gerrit_mysql.user %>
+password: <%= properties.gerrit_mysql.password %>
+dbname: <%= properties.gerrit_mysql.dbname || 'reviewdb' %>

@@ -104,3 +104,13 @@ rm -f /etc/cron.hourly/close_pull_requests
 cp /var/vcap/jobs/gerrit/bin/close_pull_requests /etc/cron.hourly
 chmod +x /etc/cron.hourly/close_pull_requests
 <% end %>
+
+# Update the CI batch account
+(
+  set -o errexit
+  set -o nounset
+  export PATH=$PACKAGE_ROOT_DIR/ruby/bin:$PATH
+  cd $PACKAGE_ROOT_DIR/create_batch_gerrit_account
+  bundle exec ruby create_batch_gerrit_account.rb $JOB_DIR/config/mysql.yml $JOB_DIR/config/jenkins_user.yml
+)
+
