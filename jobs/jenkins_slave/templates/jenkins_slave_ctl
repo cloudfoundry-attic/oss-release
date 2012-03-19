@@ -31,6 +31,16 @@ case $1 in
     chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub}
     chown -R vcap:vcap /home/vcap/.ssh
 
+    # Refresh host key for gerrit
+    <% if properties.gerrit.dev_ip %>
+    su - vcap -c 'ssh-keygen -f /home/vcap/.ssh/known_hosts -R <%= properties.gerrit.dev_ip %>'
+    su - vcap -c 'ssh-keyscan -p 29418 <%= properties.gerrit.dev_ip %> >> /home/vcap/.ssh/known_hosts'
+    <% end %>
+
+    # Refresh host key for github
+    su - vcap -c 'ssh-keygen -f /home/vcap/.ssh/known_hosts  -R github.com'
+    su - vcap -c 'ssh-keyscan github.com >> /home/vcap/.ssh/known_hosts'
+
     #No monit needed, pass back to init
     echo 1 > $PIDFILE
     ;;
