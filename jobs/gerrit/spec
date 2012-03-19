@@ -21,6 +21,7 @@ templates:
   ssh_config: config/ssh_config
   jenkins_user.yml.erb: config/jenkins_user.yml
   mysql.yml.erb: config/mysql.yml
+  gerrit_trigger.yml.erb: config/gerrit_trigger.yml
 packages:
   - git
   - ruby

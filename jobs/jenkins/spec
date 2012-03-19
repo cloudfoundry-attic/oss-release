@@ -11,6 +11,7 @@ templates:
   nodeMonitors.xml: config/nodeMonitors.xml
   gerrit-trigger.xml.erb: config/gerrit-trigger.xml
   hudson.plugins.git.GitTool.xml: config/hudson.plugins.git.GitTool.xml
+  gerrit_trigger_key.erb: config/gerrit_trigger_key
 packages:
   - java
   - git
