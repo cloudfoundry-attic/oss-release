@@ -22,6 +22,8 @@ templates:
   jenkins_user.yml.erb: config/jenkins_user.yml
   mysql.yml.erb: config/mysql.yml
   gerrit_trigger.yml.erb: config/gerrit_trigger.yml
+  logo.png: config/logo.png
+  site_header.html.erb: config/site_header.html
 packages:
   - git
   - ruby

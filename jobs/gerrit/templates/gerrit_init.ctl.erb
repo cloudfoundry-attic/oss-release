@@ -122,3 +122,12 @@ chmod +x /etc/cron.hourly/close_pull_requests
   cd $PACKAGE_ROOT_DIR/create_batch_gerrit_account
   bundle exec ruby create_batch_gerrit_account.rb $JOB_DIR/config/mysql.yml $JOB_DIR/config/gerrit_trigger.yml
 )
+
+# Configure site header
+cp $JOB_DIR/config/site_header.html $CONFIG_DIR/GerritSiteHeader.html
+chown vcap:vcap $CONFIG_DIR/GerritSiteHeader.html
+
+# Be sure to increment logo_version if the logo changes. It will invalidate
+# browser caches, forcing the new logo to be fetched.
+cp $JOB_DIR/config/logo.png $STATIC_DIR/logo.<%= properties.gerrit.logo_version %>.cache.png
+chown vcap:vcap $STATIC_DIR/logo.<%= properties.gerrit.logo_version %>.cache.png
