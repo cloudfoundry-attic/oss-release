@@ -96,7 +96,8 @@ chown vcap:vcap /home/vcap/.ssh/config
 chmod 0644 /home/vcap/.ssh/config
 
 # Refresh host key for github
-su - vcap -c "ssh-keygen -R github.com && ssh github.com"
+su - vcap -c 'ssh-keygen -f /home/vcap/.ssh/known_hosts -R github.com'
+su - vcap -c 'ssh-keyscan github.com >> /home/vcap/.ssh/known_hosts'
 
 # Auto close pull requests
 rm -f /etc/cron.hourly/close_pull_requests
