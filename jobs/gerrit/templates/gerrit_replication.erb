@@ -1,5 +1,5 @@
 [remote "backup"]
-  url = vcap@<%= properties.gerrit_replication.address %>:/var/vcap/shared/gerrit_replication/${name}.git
+  url = vcap@<%= properties.gerrit_replication.address %>:/var/vcap/store/gerrit_replication/${name}.git
 <% if properties.gerrit.github_replication %>
 [remote "github"]
   url = <%= properties.gerrit.github_replication %>/${name}.git

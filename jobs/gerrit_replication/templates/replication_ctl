@@ -14,19 +14,9 @@ case $1 in
     #The replication invoked by gerrit instance seems don't lookup env for git, copy it to /usr/bin fix it. need harden?
     cp -rf $GIT_DIR/bin/* /usr/bin/
 
-    if grep -qs /var/vcap/shared /proc/mounts; then
-      echo "Found NFS mount"
-    else
-      echo "Mounting NFS..."
-      mount -t nfs  <%= properties.nfs_server.address %>:/var/vcap/store/shared /var/vcap/shared
-
-      if [ $? != 0 ]; then
-        echo "ERROR: Unable to Mount NFS from <%= properties.nfs_server.address %>:/var/vcap/shared"
-        exit 1
-      fi
-    fi
-
-    su - vcap -c "mkdir -p /var/vcap/shared/gerrit_replication/"
+    #replication directory
+    mkdir -p /var/vcap/store/gerrit_replication/
+    chown vcap:vcap /var/vcap/store/gerrit_replication/
 
     #vcap ssh key repo
     mkdir -p /home/vcap/.ssh/
