@@ -84,8 +84,8 @@ http {
 <% end %>
 
   server {
-    listen       80;
-    server_name  "default" default_server;
+    listen       80 default_server;
+    server_name  "default";
 
     server_name_in_redirect off;
 
