@@ -77,8 +77,8 @@ chown -R vcap:vcap $STATIC_DIR
 <% if (properties.gerrit.version =~ /^2\.2\./) %>
 (
   set -o errexit
-  set -o nounset
   export PATH=$PACKAGE_ROOT_DIR/ruby/bin:$PATH
+  export LD_LIBRARY_PATH=/var/vcap/packages/mysqlclient/lib/mysql:$LD_LIBRARY_PATH
   cd $PACKAGE_ROOT_DIR/gerrit_cla_updater
   bundle exec ruby gerrit_cla_updater.rb $JOB_DIR/config/cla_config.yml
 )
@@ -109,8 +109,8 @@ chmod +x /etc/cron.hourly/close_pull_requests
 # Update the CI batch account
 (
   set -o errexit
-  set -o nounset
   export PATH=$PACKAGE_ROOT_DIR/ruby/bin:$PATH
+  export LD_LIBRARY_PATH=/var/vcap/packages/mysqlclient/lib/mysql:$LD_LIBRARY_PATH
   cd $PACKAGE_ROOT_DIR/create_batch_gerrit_account
   bundle exec ruby create_batch_gerrit_account.rb $JOB_DIR/config/mysql.yml $JOB_DIR/config/jenkins_user.yml
 )
@@ -118,8 +118,8 @@ chmod +x /etc/cron.hourly/close_pull_requests
 # Update the gerrit-trigger batch account
 (
   set -o errexit
-  set -o nounset
   export PATH=$PACKAGE_ROOT_DIR/ruby/bin:$PATH
+  export LD_LIBRARY_PATH=/var/vcap/packages/mysqlclient/lib/mysql:$LD_LIBRARY_PATH
   cd $PACKAGE_ROOT_DIR/create_batch_gerrit_account
   bundle exec ruby create_batch_gerrit_account.rb $JOB_DIR/config/mysql.yml $JOB_DIR/config/gerrit_trigger.yml
 )
