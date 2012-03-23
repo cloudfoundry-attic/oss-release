@@ -38,7 +38,7 @@
 [sshd]
   listenAddress = *:<%= properties.gerrit.ssh_port || 29418 %>
 [httpd]
-  listenUrl = proxy-http://127.0.0.1:<%= properties.gerrit.http_port || 8080 %>/
+  listenUrl = proxy-http://<%= properties.gerrit.address %>:<%= properties.gerrit.http_port || 8080 %>/
 [cache]
   directory = cache
 [cache "web_sessions"]
