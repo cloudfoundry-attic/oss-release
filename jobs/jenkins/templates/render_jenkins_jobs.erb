@@ -1,0 +1,19 @@
+#!/bin/bash
+set -o errexit
+set -o nounset
+
+export PATH=/var/vcap/packages/ruby/bin:$PATH
+export CF_CI_USER=<%= properties.jenkins_slave.gerrit_user.username %>
+export CF_GERRIT_ADDRESS=<%= properties.gerrit.address %>
+export CF_GERRIT_PORT=<%= properties.gerrit.port || 29418 %>
+
+cd /var/vcap/packages/jenkins_jobs
+for template_path in `find . -name config.xml.erb`
+do
+  echo Rendering ${template_path}
+  config_path=`echo -n /var/vcap/store/jenkins/jobs/${template_path} | sed -e "s/\.erb$//"`
+  config_dir=`dirname ${config_path}`
+  mkdir -p ${config_dir}
+  erb ${template_path} > ${config_path}
+  chown -R vcap:vcap ${config_dir}
+done

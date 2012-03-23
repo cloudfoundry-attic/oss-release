@@ -1,0 +1,4 @@
+---
+name: jenkins_jobs
+files:
+- jenkins_jobs/**/*

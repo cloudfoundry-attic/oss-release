@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <displayName>Rabbit Unit Test</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+      <maxConcurrentPerNode>0</maxConcurrentPerNode>
+      <maxConcurrentTotal>0</maxConcurrentTotal>
+      <throttleEnabled>false</throttleEnabled>
+      <throttleOption>project</throttleOption>
+    </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name></name>
+        <refspec>$GERRIT_REFSPEC</refspec>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap-services.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/services-r10</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <disableSubmodules>false</disableSubmodules>
+    <recursiveSubmodules>false</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
+    <clean>false</clean>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <remotePoll>false</remotePoll>
+    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
+      <separator>#</separator>
+    </buildChooser>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir></relativeTargetDir>
+    <reference></reference>
+    <excludedRegions></excludedRegions>
+    <excludedUsers></excludedUsers>
+    <gitConfigName></gitConfigName>
+    <gitConfigEmail></gitConfigEmail>
+    <skipTag>false</skipTag>
+    <scmName></scmName>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>cd rabbit
+
+# hack into the nats info
+ip=`ifconfig  | grep &apos;inet addr:&apos;| grep -v &apos;127.0.0.1&apos; | cut -d: -f2 | awk &apos;{ print $1}&apos;`
+orig_nats_info=&quot;localhost:4222&quot;
+nats_info=&quot;nats:nats@&quot;$ip&quot;:4222&quot;
+sed -i &quot;s/$orig_nats_info/$nats_info/g&quot; config/rabbit_node.yml
+sed -i &quot;s/$orig_nats_info/$nats_info/g&quot; config/rabbit_gateway.yml
+
+# hack into the nats info
+orig_rabbit=&quot;rabbitmq_server: \/home\/tangrui\/rabbitmq_server-2.4.1\/sbin\/rabbitmq-server&quot;
+rabbit_dir=&quot;rabbitmq_server: \/home\/ci-auth\/cloudfoundry\/.deployments\/devbox\/deploy\/rabbitmq\/sbin\/rabbitmq-server&quot;
+sed -i &quot;s/$orig_rabbit/$rabbit_dir/g&quot; config/rabbit_node.yml
+
+# change the rabbit timeout
+orig_timeout=&quot;# rabbitmq_start_timeout: 5&quot;
+new_timeout=&quot;rabbitmq_start_timeout: 9&quot;
+sed -i &quot;s/$orig_timeout/$new_timeout/g&quot; config/rabbit_node.yml
+
+export PATH=/home/ci-auth/cloudfoundry/.deployments/devbox/deploy/rubies/ruby-1.9.2-p180/bin:`/home/ci-auth/cloudfoundry/.deployments/devbox/deploy/rubies/ruby-1.9.2-p180/bin/gem env gempath`/bin:$PATH
+
+rm -rf spec_reports
+
+bundle install --deployment --without development production
+bundle exec rake spec:ci</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>rabbit/spec_reports/**</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>rabbit/spec_reports/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
+    <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
+      <reportDir>rabbit/spec_coverage/rcov</reportDir>
+      <targets>
+        <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+          <metric>TOTAL_COVERAGE</metric>
+          <healthy>80</healthy>
+          <unhealthy>0</unhealthy>
+          <unstable>0</unstable>
+        </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+        <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+          <metric>CODE_COVERAGE</metric>
+          <healthy>80</healthy>
+          <unhealthy>0</unhealthy>
+          <unstable>0</unstable>
+        </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+      </targets>
+    </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>

@@ -41,3 +41,6 @@ fi
 cp /var/vcap/jobs/jenkins/config/gerrit_trigger_key $DATA_DIR
 chown vcap:vcap $DATA_DIR/gerrit_trigger_key
 chmod 0600 $DATA_DIR/gerrit_trigger_key
+
+# Update the job configs
+$JOB_DIR/bin/render_jenkins_jobs

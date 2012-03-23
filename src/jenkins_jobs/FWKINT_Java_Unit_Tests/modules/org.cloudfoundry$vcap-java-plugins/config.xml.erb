@@ -1,0 +1,37 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<maven2-module-set>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <reporters/>
+  <displayName>vcap-java-plugins</displayName>
+  <version>1.0.0-BUILD-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <relativePath>plugins</relativePath>
+  <dependencies>
+    <dependency>
+      <groupId>org.cloudfoundry</groupId>
+      <artifactId>vcap-java</artifactId>
+      <version>1.0.0-BUILD-SNAPSHOT</version>
+      <plugin>false</plugin>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-deploy-plugin</artifactId>
+      <version>-</version>
+      <plugin>true</plugin>
+    </dependency>
+  </dependencies>
+  <children>
+    <hudson.maven.ModuleName>
+      <groupId>com.vmware.appcloud</groupId>
+      <artifactId>TomcatStartupListener</artifactId>
+    </hudson.maven.ModuleName>
+  </children>
+</maven2-module-set>

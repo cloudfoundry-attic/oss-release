@@ -12,7 +12,10 @@ templates:
   gerrit-trigger.xml.erb: config/gerrit-trigger.xml
   hudson.plugins.git.GitTool.xml: config/hudson.plugins.git.GitTool.xml
   gerrit_trigger_key.erb: config/gerrit_trigger_key
+  render_jenkins_jobs.erb: bin/render_jenkins_jobs
 packages:
   - java
   - git
   - jenkins
+  - jenkins_jobs
+  - ruby

@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Staging Unit and Functional tests</description>
+  <displayName>Staging Unit and Functional Tests</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+      <maxConcurrentPerNode>0</maxConcurrentPerNode>
+      <maxConcurrentTotal>0</maxConcurrentTotal>
+      <throttleEnabled>false</throttleEnabled>
+      <throttleOption>project</throttleOption>
+    </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name></name>
+        <refspec>$GERRIT_REFSPEC</refspec>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <disableSubmodules>false</disableSubmodules>
+    <recursiveSubmodules>true</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
+    <clean>false</clean>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <remotePoll>false</remotePoll>
+    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
+      <separator>#</separator>
+    </buildChooser>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir></relativeTargetDir>
+    <reference></reference>
+    <excludedRegions></excludedRegions>
+    <excludedUsers></excludedUsers>
+    <gitConfigName></gitConfigName>
+    <gitConfigEmail></gitConfigEmail>
+    <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
+    <scmName></scmName>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
+
+STAGING_DIR=$PWD/staging
+JAVA_DIR=$PWD/java
+SPEC_DIR=$STAGING_DIR/spec/reports
+
+rm -rvf $SPEC_DIR
+
+# Paths needed in the container
+DEA_RUBY18_REALPATH=`readlink -nf $DEA_RUBY18`
+DEA_RUBY18_BD=$DEA_RUBY18_REALPATH/bin
+DEA_RUBY19_REALPATH=`readlink -nf $DEA_RUBY19`
+DEA_RUBY19_BD=$DEA_RUBY19_REALPATH/bin
+DEA_RUBY19_VER=`$DEA_RUBY19_BD/ruby --version | awk &apos;{ print $2 }&apos;`
+
+TEST_RUNNER=`mktemp`
+
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -o errexit
+set -o nounset
+export VCAP_RUNTIME_RUBY18=$DEA_RUBY18_BD/ruby
+export VCAP_RUNTIME_RUBY19=$DEA_RUBY19_BD/ruby
+export VCAP_RUNTIME_RUBY19_VER=$DEA_RUBY19_VER
+export PATH=$DEA_RUBY19_BD:$PATH
+cd /tmp/staging
+bundle install --deployment --without development production
+bundle exec rake ci:spec
+EOT
+
+chmod +x $TEST_RUNNER
+
+HANDLE=`$CREATE_CONTAINER $DEA_RUBY19_REALPATH $DEA_RUBY18_REALPATH`
+$WARDEN_REPL -c &quot;
+copy $HANDLE in $STAGING_DIR /tmp
+copy $HANDLE in $JAVA_DIR /tmp
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+copy $HANDLE out /tmp/staging/spec/reports $STAGING_DIR/spec vcap:vcap
+destroy $HANDLE
+&quot;
+rm -f $TEST_RUNNER</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>staging/spec/reports/**</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>staging/spec/reports/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
+  </publishers>
+  <buildWrappers/>
+</project>

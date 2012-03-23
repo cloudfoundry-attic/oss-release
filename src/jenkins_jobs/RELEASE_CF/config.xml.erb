@@ -1,0 +1,145 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <displayName>CloudFoundry Release</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+      <maxConcurrentPerNode>0</maxConcurrentPerNode>
+      <maxConcurrentTotal>0</maxConcurrentTotal>
+      <throttleEnabled>false</throttleEnabled>
+      <throttleOption>project</throttleOption>
+    </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name></name>
+        <refspec>$GERRIT_REFSPEC</refspec>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/release.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <disableSubmodules>false</disableSubmodules>
+    <recursiveSubmodules>true</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
+    <clean>false</clean>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <remotePoll>false</remotePoll>
+    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
+      <separator>#</separator>
+    </buildChooser>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir></relativeTargetDir>
+    <reference></reference>
+    <excludedRegions></excludedRegions>
+    <excludedUsers></excludedUsers>
+    <gitConfigName></gitConfigName>
+    <gitConfigEmail></gitConfigEmail>
+    <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
+    <scmName></scmName>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector">
+    <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+      <spec></spec>
+      <gerritProjects>
+        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+          <compareType>PLAIN</compareType>
+          <pattern>release</pattern>
+          <branches>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+              <compareType>REG_EXP</compareType>
+              <pattern>.*</pattern>
+            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+          </branches>
+        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+      </gerritProjects>
+      <silentMode>false</silentMode>
+      <escapeQuotes>true</escapeQuotes>
+      <buildStartMessage></buildStartMessage>
+      <buildFailureMessage></buildFailureMessage>
+      <buildSuccessfulMessage></buildSuccessfulMessage>
+      <buildUnstableMessage></buildUnstableMessage>
+      <buildUnsuccessfulFilepath></buildUnsuccessfulFilepath>
+      <customUrl></customUrl>
+    </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+  </triggers>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>export PATH=$VCAP_RUBY19/bin:/var/vcap/packages/git/bin:$PATH
+
+git clean -fd
+
+# Hack until bosh cli is hosted on rubygems
+if [ -d bosh/.git ]; then
+  cd bosh
+  git reset --hard
+  git pull --rebase
+  cd ..
+else
+  rm -rf bosh
+  git clone ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/bosh.git
+fi
+
+# Paths needed in the container
+VCAP_RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+VCAP_GIT_REALPATH=`readlink -nf /var/vcap/packages/git`
+
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -o nounset
+set -o errexit
+
+export PATH=$VCAP_RUBY19_REALPATH/bin:$VCAP_GIT_REALPATH/bin:$PATH
+
+cd $WORKSPACE/bosh/cli
+bundle install --no-color --local --path vendor/bundle --without production development
+
+# Needed for scripts that use bundle package in their pre packaging
+if [ ! -x vendor/bundle/ruby/1.9.1/bin/bundle ]; then
+  env GEM_PATH=vendor/bundle/ruby/1.9.1 GEM_HOME=vendor/bundle/ruby/1.9.1 gem install bundle
+fi
+
+cd ../../
+
+git submodule sync
+git submodule update --init --recursive
+
+echo &quot;---\ndev_name: test\n&quot; &gt; config/dev.yml
+
+# bosh-release does not have blobs yet
+env BUNDLE_GEMFILE=bosh/cli/Gemfile bundle exec bosh --non-interactive --no-color sync blobs
+env BUNDLE_GEMFILE=bosh/cli/Gemfile bundle exec bosh --non-interactive --no-color create release --dry-run --force
+EOT
+
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$VCAP_RUBY19_REALPATH,$VCAP_RUBY19_REALPATH,ro bind_mount:$VCAP_GIT_REALPATH,$VCAP_GIT_REALPATH,ro bind_mount:$WORKSPACE,$WORKSPACE,rw&quot;`
+
+$WARDEN_REPL -x -e -c &quot;
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+destroy $HANDLE
+&quot;
+
+rm -f $TEST_RUNNER</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers/>
+  <buildWrappers/>
+</project>
