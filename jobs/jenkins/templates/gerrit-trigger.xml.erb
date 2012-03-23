@@ -1,7 +1,11 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <com.sonyericsson.hudson.plugins.gerrit.trigger.PluginImpl>
   <config class="com.sonyericsson.hudson.plugins.gerrit.trigger.config.Config">
-<% if properties.gerrit.dev_ip %>    <gerritHostName><%= properties.gerrit.dev_ip %></gerritHostName><% elsif properties.gerrit && properties.gerrit.uri%>    <gerritHostName><%= properties.gerrit.uri %></gerritHostName><% else %>    <gerritHostName>gerrit.<%= properties.domain %></gerritHostName><% end %>
+<% if properties.gerrit.dev_ip %>
+    <gerritHostName><%= properties.gerrit.dev_ip %></gerritHostName>
+<% else %>
+    <gerritHostName><%= properties.gerrit.external_domain %></gerritHostName>
+<% end %>
     <gerritSshPort><%= properties.gerrit.ssh_port || 29418 %></gerritSshPort>
     <gerritUserName><%= properties.jenkins.gerrit_trigger.username %></gerritUserName>
     <gerritAuthKeyFile>/var/vcap/store/jenkins/gerrit_trigger_key</gerritAuthKeyFile>
@@ -11,7 +15,11 @@
     <gerritVerifiedCmdBuildUnstable>gerrit approve &lt;CHANGE&gt;,&lt;PATCHSET&gt; --message &apos;Build Unstable &lt;BUILDS_STATS&gt;&apos; --verified &lt;VERIFIED&gt; --code-review &lt;CODE_REVIEW&gt;</gerritVerifiedCmdBuildUnstable>
     <gerritVerifiedCmdBuildFailed>gerrit approve &lt;CHANGE&gt;,&lt;PATCHSET&gt; --message &apos;Build Failed &lt;BUILDS_STATS&gt;&apos; --verified &lt;VERIFIED&gt; --code-review &lt;CODE_REVIEW&gt;</gerritVerifiedCmdBuildFailed>
     <gerritVerifiedCmdBuildStarted>gerrit approve &lt;CHANGE&gt;,&lt;PATCHSET&gt; --message &apos;Build Started &lt;BUILDURL&gt; &lt;STARTED_STATS&gt;&apos; --verified &lt;VERIFIED&gt; --code-review &lt;CODE_REVIEW&gt;</gerritVerifiedCmdBuildStarted>
-<% if properties.gerrit.dev_ip %>    <gerritFrontEndUrl>http://<%= properties.gerrit.dev_ip %>/</gerritFrontEndUrl><% elsif properties.gerrit && properties.gerrit.uri%>    <gerritFrontEndUrl>http://<%= properties.gerrit.uri %></gerritFrontEndUrl><% else %>    <gerritFrontEndUrl>http://gerrit.<%= properties.domain %></gerritFrontEndUrl><% end %>
+<% if properties.gerrit.dev_ip %>
+    <gerritFrontEndUrl>http://<%= properties.gerrit.dev_ip %>/</gerritFrontEndUrl>
+<% else %>
+    <gerritFrontEndUrl>http://<%= properties.gerrit.external_domain %></gerritFrontEndUrl>
+<% end %>
     <gerritBuildStartedVerifiedValue>0</gerritBuildStartedVerifiedValue>
     <gerritBuildStartedCodeReviewValue>0</gerritBuildStartedCodeReviewValue>
     <gerritBuildSuccessfulVerifiedValue>1</gerritBuildSuccessfulVerifiedValue>

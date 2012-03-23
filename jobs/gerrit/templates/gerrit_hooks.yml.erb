@@ -1,10 +1,6 @@
 #notify configures the mail notification hooks
 notify:
-<% if properties.gerrit && properties.gerrit.uri %>
-  from: gerrit2@<%= properties.gerrit.uri %>
-<% else %>
-  from: gerrit2@gerrit.<%= properties.domain %>
-<% end %>
+  from: gerrit2@<%= properties.gerrit.external_domain %>
   maillist:  <%= properties.gerrit.maillist %>
   smtpserver: <%= properties.gerrit.smtp_server %>
   port: <%= properties.gerrit.smtp_port||25 %>

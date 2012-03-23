@@ -10,9 +10,6 @@ templates:
   gerrit_config.erb: config/gerrit.config
   gerrit_secure.erb: config/secure.config
   gerrit_hooks.yml.erb: config/gerrit_hooks.yml
-  nginx_ctl:      bin/nginx_ctl
-  mime.types:     config/mime.types
-  nginx.conf.erb: config/nginx.conf
   cla_config.yml.erb: config/cla_config.yml
   clas/sample_cla.html: config/clas/sample_cla.html
   pr_bounce.yml.erb: config/pr_bounce.yml
@@ -27,7 +24,6 @@ templates:
 packages:
   - git
   - ruby
-  - nginx
   - java
   - gerrit
   - mysqlclient

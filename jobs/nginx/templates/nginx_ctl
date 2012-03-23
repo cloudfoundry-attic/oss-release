@@ -12,7 +12,7 @@ case $1 in
 
     echo $$ > $PIDFILE
 
-    exec /var/vcap/packages/nginx/sbin/nginx -c /var/vcap/jobs/gerrit/config/nginx.conf >>$LOG_DIR/nginx.stdout.log 2>>$LOG_DIR/nginx.stderr.log
+    exec /var/vcap/packages/nginx/sbin/nginx -c /var/vcap/jobs/nginx/config/nginx.conf >>$LOG_DIR/nginx.stdout.log 2>>$LOG_DIR/nginx.stderr.log
     ;;
 
   stop)

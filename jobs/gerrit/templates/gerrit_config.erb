@@ -1,10 +1,6 @@
 [gerrit]
   basePath = git
-<% if properties.gerrit && properties.gerrit.uri %>
-  canonicalWebUrl = http://<%= properties.gerrit.uri %>
-<% else %>
-  canonicalWebUrl = http://gerrit.<%= properties.domain %>
-<% end %>
+  canonicalWebUrl = http://<%= properties.gerrit.external_domain %>
 [database]
 <% if properties.gerrit_postgres %>
   type = POSTGRESQL
@@ -42,7 +38,7 @@
 [sshd]
   listenAddress = *:<%= properties.gerrit.ssh_port || 29418 %>
 [httpd]
-  listenUrl = proxy-http://127.0.0.1:<%= properties.gerrit.http_port || 8443 %>/
+  listenUrl = proxy-http://127.0.0.1:<%= properties.gerrit.http_port || 8080 %>/
 [cache]
   directory = cache
 [cache "web_sessions"]

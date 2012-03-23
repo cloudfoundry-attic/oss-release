@@ -3,10 +3,3 @@ check process gerrit
   start program "/var/vcap/jobs/gerrit/bin/gerrit_ctl start"
   stop program "/var/vcap/jobs/gerrit/bin/gerrit_ctl stop"
   group vcap
-
-check process nginx
-  with pidfile /var/vcap/sys/run/nginx/nginx.pid
-  start program "/var/vcap/jobs/gerrit/bin/nginx_ctl start"
-  stop program "/var/vcap/jobs/gerrit/bin/nginx_ctl stop"
-  group vcap
-

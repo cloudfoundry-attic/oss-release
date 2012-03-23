@@ -39,14 +39,10 @@ http {
 
   client_max_body_size 256M;
 
+<% if properties.gerrit %>
   server {
     listen       80;
-
-<% if properties.gerrit && properties.gerrit.uri %>
-    server_name  "<%= properties.gerrit.uri %>";
-<% else %>
-    server_name  "gerrit.<%= properties.domain %>";
-<% end %>
+    server_name  "<%= properties.gerrit.external_domain %>";
 
     server_name_in_redirect off;
 
@@ -60,11 +56,19 @@ http {
       proxy_send_timeout          30;
       proxy_read_timeout          30;
 
-      proxy_pass                   http://127.0.0.1:<%= properties.gerrit.http_port || 8443 %>;
+      proxy_pass                   http://<%= properties.gerrit.address %>:<%= properties.gerrit.http_port || 8080 %>;
     }
+  }
+<% end %>
 
 <% if properties.jenkins %>
-    location /jenkins {
+  server {
+    listen       80;
+    server_name  "<%= properties.jenkins.external_domain %>";
+
+    server_name_in_redirect off;
+
+    location / {
       access_log /var/vcap/sys/log/nginx/jenkins.access.log  main;
       proxy_buffering             off;
       proxy_set_header            Host $host;
@@ -76,7 +80,29 @@ http {
 
       proxy_pass                   http://<%= properties.jenkins.address %>:<%= properties.jenkins.http_port || 8080 %>;
     }
+  }
 <% end %>
 
+  server {
+    listen       80;
+    server_name  "default" default_server;
+
+    server_name_in_redirect off;
+
+    location / {
+      access_log /var/vcap/sys/log/nginx/default.access.log  main;
+
+      if ($http_user_agent = "HTTP-Monitor/1.1") {
+        set $health_monitor T;
+      }
+      if ($http_host = "") {
+        set $health_monitor "${health_monitor}T";
+      }
+      if ($health_monitor = TT) {
+        return 200;
+      }
+
+      return 404;
+    }
   }
 }
