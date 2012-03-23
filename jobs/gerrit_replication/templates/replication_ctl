@@ -6,7 +6,6 @@ GIT_DIR=/var/vcap/packages/git
 case $1 in
 
   start)
-    mkdir -p /var/vcap/shared
     mkdir -p $RUN_DIR
 
     echo $$ > $PIDFILE
