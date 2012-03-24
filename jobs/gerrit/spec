@@ -11,7 +11,7 @@ templates:
   gerrit_secure.erb: config/secure.config
   gerrit_hooks.yml.erb: config/gerrit_hooks.yml
   cla_config.yml.erb: config/cla_config.yml
-  clas/sample_cla.html: config/clas/sample_cla.html
+  clas/cf_cla.html: config/clas/cf_cla.html
   pr_bounce.yml.erb: config/pr_bounce.yml
   pr_bounce/closing.html: config/pr_bounce/closing.html
   close_pull_requests: bin/close_pull_requests
