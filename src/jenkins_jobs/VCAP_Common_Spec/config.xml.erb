@@ -56,7 +56,7 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$RUBY_19:$PATH
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
 cd common
 for dir in gems cache specifications; do
   rm -rvf vendor/bundle/ruby/1.9.1/$dir/vcap_*

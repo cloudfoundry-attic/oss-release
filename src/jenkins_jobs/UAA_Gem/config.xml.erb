@@ -54,7 +54,7 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$RUBY_19:$PATH
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
 cd gem
 bundle
 bundle exec rake ci</command>
