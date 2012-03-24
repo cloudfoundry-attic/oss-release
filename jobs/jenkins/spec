@@ -5,7 +5,7 @@ templates:
   jenkins_init.ctl.erb: bin/jenkins_init.ctl
   change_tmp: bin/change_tmp
   ssh_expect.erb: bin/ssh_expect
-  config_head: config/config_head
+  config_head.erb: config/config_head
   config_tail: config/config_tail
   config_slave: config/config_slave
   nodeMonitors.xml: config/nodeMonitors.xml
