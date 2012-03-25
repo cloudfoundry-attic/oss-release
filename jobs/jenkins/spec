@@ -19,3 +19,4 @@ packages:
   - jenkins
   - jenkins_jobs
   - ruby
+  - maven22
