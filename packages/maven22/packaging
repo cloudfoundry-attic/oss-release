@@ -1,0 +1,12 @@
+set -o errexit
+set -o nounset
+
+echo "Extracting archive..."
+tar xzf maven22/apache-maven-2.2.1-bin.tar.gz
+
+if [[ $? != 0 ]] ; then
+  echo "Cannot unpack Maven 2.2"
+  exit 1
+fi
+
+cp -a apache-maven-2.2.1/* ${BOSH_INSTALL_TARGET}
