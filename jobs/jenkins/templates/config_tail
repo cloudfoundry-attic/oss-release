@@ -8,6 +8,31 @@
       <filterQueue>false</filterQueue>
       <properties class="hudson.model.View$PropertyList"/>
     </hudson.model.AllView>
+  <% if properties.jenkins.views %>
+    <% for view in properties.jenkins.views %>
+    <listView>
+      <owner class="hudson" reference="../../.."/>
+      <name><%= view.name %></name>
+      <filterExecutors>false</filterExecutors>
+      <filterQueue>false</filterQueue>
+      <properties class="hudson.model.View$PropertyList"/>
+      <jobNames class="tree-set">
+        <comparator class="hudson.util.CaseInsensitiveComparator"/>
+      </jobNames>
+      <jobFilters/>
+      <columns>
+        <hudson.views.StatusColumn/>
+        <hudson.views.WeatherColumn/>
+        <hudson.views.JobColumn/>
+        <hudson.views.LastSuccessColumn/>
+        <hudson.views.LastFailureColumn/>
+        <hudson.views.LastDurationColumn/>
+        <hudson.views.BuildButtonColumn/>
+      </columns>
+      <includeRegex><%= view.regex %></includeRegex>
+    </listView>
+    <% end %>
+  <% end %>
   </views>
   <primaryView>All</primaryView>
   <slaveAgentPort>0</slaveAgentPort>
