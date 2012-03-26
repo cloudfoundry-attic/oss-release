@@ -27,8 +27,8 @@ case $1 in
     mkdir -p /home/vcap/.ssh
     chmod 0700 /home/vcap/.ssh
 
-    cp $CONFIG_DIR/{id_rsa,id_rsa.pub} /home/vcap/.ssh
-    chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub}
+    cp $CONFIG_DIR/{id_rsa,id_rsa.pub,authorized_keys} /home/vcap/.ssh
+    chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub,authorized_keys}
     chown -R vcap:vcap /home/vcap/.ssh
 
     # Refresh host key for gerrit

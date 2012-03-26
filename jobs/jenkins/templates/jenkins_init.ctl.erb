@@ -2,6 +2,7 @@
 PACKAGE_DIR=/var/vcap/packages/jenkins
 JOB_DIR=/var/vcap/jobs/jenkins
 DATA_DIR=/var/vcap/store/jenkins
+CONFIG_DIR=/var/vcap/jobs/jenkins/config
 
 # Grab all the slaves to the master config file
 cat $JOB_DIR/config/config_head > $JOB_DIR/config/config.xml
@@ -31,11 +32,11 @@ cp -pf $PACKAGE_DIR/review* $DATA_DIR/
 cp -rf $PACKAGE_DIR/plugins $DATA_DIR/
 chown -R vcap:vcap $DATA_DIR/plugins/
 
-# Passwdless ssh key pair refresh/generation (for slaves)
-if [ ! -f /home/vcap/.ssh/id_rsa.pub ]; then
-  rm -rf /home/vcap/.ssh/*
-  $JOB_DIR/bin/ssh_expect
-fi
+# Passwdless ssh host key pair(for slave)
+mkdir -p /home/vcap/.ssh
+cp $CONFIG_DIR/{id_rsa,id_rsa.pub} /home/vcap/.ssh
+chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub}
+chown -R vcap:vcap /home/vcap/.ssh
 
 # SSH Keyfile for gerrit-trigger
 cp /var/vcap/jobs/jenkins/config/gerrit_trigger_key $DATA_DIR
