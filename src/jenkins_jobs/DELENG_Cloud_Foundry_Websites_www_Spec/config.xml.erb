@@ -56,7 +56,7 @@
   <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$RUBY_19:$PATH
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
 export RACK_ENV=test
 
 cd www

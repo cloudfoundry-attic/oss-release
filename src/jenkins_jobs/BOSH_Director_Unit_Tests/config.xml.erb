@@ -56,7 +56,7 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$RUBY_19:$PATH
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
 cd director
 rm -rf director/spec_coverage director/spec_reports
 bundle install --deployment --without development production

@@ -55,7 +55,7 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$RUBY_19:$PATH
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
 cd account_manager/spec &amp;&amp; bundle --local install --without development production &amp;&amp; bundle exec rake spec:rcov
 </command>
     </hudson.tasks.Shell>

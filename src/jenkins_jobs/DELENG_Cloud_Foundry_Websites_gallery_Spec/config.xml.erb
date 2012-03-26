@@ -57,7 +57,7 @@
   <builders>
     <hudson.tasks.Shell>
       <command>if [ -f &quot;gallery/Gemfile&quot; ]; then
-export PATH=$RUBY_19:$PATH
+export PATH=$VCAP_RUBY19/bin:$PATH
 export RACK_ENV=test
 cd gallery
 bundle install --verbose --without development
