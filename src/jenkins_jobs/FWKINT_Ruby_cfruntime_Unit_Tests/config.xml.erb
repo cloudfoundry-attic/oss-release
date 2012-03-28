@@ -57,11 +57,39 @@
   <builders>
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
-cd cfruntime
+
+RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+MYSQLCLIENT_REALPATH=`readlink -nf $VCAP_MYSQLCLIENT`
+LIBPQ_REALPATH=`readlink -nf $VCAP_LIBPQ`
+CFRUNTIME=$PWD/cfruntime
+
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -o errexit
+
+export PATH=$RUBY19_REALPATH/bin:$PATH
+export LIBRARY_PATH=$MYSQLCLIENT_REALPATH/lib/mysql:$LIBPQ_REALPATH/lib:$LIBRARY_PATH
+export C_INCLUDE_PATH=$MYSQLCLIENT_REALPATH/include/mysql:$LIBPQ_REALPATH/include:$C_INCLUDE_PATH
+export LD_LIBRARY_PATH=$MYSQLCLIENT_REALPATH/lib/mysql:$LIBPQ_REALPATH/lib:$LD_LIBRARY_PATH
+
+cd /tmp/cfruntime
 bundle install --deployment
 bundle exec rake ci
 gem build cf-runtime.gemspec
-cd ..</command>
+EOT
+
+HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $MYSQLCLIENT_REALPATH $LIBPQ_REALPATH`
+$WARDEN_REPL -e -c &quot;
+copy $HANDLE in $CFRUNTIME /tmp
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+copy $HANDLE out /tmp/cfruntime/coverage $CFRUNTIME vcap:vcap
+destroy $HANDLE
+&quot;
+
+rm -f $TEST_RUNNER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

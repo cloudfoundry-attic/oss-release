@@ -1,13 +1,13 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<maven2-moduleset>
+<project>
   <actions/>
   <description></description>
   <displayName>Java Unit Tests</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
-      <maxConcurrentPerNode>0</maxConcurrentPerNode>
-      <maxConcurrentTotal>0</maxConcurrentTotal>
+      <maxConcurrentPerNode>1</maxConcurrentPerNode>
+      <maxConcurrentTotal>4</maxConcurrentTotal>
       <throttleEnabled>false</throttleEnabled>
       <throttleOption>project</throttleOption>
     </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -46,6 +46,7 @@
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
@@ -53,25 +54,45 @@
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>
-  <concurrentBuild>true</concurrentBuild>
-  <rootModule>
-    <groupId>org.cloudfoundry</groupId>
-    <artifactId>vcap-java</artifactId>
-  </rootModule>
-  <goals>clean install test emma:emma</goals>
-  <mavenName>Maven 2</mavenName>
-  <aggregatorStyleBuild>true</aggregatorStyleBuild>
-  <incrementalBuild>false</incrementalBuild>
-  <perModuleEmail>true</perModuleEmail>
-  <ignoreUpstremChanges>false</ignoreUpstremChanges>
-  <archivingDisabled>false</archivingDisabled>
-  <resolveDependencies>false</resolveDependencies>
-  <processPlugins>false</processPlugins>
-  <mavenValidationLevel>-1</mavenValidationLevel>
-  <runHeadless>false</runHeadless>
-  <settingConfigId></settingConfigId>
-  <globalSettingConfigId></globalSettingConfigId>
-  <reporters/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
+
+JAVA_REALPATH=`readlink -nf $DEA_JAVA`
+MVN_REALPATH=`readlink -nf $VCAP_MAVEN22`
+
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -o errexit
+
+export PATH=$MVN_REALPATH/bin:$PATH
+export JAVA_HOME=$JAVA_REALPATH
+
+cd $WORKSPACE
+mvn clean install test emma:emma
+EOT
+
+HANDLE=`$WARDEN_REPL -c &quot;create bind_mount:$JAVA_REALPATH,$JAVA_REALPATH,ro bind_mount:$MVN_REALPATH,$MVN_REALPATH,ro bind_mount:$WORKSPACE,$WORKSPACE,rw&quot;`
+$WARDEN_REPL -e -c &quot;
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+destroy $HANDLE
+&quot;
+
+rm -f $TEST_RUNNER
+
+
+
+
+
+
+
+</command>
+    </hudson.tasks.Shell>
+  </builders>
   <publishers>
     <hudson.plugins.emma.EmmaPublisher>
       <includes></includes>
@@ -88,11 +109,4 @@
     </hudson.plugins.emma.EmmaPublisher>
   </publishers>
   <buildWrappers/>
-  <prebuilders/>
-  <postbuilders/>
-  <runPostStepsIfResult>
-    <name>FAILURE</name>
-    <ordinal>2</ordinal>
-    <color>RED</color>
-  </runPostStepsIfResult>
-</maven2-moduleset>
+</project>
