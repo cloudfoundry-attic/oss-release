@@ -57,18 +57,38 @@
   <builders>
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
-cd common
-for dir in gems cache specifications; do
-  rm -rvf vendor/bundle/ruby/1.9.1/$dir/vcap_*
-done
-# stealing this before the git source is in place...
-mkdir -p vendor/cache
-cp -lunv ../stager/vendor/cache/eventmachine-0.12.11.cloudfoundry.3.gem vendor/cache/
-bin/fetch_gems ./Gemfile ./Gemfile.lock ./vendor/cache
-bundle install --deployment --without development production
-export VCAP_RUBY18=&quot;$RUBY_18/ruby&quot; VCAP_RUBY18_VER=`$RUBY_18/ruby --version | awk &apos;{ print $2 }&apos;`
+
+VCAP_RUBY18_VER=`$DEA_RUBY18/ruby --version | awk &apos;{ print $2 }&apos;`
+RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+RUBY18_REALPATH=`readlink -nf $DEA_RUBY18`
+COMMON=$PWD/common
+CF_EM_GEM=$PWD/stager/vendor/cache/eventmachine-0.12.11.cloudfoundry.3.gem
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -o errexit
+export VCAP_RUBY18=$VCAP_RUBY18 
 export VCAP_TEST_LOG=true
-bundle exec rake spec</command>
+export PATH=$RUBY19_REALPATH/bin:$PATH
+cd /tmp/common
+mkdir -p vendor/cache
+cp -lunv ../eventmachine-0.12.11.cloudfoundry.3.gem vendor/cache/
+bin/fetch_gems ./Gemfile ./Gemfile.lock ./vendor/cache
+bundle install --no-color --deployment --without development production
+bundle exec rake spec
+EOT
+
+HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $RUBY18_REALPATH`
+$WARDEN_REPL -e -c &quot;
+copy $HANDLE in $COMMON /tmp
+copy $HANDLE in $CF_EM_GEM /tmp
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+destroy $HANDLE
+&quot;
+
+rm -f $TEST_RUNNER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>
