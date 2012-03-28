@@ -57,9 +57,37 @@
   <builders>
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
-cd cli
+
+GIT_REALPATH=`readlink -nf /var/vcap/packages/git`
+VCAP_RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+BOSH_CLI=$PWD/cli
+RAKE_SUPPORT_DIR=$PWD/rake
+
+rm -rvf $BOSH_CLI/ci_result
+
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -o errexit
+set -o nounset
+export PATH=$VCAP_RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$PATH
+cd /tmp/cli
 bundle install --local --path vendor/bundle --without development production
-bundle exec rake spec:unit:ci</command>
+cd spec
+bundle exec rake spec:unit:ci
+EOT
+
+HANDLE=`$CREATE_CONTAINER $VCAP_RUBY19_REALPATH $GIT_REALPATH`
+$WARDEN_REPL -c &quot;
+copy $HANDLE in $RAKE_SUPPORT_DIR /tmp
+copy $HANDLE in $BOSH_CLI /tmp
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+copy $HANDLE out /tmp/cli/ci_result $BOSH_CLI vcap:vcap
+destroy $HANDLE
+&quot;
+rm -f $TEST_RUNNER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

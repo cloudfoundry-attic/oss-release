@@ -87,6 +87,7 @@ run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
 run $HANDLE cat /tmp/test_output
 copy $HANDLE out /tmp/agent/ci_result $AGENT vcap:vcap
+destroy $HANDLE
 &quot;
 rm -f $TEST_RUNNER
 </command>
