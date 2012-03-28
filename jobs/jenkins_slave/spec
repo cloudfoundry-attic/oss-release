@@ -24,3 +24,4 @@ packages:
   - ruby
   - libpq
   - maven22
+  - mysqlclient
