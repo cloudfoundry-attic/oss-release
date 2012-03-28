@@ -87,7 +87,7 @@ if [ -d bosh/.git ]; then
   git pull --rebase
 else
   rm -rf bosh
-  git clone ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/bosh.git
+  git clone ssh://ci-bot@172.23.218.50:29418/bosh.git
   cd bosh
 fi
 
