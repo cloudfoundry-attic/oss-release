@@ -17,8 +17,8 @@
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
         <name></name>
-        <refspec>$GERRIT_REFSPEC</refspec>
-        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap-services</url>
+        <refspec></refspec>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap-services.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -34,9 +34,7 @@
     <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
     <remotePoll>false</remotePoll>
-    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
-      <separator>#</separator>
-    </buildChooser>
+    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
@@ -46,6 +44,7 @@
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
@@ -56,28 +55,57 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>cd mongodb
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
-# hack into the nats info
-ip=`ifconfig  | grep &apos;inet addr:&apos;| grep -v &apos;127.0.0.1&apos; | cut -d: -f2 | awk &apos;{ print $1}&apos;`
-orig_nats_info=&quot;localhost:4222&quot;
-nats_info=&quot;nats:nats@&quot;$ip&quot;:4222&quot;
-sed -i &quot;s/$orig_nats_info/$nats_info/g&quot; config/mongodb_node.yml
-sed -i &quot;s/$orig_nats_info/$nats_info/g&quot; config/mongodb_gateway.yml
+RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+MONGODB_REALPATH=`readlink -nf $VCAP_MONGODB18`
+SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
+GIT_REALPATH=`readlink -nf $VCAP_GIT`
 
-# hack into the nats info
-orig_mongo=&quot;mongod_path: mongod&quot;
-mongo_dir=&quot;mongod_path: \/home\/ci-auth\/cloudfoundry\/.deployments\/devbox\/deploy\/mongodb\/bin\/mongod&quot;
-sed -i &quot;s/$orig_mongo/$mongo_dir/g&quot; config/mongodb_node.yml
+BASE=$PWD/base
+MONGODB_SVC=$PWD/mongodb
 
-# clean /tmp/mongodb
-rm -rf /tmp/mongodb
-rm -rf spec_reports
+#
+# HACK - Base expects to be able to write to /var/vcap/sys/run/LOCK
+#
+SCRATCHPAD=$MONGODB_SVC/xxx_scratchpad
+rm -rf $SCRATCHPAD
+mkdir $SCRATCHPAD
 
-export PATH=/home/ci-auth/cloudfoundry/.deployments/devbox/deploy/rubies/ruby-1.9.2-p180/bin:`/home/ci-auth/cloudfoundry/.deployments/devbox/deploy/rubies/ruby-1.9.2-p180/bin/gem env gempath`/bin:$PATH
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash 
+set -x
+set -o errexit
+export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$MONGODB_REALPATH/bin:$PATH
+export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
+export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
+
+cd /tmp/mongodb
+rm -rf .bundle
+rm -rf vendor/bundle
+
+mongod --version
 
 bundle install --deployment --without development production
-bundle exec rake spec:ci</command>
+bundle exec nats-server --daemonize --pid /tmp/nats.pid
+bundle exec rake spec:ci
+EOT
+
+
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$MONGODB_REALPATH,$MONGODB_REALPATH,ro&quot;`
+$WARDEN_REPL -e -x -c &quot;
+copy $HANDLE in $BASE /tmp
+copy $HANDLE in $MONGODB_SVC /tmp
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+copy $HANDLE out /tmp/mongodb/spec_reports $MONGODB_SVC vcap:vcap
+copy $HANDLE out /tmp/mongodb/spec_coverage $MONGODB_SVC vcap:vcap
+destroy $HANDLE
+&quot;
+
+rm -f $TEST_RUNNER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

@@ -38,6 +38,8 @@
       <buildFailureMessage>CI Services Build Failure.</buildFailureMessage>
       <buildSuccessfulMessage>CI Services Build Successful.</buildSuccessfulMessage>
       <buildUnstableMessage></buildUnstableMessage>
+      <buildUnsuccessfulFilepath></buildUnsuccessfulFilepath>
+      <customUrl></customUrl>
     </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
   </triggers>
   <concurrentBuild>false</concurrentBuild>
@@ -48,7 +50,7 @@
           <configs>
             <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
           </configs>
-          <projects>SERVICES_Base_New, SERVICES_Postgres_New, SERVICES_Neo4j_New, SERVICES_Mysql_New, SERVICES_Mongo_New, SERVICES_Rabbit_New</projects>
+          <projects>SERVICES_Redis_New,SERVICES_Base_New, SERVICES_Postgres_New, SERVICES_Neo4j_New, SERVICES_Mysql_New, SERVICES_Mongo_New, SERVICES_Rabbit_New</projects>
           <condition>ALWAYS</condition>
           <triggerWithNoParameters>false</triggerWithNoParameters>
           <block>
