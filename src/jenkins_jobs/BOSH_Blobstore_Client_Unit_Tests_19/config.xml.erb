@@ -57,10 +57,37 @@
   <builders>
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
-cd blobstore_client
+
+RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+GIT_REALPATH=`readlink -nf $VCAP_GIT`
+BS_CLIENT=$PWD/blobstore_client
+RAKE_SUPPORT_DIR=$PWD/rake
+
+rm -rf $BS_CLIENT/ci_result
+
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -o errexit
+set -o nounset
+export PATH=$RUBY19_REALPATH/bin:$PATH
+cd /tmp/blobstore_client
 bundle install --local --path vendor/bundle --without development production
 cd spec
-bundle exec rake spec:ci || bundle exec rake spec:unit:ci</command>
+bundle exec rake spec:unit:ci
+EOT
+
+HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $GIT_REALPATH`
+$WARDEN_REPL -c &quot;
+copy $HANDLE in $RAKE_SUPPORT_DIR /tmp
+copy $HANDLE in $BS_CLIENT /tmp
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+copy $HANDLE out /tmp/blobstore_client/ci_result $BS_CLIENT vcap:vcap
+destroy $HANDLE
+&quot;
+rm -f $TEST_RUNNER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
