@@ -108,16 +108,16 @@ rm -f $TEST_RUNNER
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>health_monitor/spec_coverage/**,health_monitor/spec_reports/**</artifacts>
+      <artifacts>health_monitor/ci_result/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>health_monitor/spec_reports/*.xml</testResults>
+      <testResults>health_monitor/ci_result/reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-      <reportDir>health_monitor/spec_coverage/rcov</reportDir>
+      <reportDir>health_monitor/ci_result/coverage/rcov</reportDir>
       <targets>
         <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
           <metric>TOTAL_COVERAGE</metric>

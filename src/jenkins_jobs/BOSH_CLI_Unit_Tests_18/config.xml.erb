@@ -62,16 +62,16 @@ bundle exec rake spec:unit:ci</command>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>cli/spec_coverage/**,cli/spec_reports/**</artifacts>
+      <artifacts>cli/ci_result/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>cli/spec_reports/*.xml</testResults>
+      <testResults>cli/ci_result/reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-      <reportDir>cli/spec_coverage/rcov</reportDir>
+      <reportDir>cli/ci_result/coverage/rcov</reportDir>
       <targets>
         <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
           <metric>TOTAL_COVERAGE</metric>

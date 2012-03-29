@@ -104,16 +104,16 @@ rm -f $TEST_RUNNER
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>ruby_vim_sdk/spec_coverage/**,ruby_vim_sdk/spec_reports/**</artifacts>
+      <artifacts>ruby_vim_sdk/ci_result/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>ruby_vim_sdk/spec_reports/*.xml</testResults>
+      <testResults>ruby_vim_sdk/ci_result/reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-      <reportDir>ruby_vim_sdk/spec_coverage/rcov</reportDir>
+      <reportDir>ruby_vim_sdk/ci_result/coverage/rcov</reportDir>
       <targets>
         <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
           <metric>TOTAL_COVERAGE</metric>

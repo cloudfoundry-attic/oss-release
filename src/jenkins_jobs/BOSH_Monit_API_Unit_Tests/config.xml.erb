@@ -99,16 +99,16 @@ rm -f $TEST_RUNNER
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>monit_api/spec_coverage/**,monit_api/spec_reports/**</artifacts>
+      <artifacts>monit_api/ci_result/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>monit_api/spec_reports/*.xml</testResults>
+      <testResults>monit_api/ci_result/reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-      <reportDir>monit_api/spec_coverage/rcov</reportDir>
+      <reportDir>monit_api/ci_result/coverage/rcov</reportDir>
       <targets>
         <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
           <metric>TOTAL_COVERAGE</metric>
