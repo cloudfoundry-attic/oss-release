@@ -93,7 +93,7 @@ if [ -d bosh/.git ]; then
   cd ..
 else
   rm -rf bosh
-  git clone ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/bosh.git
+  git clone ssh://ci-bot@172.23.218.50:29418/bosh.git
 fi
 
 # Paths needed in the container
