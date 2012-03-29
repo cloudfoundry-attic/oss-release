@@ -64,7 +64,7 @@ rake spec:ci</command>
   </builders>
   <publishers>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>spec_reports/*.xml</testResults>
+      <testResults>spec_reports/ci_result/reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>

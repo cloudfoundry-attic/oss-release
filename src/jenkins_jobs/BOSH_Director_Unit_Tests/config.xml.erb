@@ -94,16 +94,16 @@ destroy $HANDLE
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>director/spec_coverage/**,director/spec_reports/**</artifacts>
+      <artifacts>director/ci_result/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>director/spec_reports/*.xml</testResults>
+      <testResults>director/ci_result/reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-      <reportDir>director/spec_coverage/rcov</reportDir>
+      <reportDir>director/ci_result/coverage/rcov</reportDir>
       <targets>
         <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
           <metric>TOTAL_COVERAGE</metric>
