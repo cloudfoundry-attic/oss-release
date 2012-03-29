@@ -46,6 +46,7 @@
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
@@ -58,16 +59,13 @@
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
-VCAP_RUBY18_VER=`$DEA_RUBY18/ruby --version | awk &apos;{ print $2 }&apos;`
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
-RUBY18_REALPATH=`readlink -nf $DEA_RUBY18`
 COMMON=$PWD/common
 CF_EM_GEM=$PWD/stager/vendor/cache/eventmachine-0.12.11.cloudfoundry.3.gem
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 #!/bin/bash
 set -o errexit
-export VCAP_RUBY18=$VCAP_RUBY18 
 export VCAP_TEST_LOG=true
 export PATH=$RUBY19_REALPATH/bin:$PATH
 cd /tmp/common
@@ -78,7 +76,7 @@ bundle install --no-color --deployment --without development production
 bundle exec rake spec
 EOT
 
-HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $RUBY18_REALPATH`
+HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH`
 $WARDEN_REPL -e -c &quot;
 copy $HANDLE in $COMMON /tmp
 copy $HANDLE in $CF_EM_GEM /tmp
