@@ -56,9 +56,42 @@
   <builders>
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
-bundle install --deployment --without development production
+
+RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+LIBPQ_REALPATH=`readlink -nf $VCAP_LIBPQ`
+SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
+ACM=$PWD
+
+rm -rf $ACM/spec_{reports,coverage}
+
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -o errexit
+
+export PATH=$RUBY19_REALPATH/bin:$PATH
+export LIBRARY_PATH=$LIBPQ_REALPATH/lib:$SQLITE_REALPATH/lib:$LIBRARY_PATH
+export C_INCLUDE_PATH=$LIBPQ_REALPATH/include:$SQLITE_REALPATH/include:$C_INCLUDE_PATH
+
+cd /tmp/acm
+bundle install --no-color --deployment --without development production
 bundle exec rake spec:cov
-bundle exec rake spec:ci</command>
+bundle exec rake spec:ci 
+EOT
+
+HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $LIBPQ_REALPATH $SQLITE_REALPATH`
+$WARDEN_REPL -c &quot;
+run $HANDLE mkdir /tmp/acm
+copy $HANDLE in $ACM/ /tmp/acm
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+copy $HANDLE out /tmp/acm/spec_coverage $ACM vcap:vcap
+copy $HANDLE out /tmp/acm/spec_reports $ACM vcap:vcap
+destroy $HANDLE
+&quot;
+
+rm -f $TEST_RUNNER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
