@@ -17,7 +17,7 @@
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
         <name></name>
-        <refspec>$GERRIT_REFSPEC</refspec>
+        <refspec></refspec>
         <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap-services.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
@@ -34,9 +34,7 @@
     <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
     <remotePoll>false</remotePoll>
-    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
-      <separator>#</separator>
-    </buildChooser>
+    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
@@ -46,6 +44,7 @@
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
@@ -66,8 +65,6 @@ GIT_REALPATH=`readlink -nf $VCAP_GIT`
 BASE=$PWD/base
 REDIS_SVC=$PWD/redis
 
-rm -rf redis/spec_reports
-
 #
 # HACK - Base expects to be able to write to /var/vcap/sys/run/LOCK
 #
@@ -85,6 +82,8 @@ export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 
 cd /tmp/redis
+rm -rf .bundle
+rm -rf vendor/bundle
 bundle install --deployment --without development production
 bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci
