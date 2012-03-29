@@ -51,6 +51,8 @@
               <string>/var/vcap/packages/postgres</string>
               <string>VCAP_MAVEN22</string>
               <string>/var/vcap/packages/maven22</string>
+              <string>VCAP_MYSQL</string>
+              <string>/var/vcap/packages/mysql</string>
             </tree-map>
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>
