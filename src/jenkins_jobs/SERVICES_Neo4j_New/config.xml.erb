@@ -74,7 +74,7 @@ mkdir $SCRATCHPAD
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
-#!/bin/bash 
+#!/bin/bash
 set -x
 set -o errexit
 export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$JAVA_REALPATH/bin:$PATH

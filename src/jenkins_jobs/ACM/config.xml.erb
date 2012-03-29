@@ -76,7 +76,7 @@ export C_INCLUDE_PATH=$LIBPQ_REALPATH/include:$SQLITE_REALPATH/include:$C_INCLUD
 cd /tmp/acm
 bundle install --no-color --deployment --without development production
 bundle exec rake spec:cov
-bundle exec rake spec:ci 
+bundle exec rake spec:ci
 EOT
 
 HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $LIBPQ_REALPATH $SQLITE_REALPATH`
