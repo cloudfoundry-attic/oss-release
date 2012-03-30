@@ -58,7 +58,7 @@
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
-RABBIT_REALPATH=`readlink -nf $VCAP_RABBITMQ24`
+RABBIT_REALPATH=`readlink -nf $VCAP_RABBITMQ`
 ERLANG_REALPATH=`readlink -nf $VCAP_ERLANG`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
@@ -75,12 +75,13 @@ mkdir $SCRATCHPAD
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
-#!/bin/bash
+#!/bin/bash 
 set -x
 set -o errexit
-export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$RABBIT_REALPATH/sbin:$ERLANG_REALPATH/bin:$PATH
-export ERLANG_HOME=/var/vcap/packages/erlang
-export HOME=/root
+export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$RABBIT_REALPATH/sbin:/var/vcap/packages/erlang/bin:$PATH
+#export ERLANG_HOME=/var/vcap/packages/erlang/bin/erl
+#export BINDIR=/var/vcap/packages/erlang/bin
+#export HOME=/root
 
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
@@ -91,9 +92,10 @@ rm -rf vendor/bundle
 
 sed -i &quot;s/local_db: sqlite3:\/var\/vcap\/services\/rabbit\/rabbit_node.db/local_db: sqlite3:rabbit_node.db/g&quot; config/rabbit_node.yml
 sed -i &quot;s/$# rabbitmq_start_timeout: 5/$rabbitmq_start_timeout: 9/g&quot; config/rabbit_node.yml
-sed -i &quot;s/\/home\/tangrui\/rabbitmq_server-2.4.1\/sbin\/rabbitmq-server/\/var\/vcap\/packages\/rabbitmq\sbin\rabbitmq/g&quot; config/rabbit_node.yml
+sed -i &quot;s/\/home\/tangrui\/rabbitmq_server-2.4.1\/sbin\/rabbitmq-server/rabbitmq-server/g&quot; config/rabbit_node.yml
 
-rabbitmq-server
+#erl -noshell -eval &apos;io:fwrite(&quot;Hello, World!\n&quot;), init:stop().&apos;
+#rabbitmq-server
 
 bundle install --deployment --without development production
 bundle exec nats-server --daemonize --pid /tmp/nats.pid
@@ -101,7 +103,7 @@ bundle exec rake spec:ci
 EOT
 
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:/var/vcap/packages/rabbitmq24/sbin,/var/vcap/packages/rabbitmq24/sbin,ro bind_mount:$ERLANG_REALPATH,$ERLANG_REALPATH,ro&quot;`
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$RABBIT_REALPATH,$RABBIT_REALPATH,ro bind_mount:$ERLANG_REALPATH,/var/vcap/packages/erlang,ro&quot;`
 $WARDEN_REPL -e -x -c &quot;
 copy $HANDLE in $BASE /tmp
 copy $HANDLE in $RABBIT_SVC /tmp

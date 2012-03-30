@@ -1,0 +1,9 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+tar zxf neo4j/neo4j.tgz
+
+(
+  cd neo4j
+  cp -af instances neo4j-hosting-extension.jar neo4j-server.tgz $BOSH_INSTALL_TARGET
+)

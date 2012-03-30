@@ -27,3 +27,7 @@ packages:
   - maven22
   - mysqlclient
   - mysql
+  - mongodb
+  - rabbitmq
+  - erlang
+  - neo4j

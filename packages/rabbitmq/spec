@@ -1,0 +1,4 @@
+---
+name: rabbitmq
+files:
+- rabbitmq/rabbitmq.tgz
