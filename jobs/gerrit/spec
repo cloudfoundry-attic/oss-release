@@ -21,6 +21,7 @@ templates:
   gerrit_trigger.yml.erb: config/gerrit_trigger.yml
   logo.png: config/logo.png
   site_header.html.erb: config/site_header.html
+  site_footer.html: config/site_footer.html
 packages:
   - git
   - ruby
