@@ -128,6 +128,11 @@ chmod +x /etc/cron.hourly/close_pull_requests
 cp $JOB_DIR/config/site_header.html $CONFIG_DIR/GerritSiteHeader.html
 chown vcap:vcap $CONFIG_DIR/GerritSiteHeader.html
 
+# Footer
+cp $JOB_DIR/config/site_footer.html $CONFIG_DIR/GerritSiteFooter.html
+chown vcap:vcap $CONFIG_DIR/GerritSiteFooter.html
+
+
 # Be sure to increment logo_version if the logo changes. It will invalidate
 # browser caches, forcing the new logo to be fetched.
 cp $JOB_DIR/config/logo.png $STATIC_DIR/logo.<%= properties.gerrit.logo_version %>.cache.png
