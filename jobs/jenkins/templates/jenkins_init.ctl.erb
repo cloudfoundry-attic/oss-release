@@ -45,3 +45,10 @@ chmod 0600 $DATA_DIR/gerrit_trigger_key
 
 # Update the job configs
 $JOB_DIR/bin/render_jenkins_jobs
+
+# Fonts needed for graph drawing
+if [ ! -e /usr/share/fonts/truetype/ttf-dejavu ];
+then
+  mkdir -p /usr/share/fonts/truetype
+  ln -s /var/vcap/packages/ttf_dejavu /usr/share/fonts/truetype/ttf-dejavu
+fi

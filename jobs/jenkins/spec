@@ -22,3 +22,4 @@ packages:
   - jenkins_jobs
   - ruby
   - maven22
+  - ttf_dejavu
