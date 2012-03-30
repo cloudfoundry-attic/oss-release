@@ -32,18 +32,25 @@
 <% end %>
   smtpUser = <%= properties.gerrit.smtp_user %>
   smtpPass = <%= properties.gerrit.smtp_pass %>
+  from = ${user} CloudFoundry Code Review <noreply@cloudfoundry.org>
+
 [container]
   user = vcap
   javaHome = /var/vcap/packages/java/
+
 [sshd]
   listenAddress = *:<%= properties.gerrit.ssh_port || 29418 %>
+
 [httpd]
   listenUrl = proxy-http://<%= properties.gerrit.address %>:<%= properties.gerrit.http_port || 8080 %>/
+
 [cache]
   directory = cache
+
 [cache "web_sessions"]
   maxAge = 7 d
 <% if properties.gerrit.proxy %>
+
 [http]
   proxy = <%= properties.gerrit.proxy %>
 <% end %>
