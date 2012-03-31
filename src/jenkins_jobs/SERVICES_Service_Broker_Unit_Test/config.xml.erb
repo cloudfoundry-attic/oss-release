@@ -2,16 +2,14 @@
 <project>
   <actions/>
   <description></description>
-  <displayName>UAA Gem</displayName>
+  <displayName>Service Broker Unit Test</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
       <maxConcurrentPerNode>0</maxConcurrentPerNode>
       <maxConcurrentTotal>0</maxConcurrentTotal>
-      <categories/>
       <throttleEnabled>false</throttleEnabled>
       <throttleOption>project</throttleOption>
-      <configVersion>1</configVersion>
     </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM">
@@ -19,13 +17,13 @@
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
         <name></name>
-        <refspec>$GERRIT_REFSPEC</refspec>
-        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/uaa.git</url>
+        <refspec></refspec>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap-services.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>**</name>
+        <name>*/services-r10</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <disableSubmodules>false</disableSubmodules>
@@ -46,6 +44,7 @@
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
@@ -56,15 +55,71 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$VCAP_RUBY19/bin:$VCAP_GIT/bin:$PATH
-cd gem
-bundle install --path vendor/bundle
-bundle exec rake ci</command>
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
+
+RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
+GIT_REALPATH=`readlink -nf $VCAP_GIT`
+
+BASE=$PWD/base
+SB_SVC=$PWD/service_broker
+
+#
+# HACK - Base expects to be able to write to /var/vcap/sys/run/LOCK
+#
+SCRATCHPAD=$SB_SVC/xxx_scratchpad
+rm -rf $SCRATCHPAD
+mkdir $SCRATCHPAD
+
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash 
+set -x
+set -o errexit
+export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$PATH
+export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
+export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
+
+cd /tmp/service_broker
+
+rm -rf .bundle
+rm -rf vendor/bundle
+
+# change the sqlite3 db directory
+sed -i &quot;s/local_db: sqlite3:\/var\/vcap\/services\/broker\/service_broker.d/local_db: sqlite3:service_broker.db/g&quot; config/service_broker.yml
+
+bundle install --deployment --without development production
+bundle exec nats-server --daemonize --pid /tmp/nats.pid
+bundle exec rake spec:ci
+EOT
+
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw&quot;`
+$WARDEN_REPL -e -x -c &quot;
+copy $HANDLE in $BASE /tmp
+copy $HANDLE in $SB_SVC /tmp
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+copy $HANDLE out /tmp/service_broker/spec_reports $SB_SVC vcap:vcap
+copy $HANDLE out /tmp/service_broker/spec_coverage $SB_SVC vcap:vcap
+destroy $HANDLE
+&quot;
+
+rm -f $TEST_RUNNER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>service_broker/spec_reports/**</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>service_broker/spec_reports/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-      <reportDir>gem/coverage/rcov</reportDir>
+      <reportDir>service_broker/spec_coverage/rcov</reportDir>
       <targets>
         <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
           <metric>TOTAL_COVERAGE</metric>

@@ -46,6 +46,7 @@
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
@@ -72,7 +73,7 @@ set -o errexit
 set -o nounset
 export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$PATH
 cd /tmp/monit_api
-bundle install --local --path vendor/bundle --without development production
+bundle install --path vendor/bundle --without development production
 cd spec
 bundle exec rake spec:unit:ci
 EOT

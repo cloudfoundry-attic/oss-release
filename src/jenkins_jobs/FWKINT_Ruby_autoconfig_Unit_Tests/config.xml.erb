@@ -46,6 +46,7 @@
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
@@ -82,7 +83,7 @@ cp *.gem /tmp/auto-reconfiguration/vendor/cache
 cd /tmp/auto-reconfiguration
 mkdir /tmp/unused
 env BUNDLE_PATH=/tmp/unused bundle package
-bundle install --deployment
+bundle install --path vendor/bundle
 bundle exec rake ci
 EOT
 
