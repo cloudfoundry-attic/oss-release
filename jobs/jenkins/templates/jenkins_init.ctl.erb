@@ -23,11 +23,6 @@ chmod -R 600 $JOB_DIR/config/
 # Configurations replacement
 cp -pf $JOB_DIR/config/*.xml $DATA_DIR/
 
-# SSH keyfile for reviewbot
-chown vcap:vcap $PACKAGE_DIR/review*
-chmod 600 $PACKAGE_DIR/review*
-cp -pf $PACKAGE_DIR/review* $DATA_DIR/
-
 # Copy Plugins
 cp -rf $PACKAGE_DIR/plugins $DATA_DIR/
 chown -R vcap:vcap $DATA_DIR/plugins/

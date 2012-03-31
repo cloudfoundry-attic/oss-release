@@ -2,7 +2,6 @@
 set -e
 
 cp -v jenkins/jenkins.war ${BOSH_INSTALL_TARGET}/
-cp -v misc/review* ${BOSH_INSTALL_TARGET}/
 
 tar xf misc/tcl8-1.5.11rc1-src.tar
 (
