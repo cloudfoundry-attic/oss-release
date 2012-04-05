@@ -82,7 +82,7 @@ export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:/var/vcap/packages/java/bin:$
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 
-cd /tmp/neo4j
+cd /tmp/neo_source/neo4j
 
 mkdir neo4j_bin
 cp -r /var/vcap/packages/neo4j/* neo4j_bin/
@@ -94,11 +94,8 @@ rm -rf vendor/bundle
 # change the sqlite3 db directory
 sed -i &quot;s/neo4j_path: \/var\/vcap\/services\/neo4j/neo4j_path: \/tmp\/neo4j\/neo4j_bin/g&quot; config/neo4j_node.yml
 sed -i &quot;s/local_db: sqlite3:\/var\/vcap\/services\/neo4j\/neo4j_node.db/local_db: sqlite3:neo4j_node.db/g&quot; config/neo4j_node.yml
-sed -i &quot;s/Logger::FATAL/Logger::DEBUG/g&quot; spec/spec_helper.rb
 
 mkdir instances
-
-java -version
 
 bundle install --deployment --without development production
 bundle exec nats-server --daemonize --pid /tmp/nats.pid
@@ -107,13 +104,13 @@ EOT
 
 HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw, bind_mount:$JAVA_REALPATH,/var/vcap/packages/java,ro bind_mount:$NEO_REALPATH,/var/vcap/packages/neo4j,ro&quot;`
 $WARDEN_REPL -e -x -c &quot;
-copy $HANDLE in $BASE /tmp
-copy $HANDLE in $NEO_SVC /tmp
+copy $HANDLE in $BASE /tmp/neo_source
+copy $HANDLE in $NEO_SVC /tmp/neo_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
-copy $HANDLE out /tmp/neo4j/spec_reports $NEO_SVC vcap:vcap
-copy $HANDLE out /tmp/neo4j/spec_coverage $NEO_SVC vcap:vcap
+copy $HANDLE out /tmp/neo_source/neo4j/spec_reports $NEO_SVC vcap:vcap
+copy $HANDLE out /tmp/neo_source/neo4j/spec_coverage $NEO_SVC vcap:vcap
 destroy $HANDLE
 &quot;
 
