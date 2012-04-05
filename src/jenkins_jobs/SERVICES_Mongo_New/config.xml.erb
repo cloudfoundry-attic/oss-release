@@ -58,7 +58,7 @@
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
-MONGODB_REALPATH=`readlink -nf $VCAP_MONGODB18`
+MONGODB_REALPATH=`readlink -nf $VCAP_MONGODB`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
 
@@ -81,11 +81,9 @@ export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$MONGODB_REALPATH/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 
-cd /tmp/mongodb
+cd /tmp/mon_source/mongodb
 rm -rf .bundle
 rm -rf vendor/bundle
-
-mongod --version
 
 bundle install --deployment --without development production
 bundle exec nats-server --daemonize --pid /tmp/nats.pid
@@ -95,13 +93,13 @@ EOT
 
 HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$MONGODB_REALPATH,$MONGODB_REALPATH,ro&quot;`
 $WARDEN_REPL -e -x -c &quot;
-copy $HANDLE in $BASE /tmp
-copy $HANDLE in $MONGODB_SVC /tmp
+copy $HANDLE in $BASE /tmp/mon_source
+copy $HANDLE in $MONGODB_SVC /tmp/mon_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
-copy $HANDLE out /tmp/mongodb/spec_reports $MONGODB_SVC vcap:vcap
-copy $HANDLE out /tmp/mongodb/spec_coverage $MONGODB_SVC vcap:vcap
+copy $HANDLE out /tmp/mon_source/mongodb/spec_reports $MONGODB_SVC vcap:vcap
+copy $HANDLE out /tmp/mon_source/mongodb/spec_coverage $MONGODB_SVC vcap:vcap
 destroy $HANDLE
 &quot;
 
