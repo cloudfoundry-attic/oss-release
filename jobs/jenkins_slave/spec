@@ -31,3 +31,4 @@ packages:
   - rabbitmq
   - erlang
   - neo4j
+  - vblob

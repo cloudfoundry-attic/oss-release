@@ -1,0 +1,10 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+mkdir unpack_vblob
+tar zxf vblob/vblob.tgz -C unpack_vblob
+
+(
+  cd unpack_vblob
+  cp -af vblob/* $BOSH_INSTALL_TARGET
+)
