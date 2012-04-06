@@ -32,3 +32,4 @@ packages:
   - erlang
   - neo4j
   - vblob
+  - mysql-service

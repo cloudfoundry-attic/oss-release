@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description></description>
-  <displayName>Mysql Unit Test</displayName>
+  <displayName>Backup Manager Unit Test</displayName>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -17,7 +17,7 @@
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
         <name></name>
-        <refspec>$GERRIT_REFSPEC</refspec>
+        <refspec></refspec>
         <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap-services.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
@@ -34,9 +34,7 @@
     <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
     <remotePoll>false</remotePoll>
-    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
-      <separator>#</separator>
-    </buildChooser>
+    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
@@ -46,6 +44,7 @@
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
@@ -59,19 +58,16 @@
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
-MYSQL_REALPATH=`readlink -nf $VCAP_MYSQLSEV`
-MYSQLCLI_REALPATH=`readlink -nf $VCAP_MYSQLCLIENT`
-ERLANG_REALPATH=`readlink -nf $VCAP_ERLANG`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
 
 BASE=$PWD/base
-MYSQL_SVC=$PWD/mysql
+BM_SVC=$PWD/tools
 
 #
 # HACK - Base expects to be able to write to /var/vcap/sys/run/LOCK
 #
-SCRATCHPAD=$MYSQL_SVC/xxx_scratchpad
+SCRATCHPAD=$BM_SVC/xxx_scratchpad
 rm -rf $SCRATCHPAD
 mkdir $SCRATCHPAD
 
@@ -80,44 +76,32 @@ cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 #!/bin/bash 
 set -x
 set -o errexit
-export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_MYSQL/bin:$VCAP_MYSQLCLIENT/sbin:$PATH
-export LIBRARY_PATH=$SQLITE_REALPATH/lib:$VCAP_MYSQLCLIENT/lib/mysql:$VCAP_MYSQL/lib/mysql:$LIBRARY_PATH
+
+echo &quot;started testing&quot;
+
+export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$PATH
+export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
-export LD_LIBRARY_PATH=$VCAP_MYSQLCLIENT/lib/mysql:$VCAP_MYSQL/lib/mysql:$LD_LIBRARY_PATH
 
-mkdir -p /tmp/var/vcap/packages/mysql
-cp -r /var/vcap/packages/mysql/* /tmp/var/vcap/packages/mysql/
+cd /tmp/bm_source/tools/backup/manager
 
-/tmp/var/vcap/packages/mysql/libexec/mysql.server start /tmp/var/vcap/packages/mysql/my.cnf 
-/tmp/var/vcap/packages/mysql/bin/mysqladmin -u root password root -S /tmp/mysql.sock
-ls -al /tmp/var/vcap/store/mysql
-
-cd /tmp/mysql_source/mysql
 rm -rf .bundle
 rm -rf vendor/bundle
-
-sed -i &apos;s/local_db: sqlite3:\/var\/vcap\/services\/mysql\/mysql_node.db/local_db: sqlite3:mysql_node.db/g&apos; config/mysql_node.yml
-sed -i &apos;s/base_dir: \/var\/vcap\/services\/mysql\//base_dir: \/tmp\/var\/vcap\/services\/mysql/g&apos; config/mysql_node.yml
-sed -i &apos;s/\/var\/vcap\/sys\/run\/mysql_node.pid/\/tmp\/var\/vcap\/sys\/run\/mysql_node.pid/g&apos; config/mysql_node.yml
-sed -i &apos;s/\/var\/vcap\/sys\/run\/mysql_service.pid/\/tmp\/var\/vcap\/sys\/run\/mysql_service.pid/g&apos; config/mysql_gateway.yml
-
-ps aux | grep mysql
-lsof -i:3306
 
 bundle install --deployment --without development production
 bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci
 EOT
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$MYSQL_REALPATH,$VCAP_MYSQL,ro bind_mount:$MYSQLCLI_REALPATH,$VCAP_MYSQLCLIENT,ro&quot;`
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw&quot;`
 $WARDEN_REPL -e -x -c &quot;
-copy $HANDLE in $BASE /tmp/mysql_source
-copy $HANDLE in $MYSQL_SVC /tmp/mysql_source
+copy $HANDLE in $BASE /tmp/bm_source
+copy $HANDLE in $BM_SVC /tmp/bm_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
-copy $HANDLE out /tmp/mysql_source/mysql/spec_reports $MYSQL_SVC vcap:vcap
-copy $HANDLE out /tmp/mysql_source/mysql/spec_coverage $MYSQL_SVC vcap:vcap
+#copy $HANDLE out /tmp/bm_source/tools/backup/manager/spec_reports $SB_SVC vcap:vcap
+#copy $HANDLE out /tmp/bm_source/tools/backup/manager/spec_coverage $SB_SVC vcap:vcap
 destroy $HANDLE
 &quot;
 
@@ -126,16 +110,16 @@ rm -f $TEST_RUNNER</command>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>mysql/spec_reports/**</artifacts>
+      <artifacts>tools/backup/manager/spec_reports/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>mysql/spec_reports/*.xml</testResults>
+      <testResults>tools/backup/manager/spec_reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-      <reportDir>mysql/spec_coverage/rcov</reportDir>
+      <reportDir>tools/backup/manager/spec_coverage/rcov</reportDir>
       <targets>
         <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
           <metric>TOTAL_COVERAGE</metric>
