@@ -1,0 +1,9 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+tar zxf rabbitmq/rabbitmq.tgz
+
+(
+  cd rabbitmq
+  cp -af ebin include plugins sbin share $BOSH_INSTALL_TARGET
+)

@@ -1,0 +1,33 @@
+---
+name: gerrit
+templates:
+  gerrit_ctl: bin/gerrit_ctl
+  gerrit_init.ctl.erb: bin/gerrit_init.ctl
+  gerrit_expect.erb: bin/gerrit_expect
+  ssh_expect.erb: bin/ssh_expect
+  upgrade_expect.erb: bin/upgrade_expect
+  gerrit_replication.erb: config/replication.config
+  gerrit_config.erb: config/gerrit.config
+  gerrit_secure.erb: config/secure.config
+  gerrit_hooks.yml.erb: config/gerrit_hooks.yml
+  cla_config.yml.erb: config/cla_config.yml
+  clas/cf_cla.html: config/clas/cf_cla.html
+  pr_bounce.yml.erb: config/pr_bounce.yml
+  pr_bounce/closing.html: config/pr_bounce/closing.html
+  close_pull_requests: bin/close_pull_requests
+  ssh_config: config/ssh_config
+  jenkins_user.yml.erb: config/jenkins_user.yml
+  mysql.yml.erb: config/mysql.yml
+  gerrit_trigger.yml.erb: config/gerrit_trigger.yml
+  logo.png: config/logo.png
+  site_header.html.erb: config/site_header.html
+  site_footer.html: config/site_footer.html
+packages:
+  - git
+  - ruby
+  - java
+  - gerrit
+  - mysqlclient
+  - gerrit_cla_updater
+  - pr_bounce
+  - create_batch_gerrit_account

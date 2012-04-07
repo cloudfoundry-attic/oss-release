@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<maven2-module-set>
+  <keepDependencies>false</keepDependencies>
+  <properties/>
+  <scm class="hudson.scm.NullSCM"/>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <reporters/>
+  <displayName>vcap-java</displayName>
+  <version>1.0.0-BUILD-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <relativePath></relativePath>
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-deploy-plugin</artifactId>
+      <version>-</version>
+      <plugin>true</plugin>
+    </dependency>
+  </dependencies>
+  <children>
+    <hudson.maven.ModuleName>
+      <groupId>org.cloudfoundry</groupId>
+      <artifactId>cloudfoundry-runtime</artifactId>
+    </hudson.maven.ModuleName>
+    <hudson.maven.ModuleName>
+      <groupId>org.cloudfoundry</groupId>
+      <artifactId>auto-reconfiguration</artifactId>
+    </hudson.maven.ModuleName>
+    <hudson.maven.ModuleName>
+      <groupId>org.cloudfoundry</groupId>
+      <artifactId>vcap-java-plugins</artifactId>
+    </hudson.maven.ModuleName>
+  </children>
+</maven2-module-set>

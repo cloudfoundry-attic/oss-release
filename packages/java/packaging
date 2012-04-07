@@ -1,0 +1,13 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+echo "Extracting archive..."
+tar xzf java/jre_jdk_1.6.0_24-amd64.tar.gz
+
+if [[ -d j2sdk-image/bin && `j2sdk-image/bin/java -version 2>&1` =~ "OpenJDK" && $? == 0 ]]; then
+  cp -a j2sdk-image/* ${BOSH_INSTALL_TARGET}
+else
+  echo "JVM is not properly packaged"
+  exit 1
+fi
+

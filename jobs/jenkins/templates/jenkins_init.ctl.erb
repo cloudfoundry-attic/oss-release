@@ -1,0 +1,54 @@
+#!/bin/bash
+PACKAGE_DIR=/var/vcap/packages/jenkins
+JOB_DIR=/var/vcap/jobs/jenkins
+DATA_DIR=/var/vcap/store/jenkins
+CONFIG_DIR=/var/vcap/jobs/jenkins/config
+
+# Grab all the slaves to the master config file
+cat $JOB_DIR/config/config_head > $JOB_DIR/config/config.xml
+
+slave_id=1
+for ip_addr in <%= properties.jenkins_slave.slaves_ip.join(' ') %>
+do
+  cat $JOB_DIR/config/config_slave|sed -e "s/SLAVE_CONFIG_NAME/jenk${slave_id}/g" -e "s/SLAVE_CONFIG_IP/${ip_addr}/g" >> $JOB_DIR/config/config.xml
+  slave_id=`expr $slave_id + 1`
+done
+
+cat $JOB_DIR/config/config_tail >> $JOB_DIR/config/config.xml
+
+# Harden Secure Configurations
+chown -R vcap:vcap $JOB_DIR/config/
+chmod -R 600 $JOB_DIR/config/
+
+# Configurations replacement
+cp -pf $JOB_DIR/config/*.xml $DATA_DIR/
+
+# SSH keyfile for reviewbot
+chown vcap:vcap $PACKAGE_DIR/review*
+chmod 600 $PACKAGE_DIR/review*
+cp -pf $PACKAGE_DIR/review* $DATA_DIR/
+
+# Copy Plugins
+cp -rf $PACKAGE_DIR/plugins $DATA_DIR/
+chown -R vcap:vcap $DATA_DIR/plugins/
+
+# Passwdless ssh host key pair(for slave)
+mkdir -p /home/vcap/.ssh
+cp $CONFIG_DIR/{id_rsa,id_rsa.pub} /home/vcap/.ssh
+chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub}
+chown -R vcap:vcap /home/vcap/.ssh
+
+# SSH Keyfile for gerrit-trigger
+cp /var/vcap/jobs/jenkins/config/gerrit_trigger_key $DATA_DIR
+chown vcap:vcap $DATA_DIR/gerrit_trigger_key
+chmod 0600 $DATA_DIR/gerrit_trigger_key
+
+# Update the job configs
+$JOB_DIR/bin/render_jenkins_jobs
+
+# Fonts needed for graph drawing
+if [ ! -e /usr/share/fonts/truetype/ttf-dejavu ];
+then
+  mkdir -p /usr/share/fonts/truetype
+  ln -s /var/vcap/packages/ttf_dejavu /usr/share/fonts/truetype/ttf-dejavu
+fi

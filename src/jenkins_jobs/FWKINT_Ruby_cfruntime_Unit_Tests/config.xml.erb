@@ -1,0 +1,115 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <displayName>Ruby cfruntime Unit Tests</displayName>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+      <maxConcurrentPerNode>1</maxConcurrentPerNode>
+      <maxConcurrentTotal>4</maxConcurrentTotal>
+      <throttleEnabled>false</throttleEnabled>
+      <throttleOption>project</throttleOption>
+    </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name></name>
+        <refspec>$GERRIT_REFSPEC</refspec>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap-ruby.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <disableSubmodules>false</disableSubmodules>
+    <recursiveSubmodules>false</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
+    <clean>false</clean>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <remotePoll>false</remotePoll>
+    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
+      <separator>#</separator>
+    </buildChooser>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir></relativeTargetDir>
+    <reference></reference>
+    <excludedRegions></excludedRegions>
+    <excludedUsers></excludedUsers>
+    <gitConfigName></gitConfigName>
+    <gitConfigEmail></gitConfigEmail>
+    <skipTag>false</skipTag>
+    <scmName></scmName>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
+
+RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+MYSQLCLIENT_REALPATH=`readlink -nf $VCAP_MYSQLCLIENT`
+LIBPQ_REALPATH=`readlink -nf $VCAP_LIBPQ`
+CFRUNTIME=$PWD/cfruntime
+
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -o errexit
+
+export PATH=$RUBY19_REALPATH/bin:$PATH
+export LIBRARY_PATH=$MYSQLCLIENT_REALPATH/lib/mysql:$LIBPQ_REALPATH/lib:$LIBRARY_PATH
+export C_INCLUDE_PATH=$MYSQLCLIENT_REALPATH/include/mysql:$LIBPQ_REALPATH/include:$C_INCLUDE_PATH
+export LD_LIBRARY_PATH=$MYSQLCLIENT_REALPATH/lib/mysql:$LIBPQ_REALPATH/lib:$LD_LIBRARY_PATH
+
+cd /tmp/cfruntime
+bundle install --deployment
+bundle exec rake ci
+gem build cf-runtime.gemspec
+EOT
+
+HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $MYSQLCLIENT_REALPATH $LIBPQ_REALPATH`
+$WARDEN_REPL -e -c &quot;
+copy $HANDLE in $CFRUNTIME /tmp
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+copy $HANDLE out /tmp/cfruntime/coverage $CFRUNTIME vcap:vcap
+destroy $HANDLE
+&quot;
+
+rm -f $TEST_RUNNER</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
+      <reportDir>cfruntime/coverage/rcov</reportDir>
+      <targets>
+        <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+          <metric>TOTAL_COVERAGE</metric>
+          <healthy>80</healthy>
+          <unhealthy>0</unhealthy>
+          <unstable>0</unstable>
+        </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+        <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+          <metric>CODE_COVERAGE</metric>
+          <healthy>80</healthy>
+          <unhealthy>0</unhealthy>
+          <unstable>0</unstable>
+        </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+      </targets>
+    </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>

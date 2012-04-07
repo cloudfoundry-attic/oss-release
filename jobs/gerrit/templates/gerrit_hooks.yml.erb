@@ -1,0 +1,10 @@
+#notify configures the mail notification hooks
+notify:
+  from: gerrit2@<%= properties.gerrit.external_domain %>
+  maillist:  <%= properties.gerrit.maillist %>
+  smtpserver: <%= properties.gerrit.smtp_server %>
+  port: <%= properties.gerrit.smtp_port||25 %>
+  user: <%= properties.gerrit.smtp_user %>
+  password: <%= properties.gerrit.smtp_pass %>
+gerrit:
+  ssh_port: <%= properties.gerrit.ssh_port %>

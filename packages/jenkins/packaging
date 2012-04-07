@@ -1,0 +1,26 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+cp -v jenkins/jenkins.war ${BOSH_INSTALL_TARGET}/
+cp -v misc/review* ${BOSH_INSTALL_TARGET}/
+
+tar xf misc/tcl8-1.5.11rc1-src.tar
+(
+  cd tcl8.5.11/unix
+  ./configure --prefix=${BOSH_INSTALL_TARGET}
+  make
+  make install
+)
+
+tar xf misc/expect5.45.tar
+(
+  cd expect5.45
+  ./configure --prefix=${BOSH_INSTALL_TARGET}
+  make
+  make install
+)
+
+tar xf jenkins/plugins.tgz
+(
+  cp -rf plugins ${BOSH_INSTALL_TARGET}
+)

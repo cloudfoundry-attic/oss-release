@@ -1,0 +1,56 @@
+[gerrit]
+  basePath = git
+  canonicalWebUrl = http://<%= properties.gerrit.external_domain %>
+[database]
+<% if properties.gerrit_postgres %>
+  type = POSTGRESQL
+  hostname = <%= properties.gerrit_postgres.address %>
+  port = <%= properties.gerrit_postgres.port||2544 %>
+  database = <%= properties.gerrit_postgres.dbname||"reviewdb" %>
+  username = <%= properties.gerrit_postgres.user %>
+<% elsif properties.gerrit_mysql %>
+  type = MYSQL
+  hostname = <%= properties.gerrit_mysql.address %>
+  port = <%= properties.gerrit_mysql.port||3306 %>
+  database = <%= properties.gerrit_mysql.dbname||"reviewdb" %>
+  username = <%= properties.gerrit_mysql.user %>
+<% end %>
+
+[auth]
+  type = <%= properties.gerrit.auth_type||"OPENID" %>
+<% if (properties.gerrit.version =~ /^2\.2\./) %>
+  allowGoogleAccountUpgrade = true
+<% end %>
+<% if (properties.gerrit.version =~ /^2\.2\./) && !properties.gerrit.clas.nil?  %>
+  contributorAgreements = true
+<% end %>
+
+[sendemail]
+  smtpServer = <%= properties.gerrit.smtp_server %>
+<% if properties.gerrit.smtp_port %>
+  smtpServerPort = <%= properties.gerrit.smtp_port %>
+<% end %>
+  smtpUser = <%= properties.gerrit.smtp_user %>
+  smtpPass = <%= properties.gerrit.smtp_pass %>
+  from = ${user} CloudFoundry Code Review <noreply@cloudfoundry.org>
+
+[container]
+  user = vcap
+  javaHome = /var/vcap/packages/java/
+
+[sshd]
+  listenAddress = *:<%= properties.gerrit.ssh_port || 29418 %>
+
+[httpd]
+  listenUrl = proxy-http://<%= properties.gerrit.address %>:<%= properties.gerrit.http_port || 8080 %>/
+
+[cache]
+  directory = cache
+
+[cache "web_sessions"]
+  maxAge = 7 d
+<% if properties.gerrit.proxy %>
+
+[http]
+  proxy = <%= properties.gerrit.proxy %>
+<% end %>

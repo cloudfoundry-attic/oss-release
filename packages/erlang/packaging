@@ -1,0 +1,9 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+tar zxf erlang/erlang.tgz
+
+(
+  cd erlang
+  cp -af bin lib $BOSH_INSTALL_TARGET
+)

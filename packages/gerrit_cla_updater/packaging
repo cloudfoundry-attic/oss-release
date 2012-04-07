@@ -1,0 +1,13 @@
+# abort script on any command that exit with a non zero value
+set -o errexit
+
+cp -a gerrit_cla_updater/* ${BOSH_INSTALL_TARGET}
+
+(
+  set -o errexit
+  cd ${BOSH_INSTALL_TARGET}
+  export PATH=/var/vcap/packages/ruby/bin:$PATH
+  export C_INCLUDE_PATH=/var/vcap/packages/mysqlclient/include/mysql:$C_INCLUDE_PATH
+  export LIBRARY_PATH=/var/vcap/packages/mysqlclient/lib/mysql:$LIBRARY_PATH
+  bundle --local install --deployment --without=development test
+)

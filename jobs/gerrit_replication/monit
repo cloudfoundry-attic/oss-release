@@ -1,0 +1,6 @@
+check process gerrit_replication
+  with pidfile /var/vcap/sys/run/replication/replication.pid
+  start program "/var/vcap/jobs/gerrit_replication/bin/replication_ctl start"
+  stop program "/var/vcap/jobs/gerrit_replication/bin/replication_ctl stop"
+  group vcap
+

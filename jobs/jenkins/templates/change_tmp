@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# Extend /tmp for jenkins
+tmpsize=`df|grep tmp|awk '{print $2}'`
+if [ $tmpsize -le 150000 ]; then
+  umount /tmp
+  /usr/bin/truncate -s 2000M /var/vcap/data/root_tmp
+  chmod 0700 /var/vcap/data/root_tmp
+  mke2fs -t ext4 -m 1 -F /var/vcap/data/root_tmp
+  mount -t ext4 -o loop /var/vcap/data/root_tmp /tmp
+  chown root:vcap /tmp
+  chmod 0770 /tmp
+fi

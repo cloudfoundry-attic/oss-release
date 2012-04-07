@@ -1,0 +1,6 @@
+set -e
+
+echo "Extracting archive"
+tar zxf ttf_dejavu/ttf_dejavu_2.30-2.tar.gz
+
+cp -a ttf-dejavu/* ${BOSH_INSTALL_TARGET}

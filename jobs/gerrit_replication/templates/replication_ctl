@@ -1,0 +1,38 @@
+#!/bin/bash
+RUN_DIR=/var/vcap/sys/run/replication/
+PIDFILE=$RUN_DIR/replication.pid
+GIT_DIR=/var/vcap/packages/git
+
+case $1 in
+
+  start)
+    mkdir -p $RUN_DIR
+
+    echo $$ > $PIDFILE
+
+    #The replication invoked by gerrit instance seems don't lookup env for git, copy it to /usr/bin fix it. need harden?
+    cp -rf $GIT_DIR/bin/* /usr/bin/
+
+    #replication directory
+    mkdir -p /var/vcap/store/gerrit_replication/
+    chown vcap:vcap /var/vcap/store/gerrit_replication/
+
+    #vcap ssh key repo
+    mkdir -p /home/vcap/.ssh/
+    chown vcap:vcap /home/vcap/.ssh/
+
+    #renew vcap passwd
+    pass=`openssl passwd -1 <%= properties.gerrit_replication.password %>`
+    usermod -p $pass vcap
+    # Now nothing need watching, just give it to init
+    echo 1 > $PIDFILE
+    ;;
+
+  stop)
+    rm -f $PIDFILE
+    ;;
+
+  *)
+  echo "Usage: replication_ctl {start|stop}" ;;
+esac
+exit 0

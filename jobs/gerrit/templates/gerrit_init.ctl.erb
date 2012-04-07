@@ -1,0 +1,139 @@
+#!/bin/bash
+PACKAGE_ROOT_DIR=/var/vcap/packages
+PACKAGE_DIR=$PACKAGE_ROOT_DIR/gerrit
+GIT_DIR=/var/vcap/packages/git
+JAVA_DIR=/var/vcap/packages/java
+JOB_DIR=/var/vcap/jobs/gerrit
+DATA_DIR=/var/vcap/store/gerrit
+
+VERSION=<%= properties.gerrit.version %>
+NEED_UPGRADE=<%= properties.gerrit.upgrade||0 %>
+
+<% if properties.gerrit_postgres %>
+dbname=<%= properties.gerrit_postgres.dbname||"reviewdb" %>
+<% elsif properties.gerrit_mysql %>
+dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
+<% end %>
+
+CONFIG_DIR=$DATA_DIR/review_site/$dbname/etc/
+STATIC_DIR=$DATA_DIR/review_site/$dbname/static
+HOOKS_DIR=$DATA_DIR/review_site/$dbname/hooks/
+
+chown vcap:vcap $PACKAGE_DIR/*.war
+
+if [ ! -d $CONFIG_DIR ]; then
+  # Tmp directory link to persistent disks
+  mkdir -p $DATA_DIR/review_site/$dbname/.gerritcodereview/
+  ln -s $DATA_DIR/review_site/$dbname/.gerritcodereview /home/vcap/.gerritcodereview
+  chown -R vcap:vcap $DATA_DIR/review_site/$dbname
+
+  # Use expect for DB initilization.
+  $JOB_DIR/bin/gerrit_expect $VERSION
+  if [ $? != 0 ]; then
+    echo "ERROR: Unable to Initialize Gerrit"
+    exit 1
+  fi
+
+  su - vcap -c "LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH PATH=$PACKAGE_DIR/bin/:$GIT_DIR/bin/:$JAVA_DIR/bin:$PATH $DATA_DIR/review_site/$dbname/bin/gerrit.sh stop "
+fi
+
+if [ $NEED_UPGRADE != 0 ] && [ -d $CONFIG_DIR ]; then
+  $JOB_DIR/bin/upgrade_expect $VERSION
+  if [ $? != 0 ]; then
+    echo "ERROR: Unable to Upgrade Gerrit"
+    exit 1
+  fi
+fi
+
+# Harden Secure Configurations
+chown -R vcap:vcap $JOB_DIR/config/
+chmod -R 600 $JOB_DIR/config/
+
+# General Configurations
+cp -pf $JOB_DIR/config/gerrit.config $CONFIG_DIR/
+cp -pf $JOB_DIR/config/secure.config $CONFIG_DIR/
+
+# Replication setup
+cp -pf $JOB_DIR/config/replication.config $CONFIG_DIR/
+
+# Gerrit Hooks setup
+rm -rf $HOOKS_DIR
+cp -r $PACKAGE_DIR/hooks $HOOKS_DIR
+cp -pf $JOB_DIR/config/gerrit_hooks.yml $HOOKS_DIR/patchset_notification/config/
+chown -R vcap:vcap $HOOKS_DIR
+
+# SSH keyfile for reviewbot(which setup reviewers automatically)
+chown vcap:vcap $PACKAGE_DIR/review*
+chmod 600 $PACKAGE_DIR/review*
+cp -pf $PACKAGE_DIR/review* $HOOKS_DIR/patchset_notification/config/
+
+rm -rf $STATIC_DIR/*
+
+# Copy any CLA files
+cp $JOB_DIR/config/clas/* $STATIC_DIR
+chown -R vcap:vcap $STATIC_DIR
+
+# Update the DB with the CLA agreements
+<% if (properties.gerrit.version =~ /^2\.2\./) %>
+(
+  set -o errexit
+  export PATH=$PACKAGE_ROOT_DIR/ruby/bin:$PATH
+  export LD_LIBRARY_PATH=/var/vcap/packages/mysqlclient/lib/mysql:$LD_LIBRARY_PATH
+  cd $PACKAGE_ROOT_DIR/gerrit_cla_updater
+  bundle exec ruby gerrit_cla_updater.rb $JOB_DIR/config/cla_config.yml
+)
+<% end %>
+
+# Passwdless ssh key pair refresh/generation (for replication)
+if [ ! -f /home/vcap/.ssh/id_rsa.pub ]; then
+  rm -rf /home/vcap/.ssh/*
+  $JOB_DIR/bin/ssh_expect
+fi
+
+# SSH config so that Gerrit knows how to authenticate
+cp /var/vcap/jobs/gerrit/config/ssh_config /home/vcap/.ssh/config
+chown vcap:vcap /home/vcap/.ssh/config
+chmod 0644 /home/vcap/.ssh/config
+
+# Refresh host key for github
+su - vcap -c 'ssh-keygen -f /home/vcap/.ssh/known_hosts -R github.com'
+su - vcap -c 'ssh-keyscan github.com >> /home/vcap/.ssh/known_hosts'
+
+# Auto close pull requests
+rm -f /etc/cron.hourly/close_pull_requests
+<% if properties.gerrit.pr_bounce %>
+cp /var/vcap/jobs/gerrit/bin/close_pull_requests /etc/cron.hourly
+chmod +x /etc/cron.hourly/close_pull_requests
+<% end %>
+
+# Update the CI batch account
+(
+  set -o errexit
+  export PATH=$PACKAGE_ROOT_DIR/ruby/bin:$PATH
+  export LD_LIBRARY_PATH=/var/vcap/packages/mysqlclient/lib/mysql:$LD_LIBRARY_PATH
+  cd $PACKAGE_ROOT_DIR/create_batch_gerrit_account
+  bundle exec ruby create_batch_gerrit_account.rb $JOB_DIR/config/mysql.yml $JOB_DIR/config/jenkins_user.yml
+)
+
+# Update the gerrit-trigger batch account
+(
+  set -o errexit
+  export PATH=$PACKAGE_ROOT_DIR/ruby/bin:$PATH
+  export LD_LIBRARY_PATH=/var/vcap/packages/mysqlclient/lib/mysql:$LD_LIBRARY_PATH
+  cd $PACKAGE_ROOT_DIR/create_batch_gerrit_account
+  bundle exec ruby create_batch_gerrit_account.rb $JOB_DIR/config/mysql.yml $JOB_DIR/config/gerrit_trigger.yml
+)
+
+# Configure site header
+cp $JOB_DIR/config/site_header.html $CONFIG_DIR/GerritSiteHeader.html
+chown vcap:vcap $CONFIG_DIR/GerritSiteHeader.html
+
+# Footer
+cp $JOB_DIR/config/site_footer.html $CONFIG_DIR/GerritSiteFooter.html
+chown vcap:vcap $CONFIG_DIR/GerritSiteFooter.html
+
+
+# Be sure to increment logo_version if the logo changes. It will invalidate
+# browser caches, forcing the new logo to be fetched.
+cp $JOB_DIR/config/logo.png $STATIC_DIR/logo.<%= properties.gerrit.logo_version %>.cache.png
+chown vcap:vcap $STATIC_DIR/logo.<%= properties.gerrit.logo_version %>.cache.png

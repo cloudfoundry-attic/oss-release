@@ -1,0 +1,57 @@
+#!/bin/bash
+
+RUN_DIR=/var/vcap/sys/run/jenkins_slave
+LOG_DIR=/var/vcap/sys/log/jenkins_slave
+PIDFILE=$RUN_DIR/jenkins_slave.pid
+FS_ROOT=/var/vcap/store/jenkins_slave
+JOB_DIR=/var/vcap/jobs/jenkins_slave
+CONFIG_DIR=/var/vcap/jobs/jenkins_slave/config
+SSH_DIR=/home/vcap/.ssh/
+
+case $1 in
+
+  start)
+    mkdir -p $RUN_DIR $LOG_DIR $FS_ROOT $SSH_DIR
+    chown -R vcap:vcap $RUN_DIR $LOG_DIR $FS_ROOT $SSH_DIR
+
+    echo $$ > $PIDFILE
+    $JOB_DIR/bin/change_tmp
+
+    #Install fix this
+    $JOB_DIR/bin/package_install.ctl
+
+    #Renew vcap passwd
+    pass=`openssl passwd -1 <%= properties.jenkins_slave.password %>`
+    usermod -p $pass vcap
+
+    mkdir -p /home/vcap/.ssh
+    chmod 0700 /home/vcap/.ssh
+
+    cp $CONFIG_DIR/{id_rsa,id_rsa.pub,authorized_keys} /home/vcap/.ssh
+    chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub,authorized_keys}
+    chown -R vcap:vcap /home/vcap/.ssh
+
+    # Refresh host key for gerrit
+    <% if properties.gerrit.dev_ip %>
+    su - vcap -c 'ssh-keygen -f /home/vcap/.ssh/known_hosts -R <%= properties.gerrit.dev_ip %>'
+    su - vcap -c 'ssh-keyscan -p 29418 <%= properties.gerrit.dev_ip %> >> /home/vcap/.ssh/known_hosts'
+    <% end %>
+
+    # Refresh host key for github
+    su - vcap -c 'ssh-keygen -f /home/vcap/.ssh/known_hosts  -R github.com'
+    su - vcap -c 'ssh-keyscan github.com >> /home/vcap/.ssh/known_hosts'
+
+    #No monit needed, pass back to init
+    echo 1 > $PIDFILE
+    ;;
+
+  stop)
+    rm -f $PIDFILE
+    ;;
+
+  *)
+  echo "Usage: jenkins_slave_ctl {start|stop}" ;;
+
+esac
+exit 0
+

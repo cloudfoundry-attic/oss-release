@@ -1,0 +1,25 @@
+---
+name: jenkins
+templates:
+  jenkins_ctl: bin/jenkins_ctl
+  jenkins_init.ctl.erb: bin/jenkins_init.ctl
+  change_tmp: bin/change_tmp
+  id_rsa.erb: config/id_rsa
+  id_rsa.pub.erb: config/id_rsa.pub
+  config_head.erb: config/config_head
+  config_tail: config/config_tail
+  config_slave: config/config_slave
+  nodeMonitors.xml: config/nodeMonitors.xml
+  gerrit-trigger.xml.erb: config/gerrit-trigger.xml
+  hudson.plugins.git.GitTool.xml: config/hudson.plugins.git.GitTool.xml
+  hudson.tasks.Maven.xml: config/hudson.tasks.Maven.xml
+  gerrit_trigger_key.erb: config/gerrit_trigger_key
+  render_jenkins_jobs.erb: bin/render_jenkins_jobs
+packages:
+  - java
+  - git
+  - jenkins
+  - jenkins_jobs
+  - ruby
+  - maven22
+  - ttf_dejavu

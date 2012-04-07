@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<hudson.tasks.Maven_-DescriptorImpl>
+  <helpRedirect/>
+  <installations>
+    <hudson.tasks.Maven_-MavenInstallation>
+      <name>Maven 2.2</name>
+      <home>/var/vcap/packages/maven22</home>
+      <properties/>
+    </hudson.tasks.Maven_-MavenInstallation>
+  </installations>
+</hudson.tasks.Maven_-DescriptorImpl>

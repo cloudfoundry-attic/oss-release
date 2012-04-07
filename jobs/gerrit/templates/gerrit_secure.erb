@@ -1,0 +1,10 @@
+[database]
+<% if properties.gerrit_postgres %>
+  password = <%= properties.gerrit_postgres.password %>
+<% elsif properties.gerrit_mysql %>
+  password = <%= properties.gerrit_mysql.password %>
+<% end %>
+
+[auth]
+  registerEmailPrivateKey = <%= properties.gerrit.email_private_key %>
+

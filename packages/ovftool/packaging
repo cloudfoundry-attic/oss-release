@@ -1,0 +1,5 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+cp -v misc/VMware-ovftool-2.0.1-260188-lin.x86_64.sh ${BOSH_INSTALL_TARGET}/
+

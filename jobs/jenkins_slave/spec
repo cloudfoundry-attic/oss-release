@@ -1,0 +1,33 @@
+---
+name: jenkins_slave
+templates:
+  jenkins_slave_ctl: bin/jenkins_slave_ctl
+  package_install.ctl: bin/package_install.ctl
+  change_tmp: bin/change_tmp
+  warden.yml: config/warden.yml
+  warden_ctl: bin/warden_ctl
+  create_container: bin/create_container
+  id_rsa.erb: config/id_rsa
+  id_rsa.pub.erb: config/id_rsa.pub
+  authorized_keys.erb: config/authorized_keys
+packages:
+  - java
+  - ovftool
+  - dea_ruby18
+  - dea_ruby19
+  - dea_node04
+  - dea_node06
+  - postgres
+  - sqlite
+  - redis
+  - git
+  - warden
+  - ruby
+  - libpq
+  - maven22
+  - mysqlclient
+  - mysql
+  - mongodb
+  - rabbitmq
+  - erlang
+  - neo4j

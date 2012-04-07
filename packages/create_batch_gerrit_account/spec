@@ -1,0 +1,8 @@
+---
+name: create_batch_gerrit_account
+dependencies:
+- ruby
+- mysqlclient
+files:
+- create_batch_gerrit_account/**/*
+- common/fetch_gems
