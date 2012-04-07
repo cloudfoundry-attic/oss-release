@@ -64,6 +64,7 @@ JAVA_DIR=$PWD/java
 SPEC_DIR=$STAGING_DIR/spec/reports
 
 rm -rvf $SPEC_DIR
+rm -rvf $PWD/tests/assets
 
 # Paths needed in the container
 DEA_RUBY18_REALPATH=`readlink -nf $DEA_RUBY18`
