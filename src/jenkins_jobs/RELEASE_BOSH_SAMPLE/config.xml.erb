@@ -8,10 +8,8 @@
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
       <maxConcurrentPerNode>0</maxConcurrentPerNode>
       <maxConcurrentTotal>0</maxConcurrentTotal>
-      <categories/>
       <throttleEnabled>false</throttleEnabled>
       <throttleOption>project</throttleOption>
-      <configVersion>1</configVersion>
     </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM">
@@ -48,6 +46,7 @@
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
@@ -75,42 +74,68 @@
       <buildFailureMessage></buildFailureMessage>
       <buildSuccessfulMessage></buildSuccessfulMessage>
       <buildUnstableMessage></buildUnstableMessage>
+      <buildUnsuccessfulFilepath></buildUnsuccessfulFilepath>
+      <customUrl></customUrl>
     </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
   </triggers>
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$VCAP_RUBY19/bin:$PATH
+      <command>export PATH=$VCAP_RUBY19/bin:/var/vcap/packages/git/bin:$PATH
+
+git clean -fd
 
 # Hack until bosh cli is hosted on rubygems
 if [ -d bosh/.git ]; then
   cd bosh
   git reset --hard
   git pull --rebase
+  cd ..
 else
   rm -rf bosh
-  git clone ssh://ci-bot@172.23.218.50:29418/bosh.git
-  cd bosh
+  git clone ssh://ci-bot@172.31.129.32:29418/bosh.git
 fi
 
-cd cli
+# Paths needed in the container
+VCAP_RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+VCAP_GIT_REALPATH=`readlink -nf /var/vcap/packages/git`
 
-bundle install --local --path vendor/bundle --without production development
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -o nounset
+set -o errexit
+
+export PATH=$VCAP_RUBY19_REALPATH/bin:$VCAP_GIT_REALPATH/bin:$PATH
+
+cd $WORKSPACE/bosh/cli
+bundle install --no-color --local --path vendor/bundle --without production development
 
 # Needed for scripts that use bundle package in their pre packaging
 if [ ! -x vendor/bundle/ruby/1.9.1/bin/bundle ]; then
-  GEM_PATH=vendor/bundle/ruby/1.9.1 GEM_HOME=vendor/bundle/ruby/1.9.1 gem install bundle
+  env GEM_PATH=vendor/bundle/ruby/1.9.1 GEM_HOME=vendor/bundle/ruby/1.9.1 gem install bundle
 fi
 
-cd $WORKSPACE
+cd ../../
 
+git submodule sync
 git submodule update --init --recursive
 
 echo &quot;---\ndev_name: test\n&quot; &gt; config/dev.yml
 
-# no blobs in bosh-sample-release yet
-# BUNDLE_GEMFILE=bosh/cli/Gemfile bundle exec bosh --non-interactive --no-color sync blobs
-BUNDLE_GEMFILE=bosh/cli/Gemfile bundle exec bosh --non-interactive --no-color create release --dry-run --force</command>
+env BUNDLE_GEMFILE=bosh/cli/Gemfile bundle exec bosh --non-interactive --no-color create release --dry-run --force
+EOT
+
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$VCAP_RUBY19_REALPATH,$VCAP_RUBY19_REALPATH,ro bind_mount:$VCAP_GIT_REALPATH,$VCAP_GIT_REALPATH,ro bind_mount:$WORKSPACE,$WORKSPACE,rw&quot;`
+
+$WARDEN_REPL -x -e -c &quot;
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+destroy $HANDLE
+&quot;
+
+rm -f $TEST_RUNNER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers/>

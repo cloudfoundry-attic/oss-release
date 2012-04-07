@@ -8,10 +8,8 @@
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
       <maxConcurrentPerNode>0</maxConcurrentPerNode>
       <maxConcurrentTotal>0</maxConcurrentTotal>
-      <categories/>
       <throttleEnabled>false</throttleEnabled>
       <throttleOption>project</throttleOption>
-      <configVersion>1</configVersion>
     </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM">
@@ -62,6 +60,7 @@
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
 rm -rvf $PWD/router/spec_reports
+rm -rvf $PWD/tests/assets
 
 # PATHS NEEDED IN THE CONTAINER
 DEA_RUBY19_REALPATH=`readlink -nf $DEA_RUBY19`

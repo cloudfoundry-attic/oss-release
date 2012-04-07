@@ -8,10 +8,8 @@
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
       <maxConcurrentPerNode>0</maxConcurrentPerNode>
       <maxConcurrentTotal>0</maxConcurrentTotal>
-      <categories/>
       <throttleEnabled>false</throttleEnabled>
       <throttleOption>project</throttleOption>
-      <configVersion>1</configVersion>
     </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM">
@@ -65,6 +63,7 @@ STAGER_DIR=$PWD/stager
 SPEC_DIR=$STAGER_DIR/spec/reports
 
 rm -rvf $SPEC_DIR
+rm -rvf $PWD/tests/assets
 
 # Paths needed in the container
 DEA_RUBY18_REALPATH=`readlink -nf $DEA_RUBY18`
@@ -91,6 +90,7 @@ export CI_VCAP_RUBY18_VER=$DEA_RUBY18_VER
 export CI_VCAP_STAGER_RUBY18=$DEA_RUBY18_BIN
 export CI_VCAP_STAGER_RUBY18_VER=$DEA_RUBY18_VER
 export VCAP_TEST_LOG=true
+export VCAP_TEST_TASK_TIMEOUT=90
 cd /tmp/stager
 bundle install --deployment --without development production
 bundle exec rake ci:spec
