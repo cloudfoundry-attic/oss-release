@@ -8,10 +8,8 @@
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
       <maxConcurrentPerNode>0</maxConcurrentPerNode>
       <maxConcurrentTotal>4</maxConcurrentTotal>
-      <categories/>
       <throttleEnabled>true</throttleEnabled>
       <throttleOption>project</throttleOption>
-      <configVersion>1</configVersion>
     </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
   </properties>
   <scm class="hudson.scm.NullSCM"/>
@@ -40,6 +38,8 @@
       <buildFailureMessage></buildFailureMessage>
       <buildSuccessfulMessage></buildSuccessfulMessage>
       <buildUnstableMessage></buildUnstableMessage>
+      <buildUnsuccessfulFilepath></buildUnsuccessfulFilepath>
+      <customUrl></customUrl>
     </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
   </triggers>
   <concurrentBuild>true</concurrentBuild>
@@ -50,7 +50,7 @@
           <configs>
             <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
           </configs>
-          <projects>UAA_Gem,UAA_Trunk</projects>
+          <projects>UAA_Gem,UAA_Service</projects>
           <condition>ALWAYS</condition>
           <triggerWithNoParameters>false</triggerWithNoParameters>
           <block>
