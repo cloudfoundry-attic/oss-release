@@ -20,7 +20,7 @@
               <default>
                 <comparator class="hudson.util.CaseInsensitiveComparator"/>
               </default>
-              <int>22</int>
+              <int>23</int>
               <string>CREATE_CONTAINER</string>
               <string>/var/vcap/jobs/jenkins_slave/bin/create_container</string>
               <string>DEA_RUBY19</string>
@@ -65,6 +65,8 @@
               <string>/var/vcap/packages/vblob</string>
               <string>VCAP_MYSQLSEV</string>
               <string>/var/vcap/packages/mysql-service</string>
+              <string>VCAP_VPOSTGRES</string>
+              <string>/var/vcap/packages/vpostgres</string>
             </tree-map>
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>

@@ -33,3 +33,4 @@ packages:
   - neo4j
   - vblob
   - mysql-service
+  - vpostgres
