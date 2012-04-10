@@ -1,49 +1,66 @@
 Dear Cloud Foundry contributor,
 
+<p>
 If you are reading this message, it means you submitted a pull request in the
 Cloud Foundry GitHub repository.
+</p>
 
+<p>
 First of all, thanks! We really appreciate your participation.
+</p>
 
+<p>
 Recently we made some changes in how we are verifying and reviewing open source
 contributions like yours. In addition, we changed the way we can expose our
 internal development in real-time. The changes are exciting, as they allow all
 our staff to collaborate seamlessly with you, which increases our mutual
 velocity and gives the community a bigger stake in our direction.
+</p>
 
-In our new OSS model, Github becomes an official mirror of a public git repo
-that includes both integrated code review and continuous integration
-testing. To contribute to Cloud Foundry, please follow the step by step
-instructions below.
+<p>
+The Cloud Foundry team uses Gerrit, a code review tool that originated in the
+Android Open Source Project. We also use GitHub as an official mirror, though
+all pull requests are accepted via Gerrit.
+</p>
 
-In lieu of submitting a pull request on Github sign up for an account on our
-public Gerrit server at http://reviews.cloudfoundry.org. Gerrit is a code
-review tool, originally developed for the Android Open Source Project, which
-shows changes in a side-by-side display, allowing inline comments to be added
-by any reviewer.
+<p>
+Follow these steps to make a contribution to any of our open source
+repositories:
+</p>
 
-1. Sign our Contributor License Agreement.
+1. Complete our CLA Agreement for
+   [individuals](http://www.cloudfoundry.org/individualcontribution.pdf) or
+   [corporations](http://www.cloudfoundry.org/corpcontribution.pdf).
+1. Sign up for an account on our public Gerrit server at
+   http://reviews.cloudfoundry.org/.
 1. Create and upload your public SSH key in your Gerrit account profile.
-1. Create a ~/.gitconfig file as follows:
+1. Set your name and email:
 
-        [user]
-        name = YOUR_NAME
-        email = YOUR_EMAIL
+                git config --global user.name "Firstname Lastname"
+                git config --global user.email "your_email@youremail.com"
 
-1. Install our gerrit tools:
+1. Install our gerrit-cli gem:
 
-        gem install gerrit-cli
+                gem install gerrit-cli
 
 1. Clone the Cloud Foundry repo:
+   _Note: to clone the BOSH repo, or the Documentation repo, replace
+   `vcap` with `bosh` or `oss-docs`_
 
-        cd /tmp
-        gerrit clone ssh://reviews.cloudfoundry.org:29418/<repo>
-        cd <repo>
+                gerrit clone ssh://reviews.cloudfoundry.org:29418/vcap
+                cd vcap
 
-1. Make your changes, add yourself to the list of contributors for the repo, and submit your changes to Gerrit:
+1. Make your changes, commit, and push to gerrit:
 
-        gerrit push
+                git commit
+                gerrit push
 
-1. Once your commits are approved you should see your revisions go from OPEN to MERGED and be replicated to GitHub.
-
-<!-- XXX - If you have any questions, please post a message to our email list at _____________google group______________ -->
+<p>
+Once your commits are approved by our Continuous Integration Bot (CI Bot) as
+well as our engineering staff, return to the Gerrit interface and MERGE your
+changes. The merge will be replicated to GitHub automatically at
+[http://github.com/cloudfoundry/](https://github.com/cloudfoundry/). If you get
+feedback on your submission, we recommend squashing your commit with the
+original change-id. See the squashing section here for more details:
+[http://help.github.com/rebase/](http://help.github.com/rebase/).
+</p>
