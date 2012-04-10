@@ -92,7 +92,7 @@ rm -rf .bundle
 rm -rf vendor/bundle
 
 # change the sqlite3 db directory
-sed -i &quot;s/neo4j_path: \/var\/vcap\/services\/neo4j/neo4j_path: \/tmp\/neo4j\/neo4j_bin/g&quot; config/neo4j_node.yml
+sed -i &quot;s/neo4j_path: \/var\/vcap\/services\/neo4j/neo4j_path: \/tmp\/neo_source\/neo4j\/neo4j_bin/g&quot; config/neo4j_node.yml
 sed -i &quot;s/local_db: sqlite3:\/var\/vcap\/services\/neo4j\/neo4j_node.db/local_db: sqlite3:neo4j_node.db/g&quot; config/neo4j_node.yml
 
 mkdir instances
