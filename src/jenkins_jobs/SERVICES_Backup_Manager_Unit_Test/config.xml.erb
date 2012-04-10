@@ -100,8 +100,8 @@ copy $HANDLE in $BM_SVC /tmp/bm_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
-#copy $HANDLE out /tmp/bm_source/tools/backup/manager/spec_reports $SB_SVC vcap:vcap
-#copy $HANDLE out /tmp/bm_source/tools/backup/manager/spec_coverage $SB_SVC vcap:vcap
+copy $HANDLE out /tmp/bm_source/tools/backup/manager/spec_reports $BM_SVC/backup/manager vcap:vcap
+copy $HANDLE out /tmp/bm_source/tools/backup/manager/spec_coverage $BM_SVC/backup/manager vcap:vcap
 destroy $HANDLE
 &quot;
 
