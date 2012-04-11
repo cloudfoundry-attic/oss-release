@@ -1,0 +1,7 @@
+set -o errexit
+set -o nounset
+
+mkdir -p ./new_user_notifier/vendor/cache
+ruby common/fetch_gems ./new_user_notifier/Gemfile ./new_user_notifier/Gemfile.lock ./new_user_notifier/vendor/cache
+
+rm -rf common

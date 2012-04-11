@@ -1,0 +1,20 @@
+<p>
+  The following users registered since <%= params[:last_registered_ts] %>:
+</p>
+
+<table cellspacing="5">
+  <tr>
+    <th>Registered On </th>
+    <th>Account ID</th>
+    <th>Full Name</th>
+    <th>Email Address</th>
+  </tr>
+  <% params[:users].each_with_index do |user| %>
+  <tr>
+    <td><%= user[:registered_on] %></td>
+    <td><%= user[:account_id] %></td>
+    <td><%= user[:full_name] %></td>
+    <td><%= user[:preferred_email] %></td>
+  </tr>
+  <% end %>
+</table>

@@ -1,0 +1,23 @@
+---
+<% if properties.gerrit.new_user_notifier %>
+smtp:
+  host: <%= properties.gerrit.smtp_server %>
+  port: <%= properties.gerrit.smtp_port %>
+  user: <%= properties.gerrit.smtp_user %>
+  pass: <%= properties.gerrit.smtp_pass %>
+
+mysql:
+  host: <%= properties.gerrit_mysql.address %>
+  port: <%= properties.gerrit_mysql.port || 3306 %>
+  user: <%= properties.gerrit_mysql.user %>
+  pass: <%= properties.gerrit_mysql.password %>
+  dbname: <%= properties.gerrit_mysql.dbname || "reviewdb" %>
+
+recipients:
+<% properties.gerrit.new_user_notifier.recipients.each do |recip| %>
+- <%= recip %>
+<% end %>
+
+last_registered_path: /var/vcap/store/last_registered_ts
+oldest_registered_ts: 1333313801 # April 1, 2012
+<% end %>
