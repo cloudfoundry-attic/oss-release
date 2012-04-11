@@ -1,0 +1,191 @@
+--- 
+packages: 
+- name: create_batch_gerrit_account
+  version: 1
+  sha1: d4a5351d7bbe7b92db26e88ff5243234ec11ec3b
+  dependencies: 
+  - ruby
+  - mysqlclient
+- name: dea_node04
+  version: 1
+  sha1: a579c63c5ee49f60f2ed9252ddef52cfdc761cc8
+  dependencies: []
+
+- name: dea_node06
+  version: 1
+  sha1: 90289b161a0097ecc0c657701bafe785221e8f77
+  dependencies: []
+
+- name: dea_ruby18
+  version: 1
+  sha1: c2340a2d6a5a817484e64e4eb4dc67e069c195d1
+  dependencies: []
+
+- name: dea_ruby19
+  version: 1
+  sha1: ffd075724cca641ca5e93d072ba5ca78ad9d2d6c
+  dependencies: []
+
+- name: debian_nfs_server
+  version: 1
+  sha1: 34b5d43a2c9927025b1a151d792ea7444c870416
+  dependencies: []
+
+- name: erlang
+  version: 1
+  sha1: 59144896e6d1efa2ae3396593be92c984bdb3ca6
+  dependencies: []
+
+- name: gerrit
+  version: 1
+  sha1: 6631fca7a512c93d0015767286001b4816c0d39a
+  dependencies: 
+  - ruby
+- name: gerrit_cla_updater
+  version: 1
+  sha1: 3bfa9c8797c630d710f567b25baeeca568d13502
+  dependencies: 
+  - ruby
+  - mysqlclient
+- name: git
+  version: 1
+  sha1: ff0e36723e3ca6491ccd019992e3bfc55b4ed653
+  dependencies: []
+
+- name: java
+  version: 1
+  sha1: 49a6122f939a7cbf32a7f4feca883873d995969f
+  dependencies: []
+
+- name: jenkins
+  version: 1
+  sha1: 4db6f926a02528afa1d556288ed7e26000a8d4e0
+  dependencies: []
+
+- name: jenkins_jobs
+  version: 3
+  sha1: 573abdbe0afd0c4ebf3216b11dcf055d24cb904b
+  dependencies: []
+
+- name: libpq
+  version: 1
+  sha1: cd5cf005dae71f5735d2b0fe060d3979a3541132
+  dependencies: []
+
+- name: maven22
+  version: 1
+  sha1: c00065717d2d5cd12aadbc4705202435809353bf
+  dependencies: []
+
+- name: mongodb
+  version: 1
+  sha1: 13839705322382d6ad33e50badcc2e73a00fad5a
+  dependencies: []
+
+- name: mysql
+  version: 1
+  sha1: b2ec4389a067ff9e1fb11235c9b1798c2cd899e5
+  dependencies: []
+
+- name: mysql-service
+  version: 1
+  sha1: 5657746e578adf9bd786163337970d63a5654c05
+  dependencies: []
+
+- name: mysqlclient
+  version: 1
+  sha1: f86fa06c7bccaba49a17d4be60f47a4a368c1554
+  dependencies: []
+
+- name: neo4j
+  version: 1
+  sha1: 35691552b04822366d22568c51f551a8292c95b0
+  dependencies: []
+
+- name: nginx
+  version: 1
+  sha1: 8645858e7b723499c1c156be8b54b4cd664655d7
+  dependencies: []
+
+- name: ovftool
+  version: 1
+  sha1: be82a637d25a04ab509b162296bd384adb710dfb
+  dependencies: []
+
+- name: postgres
+  version: 1
+  sha1: 17fc7b9ddf6bef83b4b7d9d96ec3c18223571c67
+  dependencies: []
+
+- name: pr_bounce
+  version: 1
+  sha1: b1919a27387d95d4715a2f9e96a0d5fefa5c91f2
+  dependencies: 
+  - ruby
+- name: rabbitmq
+  version: 1
+  sha1: 979ea474f2e28fdcd8869d71dd2423fd8bb5c259
+  dependencies: []
+
+- name: redis
+  version: 1
+  sha1: dc4d5e0c2793a71f0e5b10260df1f1881c6dae08
+  dependencies: []
+
+- name: ruby
+  version: 1
+  sha1: 31cffed4cadcb204e79208608d953c8b2c1a5869
+  dependencies: []
+
+- name: sqlite
+  version: 1
+  sha1: 3de5bac4548c7088107901de302022c8b95afe57
+  dependencies: []
+
+- name: ttf_dejavu
+  version: 1
+  sha1: 52b4b77059f7bd2014256c123bff1d8a3ec84a40
+  dependencies: []
+
+- name: vblob
+  version: 1
+  sha1: 1c58d8a8c61ade560e466c5b58f32128c6b1fd22
+  dependencies: []
+
+- name: vpostgres
+  version: 1
+  sha1: 30fe578e8f12db0ad3bdbadda701fd777991602a
+  dependencies: []
+
+- name: warden
+  version: 2
+  sha1: a5b83fb063efa2861e9083871faab1a93d736057
+  dependencies: 
+  - ruby
+jobs: 
+- name: debian_nfs_server
+  version: 1
+  sha1: b72909c66ed166ff2e5519168f8221e979b4babe
+- name: gerrit
+  version: 2
+  sha1: 2f829b1c2d3e80b74096774a68f292e2b1a8869b
+- name: gerrit_mysql
+  version: 1
+  sha1: 8e63c02c899fc25fce49ebe296f675d11851186d
+- name: gerrit_postgres
+  version: 1
+  sha1: a08b16f548ef8fdc45f92729f6f2d1f01af445c3
+- name: gerrit_replication
+  version: 1
+  sha1: fb49a35b6552c71b6a6def2d9daabd49c55a3107
+- name: jenkins
+  version: 2
+  sha1: 5c181cd16e3341a06ef9a12d26476091267bf844
+- name: jenkins_slave
+  version: 2
+  sha1: 0e07bda44efcc854e1aa052f65d3b8c99038ce7f
+- name: nginx
+  version: 1
+  sha1: f9dfdb4a70448dc61a6c657a33975ce99392846a
+name: oss_tools
+version: 3
