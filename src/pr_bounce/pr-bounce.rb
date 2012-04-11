@@ -15,7 +15,8 @@ def update_pull_request(log, config, client, org, repo, pr)
   url = "repos/#{org}/#{repo}/pulls/#{pr.number}"
 
   begin
-    client.patch(url, {:state => 'closed', :body => pr.body + closing_template})
+    client.post(pr._links.comments.href, :body => closing_template)
+    client.patch(url, {:state => 'closed'})
   rescue => err
     log.fatal("Could not close PR#{pr.number}")
     log.fatal(err)
