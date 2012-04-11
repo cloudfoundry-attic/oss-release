@@ -60,6 +60,7 @@
 GIT_REALPATH=`readlink -nf /var/vcap/packages/git`
 VCAP_RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
 UAA=$PWD
+UAA_GEM_BASE=$(basename $UAA)
 
 rm -rvf $UAA/gem/coverage
 
@@ -69,7 +70,7 @@ cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 set -o errexit
 set -o nounset
 export PATH=$VCAP_RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$PATH
-cd /tmp/UAA_Gem/gem
+cd /tmp/$UAA_GEM_BASE/gem
 bundle install --path vendor/bundle
 bundle exec rake ci
 EOT
@@ -80,7 +81,7 @@ copy $HANDLE in $UAA /tmp
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
-copy $HANDLE out /tmp/UAA_Gem/gem/coverage $UAA/gem vcap:vcap
+copy $HANDLE out /tmp/$UAA_GEM_BASE/gem/coverage $UAA/gem vcap:vcap
 destroy $HANDLE
 &quot;
 rm -f $TEST_RUNNER
@@ -88,6 +89,15 @@ rm -f $TEST_RUNNER
     </hudson.tasks.Shell>
   </builders>
   <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>gem/spec_reports/**</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>gem/spec_reports/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
       <reportDir>gem/coverage/rcov</reportDir>
       <targets>
