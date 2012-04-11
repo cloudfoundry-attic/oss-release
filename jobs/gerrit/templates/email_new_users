@@ -1,0 +1,7 @@
+#!/bin/bash
+set -o errexit
+export PATH=/var/vcap/packages/ruby/bin:$PATH
+export LD_LIBRARY_PATH=/var/vcap/packages/mysqlclient/lib/mysql:$LD_LIBRARY_PATH
+
+cd /var/vcap/packages/new_user_notifier
+bundle exec ruby new_user_notifier.rb /var/vcap/jobs/gerrit/config/new_user_notifier.yml >> /var/vcap/sys/log/gerrit/new_user_notifier.log 2>&1

@@ -106,6 +106,13 @@ cp /var/vcap/jobs/gerrit/bin/close_pull_requests /etc/cron.hourly
 chmod +x /etc/cron.hourly/close_pull_requests
 <% end %>
 
+# Send out email digests of users registered in the last hour
+rm -f /etc/cron.hourly/email_new_users
+<% if properties.gerrit.new_user_notifier %>
+cp /var/vcap/jobs/gerrit/bin/email_new_users /etc/cron.hourly
+chmod +x /etc/cron.hourly/email_new_users
+<% end %>
+
 # Update the CI batch account
 (
   set -o errexit

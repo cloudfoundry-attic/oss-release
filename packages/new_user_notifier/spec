@@ -1,0 +1,8 @@
+---
+name: new_user_notifier
+dependencies:
+- ruby
+- mysqlclient
+files:
+- new_user_notifier/**/*
+- common/fetch_gems

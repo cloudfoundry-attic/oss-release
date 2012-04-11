@@ -22,6 +22,8 @@ templates:
   logo.png: config/logo.png
   site_header.html.erb: config/site_header.html
   site_footer.html: config/site_footer.html
+  email_new_users: bin/email_new_users
+  new_user_notifier.yml.erb: config/new_user_notifier.yml
 packages:
   - git
   - ruby
@@ -31,3 +33,4 @@ packages:
   - gerrit_cla_updater
   - pr_bounce
   - create_batch_gerrit_account
+  - new_user_notifier

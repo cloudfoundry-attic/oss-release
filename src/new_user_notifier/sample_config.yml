@@ -1,0 +1,19 @@
+---
+smtp:
+  host:
+  port:
+  user:
+  pass:
+
+mysql:
+  host:
+  port:
+  user:
+  pass:
+  dbname:
+
+recipients:
+  - a@b.com
+
+last_registered_path: /tmp/last_notifier_run
+oldest_registered_ts: 0
