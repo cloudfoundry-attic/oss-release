@@ -16,6 +16,7 @@ mkdir -p vendor/cache
 cp -lunv ../eventmachine-0.12.11.cloudfoundry.3.gem vendor/cache/
 bin/fetch_gems ./Gemfile ./Gemfile.lock ./vendor/cache
 bundle install --no-color --deployment --without development production
+export VCAP_TEST_PQUEUE_LOAD=20_000
 bundle exec rake spec
 EOT
 
