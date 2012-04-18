@@ -75,6 +75,12 @@
       </configs>
     </hudson.plugins.parameterizedtrigger.TriggerBuilder>
   </builders>
-  <publishers/>
+  <publishers>
+    <hudson.tasks.Mailer>
+      <recipients>cf-id@vmware.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+  </publishers>
   <buildWrappers/>
 </project>

@@ -27,7 +27,7 @@
       </hudson.plugins.git.BranchSpec>
     </branches>
     <disableSubmodules>false</disableSubmodules>
-    <recursiveSubmodules>true</recursiveSubmodules>
+    <recursiveSubmodules>false</recursiveSubmodules>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
     <authorOrCommitter>false</authorOrCommitter>
     <clean>false</clean>
@@ -119,6 +119,7 @@ fi
 cd ../../
 
 git submodule sync
+git submodule foreach --recursive &apos;git submodule sync&apos;
 git submodule update --init --recursive
 
 echo &quot;---\ndev_name: test\n&quot; &gt; config/dev.yml

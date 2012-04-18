@@ -34,7 +34,9 @@
     <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
     <remotePoll>false</remotePoll>
-    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
+    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
+      <separator>#</separator>
+    </buildChooser>
     <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
@@ -82,6 +84,7 @@ copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
 copy $HANDLE out /tmp/$UAA_GEM_BASE/gem/coverage $UAA/gem vcap:vcap
+copy $HANDLE out /tmp/$UAA_GEM_BASE/gem/spec_reports $UAA/gem vcap:vcap
 destroy $HANDLE
 &quot;
 rm -f $TEST_RUNNER
@@ -90,11 +93,11 @@ rm -f $TEST_RUNNER
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>gem/spec_reports/**</artifacts>
+      <artifacts>gem/coverage/**,gem/spec_reports/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>gem/spec_reports/*.xml</testResults>
+      <testResults>gem/spec_reports/*xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
