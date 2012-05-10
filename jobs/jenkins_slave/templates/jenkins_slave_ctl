@@ -16,7 +16,7 @@ case $1 in
 
     echo $$ > $PIDFILE
     $JOB_DIR/bin/change_tmp
-
+    $JOB_DIR/bin/vcap_sudo_nopasswd
     #Install fix this
     $JOB_DIR/bin/package_install.ctl
 

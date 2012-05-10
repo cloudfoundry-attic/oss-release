@@ -20,7 +20,7 @@
               <default>
                 <comparator class="hudson.util.CaseInsensitiveComparator"/>
               </default>
-              <int>23</int>
+              <int>25</int>
               <string>CREATE_CONTAINER</string>
               <string>/var/vcap/jobs/jenkins_slave/bin/create_container</string>
               <string>DEA_RUBY19</string>
@@ -37,6 +37,10 @@
               <string>/var/vcap/packages/sqlite</string>
               <string>VCAP_RUBY19</string>
               <string>/var/vcap/packages/ruby</string>
+              <string>WARDEN_PKG</string>
+              <string>/var/vcap/packages/warden/warden</string>
+              <string>WARDEN_CFG_DIR</string>
+              <string>/var/vcap/jobs/jenkins_slave/config</string>
               <string>WARDEN_REPL</string>
               <string>/var/vcap/packages/warden/warden/bin/warden-repl</string>
               <string>VCAP_GIT</string>

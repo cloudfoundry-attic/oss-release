@@ -4,7 +4,9 @@ templates:
   jenkins_slave_ctl: bin/jenkins_slave_ctl
   package_install.ctl: bin/package_install.ctl
   change_tmp: bin/change_tmp
+  vcap_sudo_nopasswd: bin/vcap_sudo_nopasswd
   warden.yml: config/warden.yml
+  warden_in_warden.yml: config/warden_in_warden.yml
   warden_ctl: bin/warden_ctl
   create_container: bin/create_container
   id_rsa.erb: config/id_rsa

@@ -57,12 +57,15 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$VCAP_RUBY19/bin:$PATH
+      <command>
+export PATH=$VCAP_RUBY19/bin:$PATH
 
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
 MONGODB_REALPATH=`readlink -nf $VCAP_MONGODB`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
+WARDEN_PKG_REALPATH=`readlink -nf $WARDEN_PKG`
+WARDEN_CFG_DIR_REALPATH=`readlink -nf $WARDEN_CFG_DIR`
 
 BASE=$PWD/base
 MONGODB_SVC=$PWD/mongodb
@@ -70,9 +73,76 @@ MONGODB_SVC=$PWD/mongodb
 #
 # HACK - Base expects to be able to write to /var/vcap/sys/run/LOCK
 #
+
 SCRATCHPAD=$MONGODB_SVC/xxx_scratchpad
 rm -rf $SCRATCHPAD
-mkdir $SCRATCHPAD
+mkdir -p $SCRATCHPAD/log/warden
+mkdir -p $SCRATCHPAD/run/warden
+
+
+#
+# HACK - Generate the init script of mongodb running in one container within another container
+#
+
+MONGODB_INIT_SCRIPT=/tmp/mongdb_init
+
+cat &lt;&lt;-EOT  &gt; $MONGODB_INIT_SCRIPT
+pre-start script
+  chown vcap:vcap -R /store/data
+  touch /store/log/mongodb.log
+  chown vcap:vcap -R /store/log
+  echo &quot;PATH=/opt/mongodb/`basename $MONGODB_REALPATH`/bin:\$PATH&quot; &gt;&gt; /home/vcap/.profile
+end script
+
+#start on runlevel [2345]
+start on filesystem
+stop on runlevel S
+
+script
+  ENABLE_MONGODB=&quot;yes&quot;
+  if [ -f /etc/default/mongodb ]; then . /etc/default/mongodb; fi
+  if [ &quot;x\$ENABLE_MONGODB&quot; = &quot;xyes&quot; ]; then exec start-stop-daemon --start --quiet --chuid vcap --exec /opt/mongodb/`basename $MONGODB_REALPATH`/bin/mongod -- --config /opt/mongodb.conf; fi
+end script
+
+EOT
+
+cat $MONGODB_INIT_SCRIPT
+
+#
+# HACK - Generate the configuration file of mongodb running in one container within another container
+#
+MONGODB_CFG=/tmp/mongdb_cfg
+cat &lt;&lt;-EOT &gt; $MONGODB_CFG
+dbpath = /store/data
+logpath = /store/log/mongodb.log
+logappend = false  # This doesn't works
+
+bind_ip = 0.0.0.0
+port = 27017
+
+auth = true
+
+nohttpinterface = true
+
+maxConns = 500
+
+# mms-token = 33f75ccb-ec85-4294-b6ec-e6ae7a63901f
+
+# journaling is currently preallocating 4G of space on disk
+# we can't do that.
+#
+#journal    = true
+noprealloc = true
+
+# smallfiles = start first container file at 16MB, doubling 4 times.
+# so this = 240MB per user. (i.e. 16MB container + 32MB + 64MB + 128MB)
+#quota      = true
+smallfiles = true
+EOT
+
+#
+# HACK - Generate the script to drive the unit-test
+#
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
@@ -83,6 +153,21 @@ export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$MONGODB_REALPATH/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 
+# copy the mongodb's binary/config and init script to the base
+rm -rf /var/vcap/packages/warden/warden/root/linux/base/rootfs/etc/init/mongodb.conf
+rsync -arl $MONGODB_INIT_SCRIPT /var/vcap/packages/warden/warden/root/linux/base/rootfs/etc/init/mongodb.conf
+rm -rf /var/vcap/packages/warden/warden/root/linux/base/rootfs/opt/mongodb.conf
+rsync -arl $MONGODB_CFG /var/vcap/packages/warden/warden/root/linux/base/rootfs/opt/mongodb.conf
+mkdir -p /var/vcap/packages/warden/warden/root/linux/base/rootfs/opt/mongodb
+rm -rf /var/vcap/packages/warden/warden/root/linux/base/rootfs/opt/mongodb/`basename $MONGODB_REALPATH`
+rsync -arl $MONGODB_REALPATH /var/vcap/packages/warden/warden/root/linux/base/rootfs/opt/mongodb
+
+cd /var/vcap/packages/warden/warden
+bundle --local install --deployment --without=devlopment test
+# run warden server in the warden container with above HANDLE
+nohup bundle exec rake warden:start[/var/vcap/jobs/jenkins_slave/config/warden_in_warden.yml] &gt;&gt;/var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
+
+
 cd /tmp/mon_source/mongodb
 rm -rf .bundle
 rm -rf vendor/bundle
@@ -90,22 +175,51 @@ rm -rf vendor/bundle
 bundle install --deployment --without development production
 bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci
+
+rm -rf /var/vcap/packages/warden/warden/root/linux/base/rootfs/opt/mongodb
+rm -rf /var/vcap/packages/warden/warden/root/linux/base/rootfs/opt/mongodb.conf
+rm -rf /var/vcap/packages/warden/warden/root/linux/base/rootfs/etc/init/mongodb.conf
+
 EOT
 
+#
+# MAIN ENTRY
+#
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$MONGODB_REALPATH,$MONGODB_REALPATH,ro&quot;`
+# bind root/linux/base to bypass aufs issue.
+echo &quot;Create a warden container this unit-test&quot;
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys,rw bind_mount:$MONGODB_REALPATH,$MONGODB_REALPATH,ro bind_mount:$WARDEN_PKG_REALPATH,/tmp/warden,ro bind_mount:$WARDEN_CFG_DIR_REALPATH,/var/vcap/jobs/jenkins_slave/config,ro bind_mount:/lib/modules,/lib/modules,ro bind_mount:$WARDEN_PKG_REALPATH,/var/vcap/packages/warden/warden,rw disk_size_mb:4096&quot;`
+
+echo &quot;Enable vcap could execute sudo without password &quot;
+sudo ls $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config
+set +e
+vcap_sudo_line=&quot;vcap ALL=(ALL) NOPASSWD:ALL&quot;
+vcap_chk_ret=`sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
+if test -z &quot;$vcap_chk_ret&quot;
+then
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
+fi
+set -e
+
+echo &quot;Starting the unit test&quot;
 $WARDEN_REPL -e -x -c &quot;
 copy $HANDLE in $BASE /tmp/mon_source
 copy $HANDLE in $MONGODB_SVC /tmp/mon_source
+copy $HANDLE in $MONGODB_INIT_SCRIPT /tmp
+copy $HANDLE in $MONGODB_CFG /tmp
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
-run $HANDLE $TEST_RUNNER
+run $HANDLE sudo /bin/bash $TEST_RUNNER
 copy $HANDLE out /tmp/mon_source/mongodb/spec_reports $MONGODB_SVC vcap:vcap
 copy $HANDLE out /tmp/mon_source/mongodb/spec_coverage $MONGODB_SVC vcap:vcap
 destroy $HANDLE
 &quot;
 
-rm -f $TEST_RUNNER</command>
+rm -f $TEST_RUNNER
+      </command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

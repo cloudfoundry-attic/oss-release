@@ -7,5 +7,5 @@ logging:
   level: debug2
   file: /var/vcap/sys/log/warden/warden.log
 network:
-  pool_start_address: 10.254.0.0
+  pool_start_address: 20.254.0.0
   pool_size: 256

@@ -1,0 +1,16 @@
+#!/bin/bash
+
+# add user to sudo without password
+if test `id -u` -eq 0
+then
+  sudo_line="vcap ALL=(ALL) NOPASSWD: ALL"
+  set +e
+  chk_ret=`cat /etc/sudoers | grep "$sudo_line"`
+  if test -z "$chk_ret"
+  then
+    chmod 740 /etc/etcsudoers
+    echo "$sudo_line" >> /etc/sudoers
+    chmod 440 /etc/sudo_lineers
+  fi
+  set -e
+fi

@@ -11,7 +11,12 @@ cp -a * ${BOSH_INSTALL_TARGET}
   # Unzip base chroot from stemcell
   chroot_base=/${BOSH_INSTALL_TARGET}/warden/root/linux/base
   mkdir -p ${chroot_base}/rootfs
-  tar -C ${chroot_base}/rootfs -zxf /var/vcap/stemcell_base.tar.gz
+  if test -e /var/vcap/stemcell_base.tar.gz
+  then
+    tar -C ${chroot_base}/rootfs -zxf /var/vcap/stemcell_base.tar.gz
+  else
+    tar -C ${chroot_base}/rootfs -zxf /${BOSH_INSTALL_TARGET}/warden/stemcell_base.tar.gz
+  fi
 
   # Configure it to our liking, as well as compile helper binaries
   env SKIP_DEBOOTSTRAP=true SKIP_APT=true /var/vcap/packages/ruby/bin/bundle exec rake setup

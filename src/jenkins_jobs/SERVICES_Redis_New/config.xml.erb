@@ -55,12 +55,15 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$VCAP_RUBY19/bin:$PATH
-
+      <command>
+export PATH=$VCAP_RUBY19/bin:$PATH
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
 REDIS_REALPATH=`readlink -nf $VCAP_REDIS22`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
+WARDEN_PKG_REALPATH=`readlink -nf $WARDEN_PKG`
+WARDEN_CFG_DIR_REALPATH=`readlink -nf $WARDEN_CFG_DIR`
+
 
 BASE=$PWD/base
 REDIS_SVC=$PWD/redis
@@ -71,6 +74,33 @@ REDIS_SVC=$PWD/redis
 SCRATCHPAD=$REDIS_SVC/xxx_scratchpad
 rm -rf $SCRATCHPAD
 mkdir $SCRATCHPAD
+mkdir -p $SCRATCHPAD/log/warden
+mkdir -p $SCRATCHPAD/run/warden
+
+REDIS_INIT_SCRIPT=/tmp/redis_init
+cat &lt;&lt;-EOT &gt; $REDIS_INIT_SCRIPT
+pre-start script
+   mkdir -p /store/instance
+   chmod 0777 /store/instance
+   mkdir -p /store/instance/data
+   chmod 0777 /store/instance/data
+   mkdir -p /store/log
+   chmod 0777 /store/log
+   touch /store/log/redis.log
+   chmod 0666 /store/log/redis.log
+   echo &quot;PATH=/opt/redis/`basename $REDIS_REALPATH`/bin:\$PATH&quot; &gt;&gt; /home/vcap/.profile
+end script
+
+#start on runlevel [2345]
+start on filesystem
+stop on runlevel S
+
+script
+ ENABLE_REDIS=&quot;yes&quot;
+ if [ -f /etc/default/redis ]; then . /etc/default/redis; fi
+ if [ &quot;x\$ENABLE_REDIS&quot; = &quot;xyes&quot; ]; then exec start-stop-daemon --start --quiet --exec  /opt/redis/`basename $REDIS_REALPATH`/bin/redis-server /store/instance/redis.conf; fi
+end script
+EOT
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
@@ -81,6 +111,19 @@ export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$REDIS_REALPATH/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 
+# copy the redis's binary/config and init script to the base
+rm -rf /var/vcap/packages/warden/warden/root/linux/base/rootfs/etc/init/redis.conf
+rsync -arl $REDIS_INIT_SCRIPT /var/vcap/packages/warden/warden/root/linux/base/rootfs/etc/init/redis.conf
+mkdir -p /var/vcap/packages/warden/warden/root/linux/base/rootfs/opt/redis
+rm -rf /var/vcap/packages/warden/warden/root/linux/base/rootfs/opt/mongodb/`basename $REDIS_REALPATH`
+rsync -arl $REDIS_REALPATH /var/vcap/packages/warden/warden/root/linux/base/rootfs/opt/redis
+
+cd /var/vcap/packages/warden/warden
+bundle --local install --deployment --without=devlopment test
+# run warden server in the warden container with above HANDLE
+nohup bundle exec rake warden:start[/var/vcap/jobs/jenkins_slave/config/warden_in_warden.yml] &gt;&gt;/var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
+
+
 cd /tmp/redis_source/redis
 rm -rf .bundle
 rm -rf vendor/bundle
@@ -90,19 +133,40 @@ bundle exec rake spec:ci
 EOT
 
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$REDIS_REALPATH,$REDIS_REALPATH,ro&quot;`
+# bind root/linux/base to bypass aufs issue.
+echo &quot;Create a warden container this unit-test&quot;
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys,rw bind_mount:$REDIS_REALPATH,$REDIS_REALPATH,ro bind_mount:$WARDEN_PKG_REALPATH,/tmp/warden,ro bind_mount:$WARDEN_CFG_DIR_REALPATH,/var/vcap/jobs/jenkins_slave/config,ro bind_mount:/lib/modules,/lib/modules,ro bind_mount:$WARDEN_PKG_REALPATH,/var/vcap/packages/warden/warden,rw disk_size_mb:4096&quot;`
+
+echo &quot;Enable vcap could execute sudo without password &quot;
+sudo ls $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config
+set +e
+vcap_sudo_line=&quot;vcap ALL=(ALL) NOPASSWD:ALL&quot;
+vcap_chk_ret=`sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
+if test -z &quot;$vcap_chk_ret&quot;
+then
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
+  #sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
+fi
+set -e
+
+echo &quot;Starting the unit test&quot;
 $WARDEN_REPL -e -x -c &quot;
 copy $HANDLE in $BASE /tmp/redis_source
 copy $HANDLE in $REDIS_SVC /tmp/redis_source
+copy $HANDLE in $REDIS_INIT_SCRIPT /tmp
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
-run $HANDLE $TEST_RUNNER
+run $HANDLE sudo /bin/bash $TEST_RUNNER
 copy $HANDLE out /tmp/redis_source/redis/spec_reports $REDIS_SVC vcap:vcap
 copy $HANDLE out /tmp/redis_source/redis/spec_coverage $REDIS_SVC vcap:vcap
 destroy $HANDLE
 &quot;
 
-rm -f $TEST_RUNNER</command>
+rm -f $TEST_RUNNER
+      </command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
