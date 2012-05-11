@@ -68,6 +68,7 @@ rm -rvf $PWD/tests/assets
 
 # PATHS NEEDED IN THE CONTAINER
 DEA_RUBY19_REALPATH=`readlink -nf $DEA_RUBY19`
+GIT_REALPATH=$(readlink -nf $VCAP_GIT)
 SQLITE_REALPATH=`readlink -nf /var/vcap/packages/sqlite`
 RUBY_BD=$DEA_RUBY19_REALPATH/bin
 SQLITE_LIB=$SQLITE_REALPATH/lib
@@ -79,7 +80,7 @@ cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 #!/bin/bash
 set -o errexit
 set -o nounset
-export PATH=$RUBY_BD:$PATH
+export PATH=$GIT_REALPATH/bin:$RUBY_BD:$PATH
 export C_INCLUDE_PATH=$SQLITE_INC:$C_INCLUDE_PATH
 export LIBRARY_PATH=$SQLITE_LIB:$LIBRARY_PATH
 cd /tmp/cloud_controller
@@ -90,7 +91,7 @@ bundle exec rake prepare_test_db
 bundle exec rake ci:spec
 EOT
 
-HANDLE=`$CREATE_CONTAINER $DEA_RUBY19_REALPATH $SQLITE_REALPATH`
+HANDLE=`$CREATE_CONTAINER $GIT_REALPATH $DEA_RUBY19_REALPATH $SQLITE_REALPATH`
 $WARDEN_REPL -c &quot;
 copy $HANDLE in $CC_DIR /tmp
 copy $HANDLE in $HM_DIR /tmp
