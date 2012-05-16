@@ -1,0 +1,6 @@
+echo "Extracting archive..."
+tar xzf golang/go1.0.1.src.tar.gz
+cd go/src
+./all.bash
+cd ../..
+cp -R go/* ${BOSH_INSTALL_TARGET}
