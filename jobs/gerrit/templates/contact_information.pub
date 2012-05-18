@@ -1,0 +1,1 @@
+<%= properties.gerrit.gpg_keys.public %>

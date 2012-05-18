@@ -1,0 +1,9 @@
+set -o errexit
+set -o nounset
+
+ls
+
+mkdir -p ./cla_notice/vendor/cache
+ruby common/fetch_gems ./cla_notice/Gemfile ./cla_notice/Gemfile.lock ./cla_notice/vendor/cache
+
+rm -rf common

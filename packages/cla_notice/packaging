@@ -1,0 +1,11 @@
+# abort script on any command that exit with a non zero value
+set -o errexit
+
+cp -a cla_notice/* ${BOSH_INSTALL_TARGET}
+
+(
+  set -o errexit
+  cd ${BOSH_INSTALL_TARGET}
+  export PATH=/var/vcap/packages/ruby/bin:$PATH
+  bundle --local install --deployment --without=development test
+)
