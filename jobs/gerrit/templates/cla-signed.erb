@@ -1,0 +1,5 @@
+#!/bin/bash
+export PATH=/var/vcap/packages/ruby/bin:$PATH
+path=`dirname $0`
+cd /var/vcap/packages/cla_notice/
+bundle exec ruby /var/vcap/packages/cla_notice/cla_notice.rb $@ --config $path/cla_notice_config.yml >> /var/vcap/sys/log/gerrit/cla_notice.log 2>&1

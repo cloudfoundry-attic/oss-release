@@ -10,3 +10,5 @@ files:
 - gerrit/gerrit-2.1.7.war
 - gerrit/gerrit-2.2.2.1.war
 - gerrit/hooks.tgz
+- gerrit/bcpg-jdk16-146.jar
+- gerrit/jce_policy-6.zip

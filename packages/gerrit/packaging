@@ -27,3 +27,6 @@ tar xf gerrit/hooks.tgz
   cd ${BOSH_INSTALL_TARGET}/hooks/patchset_notification
   /var/vcap/packages/ruby/bin/bundle --local install --deployment
 )
+
+cp -v gerrit/bcpg-jdk16-146.jar ${BOSH_INSTALL_TARGET}
+cp -v gerrit/jce_policy-6.zip ${BOSH_INSTALL_TARGET}
