@@ -1,0 +1,11 @@
+---
+<% if !properties.gerrit.clas.nil? %>
+port: '<%= properties.gerrit.smtp_port %>'
+host: '<%= properties.gerrit.smtp_server %>'
+user: '<%= properties.gerrit.smtp_user %>'
+password: '<%= properties.gerrit.smtp_pass %>'
+subject: '<%= properties.gerrit.cla_notification_subject %>'
+to: '<%= properties.gerrit.cla_notification_to %>'
+body: '<%= properties.gerrit.cla_notification_body %>'
+from: '<%= properties.gerrit.cla_notification_from %>'
+<% end %>

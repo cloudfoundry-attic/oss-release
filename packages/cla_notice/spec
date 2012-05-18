@@ -1,0 +1,7 @@
+---
+name: cla_notice
+dependencies:
+- ruby
+files:
+- cla_notice/**/*
+- common/fetch_gems

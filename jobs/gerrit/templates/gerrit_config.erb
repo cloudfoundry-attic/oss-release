@@ -54,3 +54,8 @@
 [http]
   proxy = <%= properties.gerrit.proxy %>
 <% end %>
+
+<% if !properties.gerrit.clas.nil? %>
+[contactstore]
+  url = <%= properties.gerrit.contact_store_url %>
+<% end %>

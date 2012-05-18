@@ -18,6 +18,7 @@ dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
 CONFIG_DIR=$DATA_DIR/review_site/$dbname/etc/
 STATIC_DIR=$DATA_DIR/review_site/$dbname/static
 HOOKS_DIR=$DATA_DIR/review_site/$dbname/hooks/
+LIB_DIR=$DATA_DIR/review_site/$dbname/lib/
 
 chown vcap:vcap $PACKAGE_DIR/*.war
 
@@ -66,6 +67,18 @@ chown -R vcap:vcap $HOOKS_DIR
 chown vcap:vcap $PACKAGE_DIR/review*
 chmod 600 $PACKAGE_DIR/review*
 cp -pf $PACKAGE_DIR/review* $HOOKS_DIR/patchset_notification/config/
+
+# cla_signed hook, will send mail once anyone signed CLA
+cp -pf $JOB_DIR/bin/cla-signed $HOOKS_DIR/
+cp -pf $JOB_DIR/config/cla_notice_config.yml $HOOKS_DIR/
+
+# cp contact_information.pub key, which is used to encrypt contact information
+cp -pf $JOB_DIR/config/contact_information.pub $CONFIG_DIR
+cp -pf $PACKAGE_DIR/bcpg-jdk16-146.jar $LIB_DIR/
+chown vcap:vcap $LIB_DIR/bcpg-jdk16-146.jar
+touch /var/vcap/sys/log/gerrit/cla_notice.log
+chown vcap:vcap  $PACKAGE_ROOT_DIR/cla_notice/cla_notice.rb /var/vcap/sys/log/gerrit/cla_notice.log
+chmod 600 $PACKAGE_ROOT_DIR/cla_notice/cla_notice.rb /var/vcap/sys/log/gerrit/cla_notice.log
 
 rm -rf $STATIC_DIR/*
 
