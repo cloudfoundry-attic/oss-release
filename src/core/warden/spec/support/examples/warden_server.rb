@@ -31,6 +31,13 @@ shared_examples "a warden server" do |container_klass|
     handle.should match(/^[0-9a-f]{8}$/i)
   end
 
+  it "should stays alive after seeing invalid json" do
+    ::UNIXSocket.open unix_domain_path do |sock|
+      sock.write "yada yada\n"
+    end
+    client.ping.should == "pong"
+  end
+
   it "allows destroying a container" do
     handle = client.create
 
@@ -255,6 +262,12 @@ shared_examples "a warden server" do |container_klass|
     it 'should return the container state as part of "info"' do
       info = client.info(@handle)
       info["state"].should == "active"
+    end
+
+    it "should return its IP address" do
+      info = client.info(@handle)
+      info["host_ip"].should be
+      info["container_ip"].should be
     end
   end
 
