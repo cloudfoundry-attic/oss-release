@@ -58,6 +58,7 @@ chroot <<-EOS
 if ! id vcap > /dev/null 2>&1
 then
 useradd -mU -s /bin/bash vcap
+echo "vcap  ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 fi
 EOS
 
