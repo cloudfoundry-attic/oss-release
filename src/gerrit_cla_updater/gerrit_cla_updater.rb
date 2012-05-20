@@ -43,7 +43,7 @@ def add_clas(db, logger, clas)
       :short_name    => cla['shortname'],
       :agreement_url => "static/#{cla['basename']}",
       :short_description => cla['description'],
-      :require_contact_information => 'N',
+      :require_contact_information => 'Y',
     }
     logger.info("Adding #{row}")
     db[:contributor_agreements] << row
