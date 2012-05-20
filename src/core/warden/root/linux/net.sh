@@ -10,6 +10,10 @@ filter_instance_prefix="warden-instance-"
 nat_prerouting_chain="warden-prerouting"
 nat_instance_prefix="warden-instance-"
 
+# Default ALLOW_NETWORKS/DENY_NETWORKS to empty
+ALLOW_NETWORKS=${ALLOW_NETWORKS:-}
+DENY_NETWORKS=${DENY_NETWORKS:-}
+
 function teardown_filter() {
   # Prune dispatch chain
   iptables -S ${filter_dispatch_chain} 2> /dev/null |
@@ -98,10 +102,16 @@ function setup_nat() {
 
   external_interface=$(ip route get 1.1.1.1 | head -n1 | cut -d" " -f5)
 
-  # Bind chain
+  # Bind chain to PREROUTING
   (iptables -t nat -S PREROUTING | grep -q "\-j ${nat_prerouting_chain}\b") ||
     iptables -t nat -A PREROUTING \
       --in-interface "${external_interface}" \
+      --jump ${nat_prerouting_chain}
+
+  # Bind chain to OUTPUT (for traffic originating from same host)
+  (iptables -t nat -S OUTPUT | grep -q "\-j ${nat_prerouting_chain}\b") ||
+    iptables -t nat -A OUTPUT \
+      --out-interface "lo" \
       --jump ${nat_prerouting_chain}
 
   # Enable NAT on outgoing traffic
