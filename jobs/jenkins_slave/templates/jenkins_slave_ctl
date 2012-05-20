@@ -41,6 +41,9 @@ case $1 in
     su - vcap -c 'ssh-keygen -f /home/vcap/.ssh/known_hosts  -R github.com'
     su - vcap -c 'ssh-keyscan github.com >> /home/vcap/.ssh/known_hosts'
 
+    cat /etc/sudoers | grep "vcap  ALL=(ALL) NOPASSWD: ALL" > /dev/null 2>&1
+    [ $? != 0 ] && echo "vcap  ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
     #No monit needed, pass back to init
     echo 1 > $PIDFILE
     ;;
