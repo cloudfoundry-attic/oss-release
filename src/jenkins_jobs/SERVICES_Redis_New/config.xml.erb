@@ -34,7 +34,9 @@
     <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
     <remotePoll>false</remotePoll>
-    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
+    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
+      <separator>#</separator>
+    </buildChooser>
     <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
