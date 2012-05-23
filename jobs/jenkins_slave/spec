@@ -21,6 +21,7 @@ packages:
   - sqlite
   - redis
   - golang
+  - go2xunit
   - git
   - warden
   - ruby

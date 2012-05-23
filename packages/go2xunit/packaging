@@ -1,0 +1,3 @@
+echo "Extracting archive..."
+tar xzf go2xunit/go2xunit-0.1.0.tar.gz
+cp -R go2xunit/* ${BOSH_INSTALL_TARGET}
