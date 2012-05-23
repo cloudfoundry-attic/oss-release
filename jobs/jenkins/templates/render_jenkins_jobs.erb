@@ -18,6 +18,7 @@ do
   chown -R vcap:vcap ${config_dir}
 
   cat ${config_path} | sed '
+/<logRotator>/,/<\/logRotator>/ d' | sed '
   /<keepDependencies>/ i \
 \  <logRotator> \
 \    <daysToKeep><%= properties.jenkins.days_to_keep || 30 %></daysToKeep> \
