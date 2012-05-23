@@ -36,6 +36,23 @@ def handle_pull_requests(log, config, client, org, repo)
   end
 end
 
+def handle_issues(log, config, client, org, repo)
+  log.info("Getting issues for #{repo}")
+  org_repo = org + "/" + repo
+
+  issues = client.issues(org_repo)
+  issues.each do |issue|
+    begin
+      closing_template = IO.read(config['templates']['closing_issue'])
+      client.add_comment(org_repo, issue.number, closing_template)
+      client.close_issue(org_repo, issue.number)
+    rescue => err
+      log.fatal("Could not close Issue #{issue.number}")
+      log.fatal(err);
+    end
+  end
+end
+
 opts = {
   :verbose => false
 }
@@ -78,6 +95,7 @@ begin
 
   repos.each do |repo|
     handle_pull_requests(log, config, client, org, repo["name"])
+    handle_issues(log, config, client, org, repo["name"])
   end
 
   log.info("Done")
