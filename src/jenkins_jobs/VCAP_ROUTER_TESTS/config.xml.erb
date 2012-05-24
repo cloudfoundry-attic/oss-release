@@ -3,6 +3,12 @@
   <actions/>
   <description>Router Unit and Functional Tests</description>
   <displayName>Router Unit and Functional Tests</displayName>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -26,8 +32,8 @@
         <name>*/master</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
-    <disableSubmodules>false</disableSubmodules>
-    <recursiveSubmodules>true</recursiveSubmodules>
+    <disableSubmodules>true</disableSubmodules>
+    <recursiveSubmodules>false</recursiveSubmodules>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
     <authorOrCommitter>false</authorOrCommitter>
     <clean>false</clean>
@@ -65,19 +71,22 @@ rm -rvf $PWD/tests/assets
 # PATHS NEEDED IN THE CONTAINER
 DEA_RUBY19_REALPATH=`readlink -nf $DEA_RUBY19`
 DEA_RUBY19_BD=$DEA_RUBY19_REALPATH/bin
+GIT_REALPATH=$(readlink -nf $VCAP_GIT)
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 #!/bin/bash
 set -o errexit
 set -o nounset
-export PATH=$DEA_RUBY19_BD:$PATH
+set -o xtrace
+
+export PATH=$GIT_REALPATH/bin:$DEA_RUBY19_BD:$PATH
 cd /tmp/router
 bundle install --deployment --without development production
 bundle exec rake ci:spec
 EOT
 
-HANDLE=`$CREATE_CONTAINER $DEA_RUBY19_REALPATH`
+HANDLE=`$CREATE_CONTAINER $GIT_REALPATH $DEA_RUBY19_REALPATH`
 $WARDEN_REPL -c &quot;
 copy $HANDLE in $PWD/router /tmp
 copy $HANDLE in $TEST_RUNNER /tmp
