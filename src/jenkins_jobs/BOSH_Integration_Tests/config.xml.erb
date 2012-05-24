@@ -3,15 +3,19 @@
   <actions/>
   <description></description>
   <displayName>Integration Tests</displayName>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
       <maxConcurrentPerNode>1</maxConcurrentPerNode>
       <maxConcurrentTotal>0</maxConcurrentTotal>
-      <categories/>
       <throttleEnabled>true</throttleEnabled>
       <throttleOption>project</throttleOption>
-      <configVersion>1</configVersion>
     </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM">
@@ -48,6 +52,7 @@
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
@@ -59,14 +64,48 @@
   <customWorkspace>workspace/bosh-integration</customWorkspace>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$RUBY_19:$REDIS_24:$PATH
-export BUNDLE_PATH=`pwd`/gems
-rake spec:ci</command>
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
+
+SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
+REDIS_REALPATH=`readlink -nf $VCAP_REDIS22`
+RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+GIT_REALPATH=`readlink -nf /var/vcap/packages/git`
+BOSH=$PWD
+
+rm -rvf $BOSH/spec_reports
+
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash -x
+set -o errexit
+set -o nounset
+export PATH=$RUBY19_REALPATH/bin:$REDIS_REALPATH/bin:$GIT_REALPATH/bin:$PATH
+export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
+export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
+cd /tmp/bosh-integration
+export BUNDLE_PATH=/tmp/bosh-integration/gems
+export GEM_HOME=/tmp/bosh-integration/gems
+mkdir -p /tmp/bosh-integration/gems
+gem install rake bundler --no-ri --no-rdoc
+DEBUG=1 rake spec:ci
+EOT
+
+HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $REDIS_REALPATH $SQLITE_REALPATH $GIT_REALPATH`
+$WARDEN_REPL -c &quot;
+copy $HANDLE in $BOSH /tmp
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+copy $HANDLE out /tmp/bosh-integration/spec_reports $BOSH vcap:vcap
+copy $HANDLE out /tmp/bosh-integration/spec/assets/logs $BOSH vcap:vcap
+
+destroy $HANDLE
+&quot;</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>spec_reports/ci_result/reports/*.xml</testResults>
+      <testResults>spec_reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
