@@ -39,6 +39,8 @@
               <string>/var/vcap/packages/ruby</string>
               <string>WARDEN_REPL</string>
               <string>/var/vcap/packages/warden/warden/bin/warden-repl</string>
+              <string>WARDEN_INSTANCES</string>
+              <string>/var/vcap/packages/warden/warden/root/linux/instances</string>
               <string>VCAP_GIT</string>
               <string>/var/vcap/packages/git</string>
               <string>VCAP_REDIS22</string>
@@ -67,6 +69,8 @@
               <string>/var/vcap/packages/mysql-service</string>
               <string>VCAP_VPOSTGRES</string>
               <string>/var/vcap/packages/vpostgres</string>
+              <string>VCAP_GOLANG</string>
+              <string>/var/vcap/packages/golang</string>
             </tree-map>
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>
