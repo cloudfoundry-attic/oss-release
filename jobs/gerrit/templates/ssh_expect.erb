@@ -1,19 +1,16 @@
 #!/bin/bash
 
 PACKAGE_DIR=/var/vcap/packages/gerrit
+CONFIG_DIR=/var/vcap/jobs/gerrit/config
 
 export LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH
 export PATH=$PACKAGE_DIR/bin/:$PATH
 
-expect -c "
-set timeout -1;
-spawn su - vcap -c \"ssh-keygen -t rsa\"
-while {1} {
-  expect {
-    \"Enter*\"           {send \"\r\"}
-    eof                  break
-  }
-}"
+#Passwdless ssh host key pair(for replication to github)
+mkdir -p /home/vcap/.ssh
+cp $CONFIG_DIR/{id_rsa,id_rsa.pub} /home/vcap/.ssh
+chmod 600 /home/vcap/.ssh/{id_rsa,id_rsa.pub}
+chown -R vcap:vcap /home/vcap/.ssh
 
 expect -c "
 set timeout -1;

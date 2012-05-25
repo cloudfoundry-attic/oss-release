@@ -28,6 +28,8 @@ templates:
   cla-signed.erb: bin/cla-signed
   cla_notice_config.yml.erb: config/cla_notice_config.yml
   contact_information.pub: config/contact_information.pub
+  id_rsa.erb: config/id_rsa
+  id_rsa.pub.erb: config/id_rsa.pub
 packages:
   - git
   - ruby
