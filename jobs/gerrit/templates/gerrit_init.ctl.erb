@@ -80,6 +80,13 @@ touch /var/vcap/sys/log/gerrit/cla_notice.log
 chown vcap:vcap  $PACKAGE_ROOT_DIR/cla_notice/cla_notice.rb /var/vcap/sys/log/gerrit/cla_notice.log
 chmod 600 $PACKAGE_ROOT_DIR/cla_notice/cla_notice.rb /var/vcap/sys/log/gerrit/cla_notice.log
 
+# set up gitweb files
+if [ ! -d /usr/lib/cgi-bin ]; then
+  mkdir /usr/lib/cgi-bin
+fi
+cp -vf $PACKAGE_DIR/gitweb/gitweb.cgi /usr/lib/cgi-bin/gitweb.cgi
+cp -vrf $PACKAGE_DIR/gitweb/static /usr/share/gitweb
+
 rm -rf $STATIC_DIR/*
 
 # Copy any CLA files

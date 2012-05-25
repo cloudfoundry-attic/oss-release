@@ -29,3 +29,5 @@ tar xf gerrit/hooks.tgz
 )
 
 cp -v gerrit/bcpg-jdk16-146.jar ${BOSH_INSTALL_TARGET}
+
+cp -vrf gerrit/gitweb ${BOSH_INSTALL_TARGET}
