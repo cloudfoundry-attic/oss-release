@@ -1,7 +1,10 @@
 # pr-bounce - A script to automatically close Github Pull Requests
 
 This script should be run in cron. It will autoclose Github Pull Requests since
-Github does not allow the Pull Request feature to be turned off.
+Github does not allow the Pull Request feature to be turned off. It will also
+autoclose issues since Cloudfoundry use the below site to track issues.
+
+https://cloudfoundry.atlassian.net/secure/Dashboard.jspa
 
 # How does it work?
 
@@ -19,13 +22,14 @@ example:
     password: 'toomanysecrets'
     templates:
       closing: 'templates/closing.html'
+      closing_issue: 'templates/closing_issue.html'
     min_pr_num:
       foo: 42
       bar: 10
 
 The above config would close any Pull Requests newer than #42 in the foo repo
 and newer than #10 in the bar repo, which both are part of the
-'setec\_astronomy' organization.
+'setec\_astronomy' organization. It also close any open issues.
 
 # Running
 
