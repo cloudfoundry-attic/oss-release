@@ -7,6 +7,7 @@ export CF_CI_USER=<%= properties.jenkins_slave.gerrit_user.username %>
 export CF_GERRIT_ADDRESS=<%= properties.gerrit.address %>
 export CF_GERRIT_PORT=<%= properties.gerrit.port || 29418 %>
 
+<% if ! properties.jenkins.keep_jobs || properties.jenkins.keep_jobs == nil %>
 cd /var/vcap/packages/jenkins_jobs
 for template_path in `find . -name config.xml.erb`
 do
@@ -16,16 +17,21 @@ do
   mkdir -p ${config_dir}
   erb ${template_path} > ${config_path}
   chown -R vcap:vcap ${config_dir}
+done
+<% end %>
 
-  cat ${config_path} | sed '
+cd /var/vcap/store/jenkins/jobs
+for config_path in `find ./ -type f -maxdepth 2 -name "config.xml"`
+do
+  cat "${config_path}" | sed '
 /<logRotator>/,/<\/logRotator>/ d' | sed '
   /<keepDependencies>/ i \
-\  <logRotator> \
-\    <daysToKeep><%= properties.jenkins.days_to_keep || 30 %></daysToKeep> \
-\    <numToKeep><%= properties.jenkins.num_to_keep || -1 %></numToKeep> \
-\    <artifactDaysToKeep><%= properties.jenkins.artifact_days_to_keep || -1 %></artifactDaysToKeep> \
-\    <artifactNumToKeep><%= properties.jenkins.artifact_num_to_keep || -1 %></artifactNumToKeep> \
-\  </logRotator>
+\  <logRotator> \
+\    <daysToKeep><%= properties.jenkins.days_to_keep || 30 %></daysToKeep> \
+\    <numToKeep><%= properties.jenkins.num_to_keep || -1 %></numToKeep> \
+\    <artifactDaysToKeep><%= properties.jenkins.artifact_days_to_keep || -1 %></artifactDaysToKeep> \
+\    <artifactNumToKeep><%= properties.jenkins.artifact_num_to_keep || -1 %></artifactNumToKeep> \
+\  </logRotator>
 ' > /tmp/config.xml
-  mv /tmp/config.xml ${config_path}
+  mv /tmp/config.xml "${config_path}"
 done
