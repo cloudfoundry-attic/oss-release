@@ -4,24 +4,29 @@ JOB_DIR=/var/vcap/jobs/jenkins
 DATA_DIR=/var/vcap/store/jenkins
 CONFIG_DIR=/var/vcap/jobs/jenkins/config
 
-# Grab all the slaves to the master config file
-cat $JOB_DIR/config/config_head > $JOB_DIR/config/config.xml
+NEED_UPGRADE_SITE_CONFIG=<%= properties.jenkins.upgrade_site_config||0 %>
+NEED_UPGRADE_JOBS=<%= properties.jenkins.upgrade_jobs||0 %>
 
-slave_id=1
-for ip_addr in <%= properties.jenkins_slave.slaves_ip.join(' ') %>
-do
-  cat $JOB_DIR/config/config_slave|sed -e "s/SLAVE_CONFIG_NAME/jenk${slave_id}/g" -e "s/SLAVE_CONFIG_IP/${ip_addr}/g" >> $JOB_DIR/config/config.xml
-  slave_id=`expr $slave_id + 1`
-done
+if [ $NEED_UPGRADE_SITE_CONFIG != 0 ]; then
+  # Grab all the slaves to the master config file
+  cat $JOB_DIR/config/config_head > $JOB_DIR/config/config.xml
 
-cat $JOB_DIR/config/config_tail >> $JOB_DIR/config/config.xml
+  slave_id=1
+  for ip_addr in <%= properties.jenkins_slave.slaves_ip.join(' ') %>
+  do
+    cat $JOB_DIR/config/config_slave|sed -e "s/SLAVE_CONFIG_NAME/jenk${slave_id}/g" -e "s/SLAVE_CONFIG_IP/${ip_addr}/g" >> $JOB_DIR/config/config.xml
+    slave_id=`expr $slave_id + 1`
+  done
 
-# Harden Secure Configurations
-chown -R vcap:vcap $JOB_DIR/config/
-chmod -R 600 $JOB_DIR/config/
+  cat $JOB_DIR/config/config_tail >> $JOB_DIR/config/config.xml
 
-# Configurations replacement
-cp -pf $JOB_DIR/config/*.xml $DATA_DIR/
+  # Harden Secure Configurations
+  chown -R vcap:vcap $JOB_DIR/config/
+  chmod -R 600 $JOB_DIR/config/
+
+  # Configurations replacement
+  cp -pf $JOB_DIR/config/*.xml $DATA_DIR/
+fi
 
 # SSH keyfile for reviewbot
 chown vcap:vcap $PACKAGE_DIR/review*
@@ -43,8 +48,10 @@ cp /var/vcap/jobs/jenkins/config/gerrit_trigger_key $DATA_DIR
 chown vcap:vcap $DATA_DIR/gerrit_trigger_key
 chmod 0600 $DATA_DIR/gerrit_trigger_key
 
-# Update the job configs
-$JOB_DIR/bin/render_jenkins_jobs
+if [ $NEED_UPGRADE_JOBS != 0 ]; then
+  # Update the job configs
+  $JOB_DIR/bin/render_jenkins_jobs
+fi
 
 # Fonts needed for graph drawing
 if [ ! -e /usr/share/fonts/truetype/ttf-dejavu ];
