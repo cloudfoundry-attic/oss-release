@@ -1,0 +1,4 @@
+---
+name: zabbix_agent
+files:
+- zabbix_agent/bds-zabbix_0.1-39_all.deb
