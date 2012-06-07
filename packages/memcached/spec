@@ -1,0 +1,4 @@
+---
+name: memcached
+files:
+- memcached/memcached-linux-x86_64-1.4.13.tgz

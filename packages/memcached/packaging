@@ -1,0 +1,10 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+mkdir unpack_memcached
+tar zxf memcached/memcached-linux-x86_64-1.4.13.tgz -C unpack_memcached
+
+(
+  cd unpack_memcached
+  cp -af memcached/* $BOSH_INSTALL_TARGET
+)
