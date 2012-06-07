@@ -1,4 +1,3 @@
-#!/bin/bash
 PACKAGE_ROOT_DIR=/var/vcap/packages
 PACKAGE_DIR=$PACKAGE_ROOT_DIR/gerrit
 GIT_DIR=/var/vcap/packages/git
@@ -14,6 +13,8 @@ dbname=<%= properties.gerrit_postgres.dbname||"reviewdb" %>
 <% elsif properties.gerrit_mysql %>
 dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
 <% end %>
+
+ENABLE_ZABBIX_AGENT=<%= properties.gerrit.enable_zabbix_agent||0 %>
 
 CONFIG_DIR=$DATA_DIR/review_site/$dbname/etc/
 STATIC_DIR=$DATA_DIR/review_site/$dbname/static
@@ -164,3 +165,13 @@ chown vcap:vcap $CONFIG_DIR/GerritSiteFooter.html
 # browser caches, forcing the new logo to be fetched.
 cp $JOB_DIR/config/logo.png $STATIC_DIR/logo.<%= properties.gerrit.logo_version %>.cache.png
 chown vcap:vcap $STATIC_DIR/logo.<%= properties.gerrit.logo_version %>.cache.png
+
+# install zabbix agent
+if [ $ENABLE_ZABBIX_AGENT = 1 ]; then
+  dpkg -iE $PACKAGE_ROOT_DIR/zabbix_agent/bds-zabbix_0.1-39_all.deb
+else
+  zabbix_installed=`dpkg -l | grep -c zabbix-agent`
+  if [ $zabbix_installed > 0 ] ; then
+    dpkg -P zabbix-agent
+  fi
+fi
