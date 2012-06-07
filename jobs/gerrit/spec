@@ -41,3 +41,4 @@ packages:
   - create_batch_gerrit_account
   - new_user_notifier
   - cla_notice
+  - zabbix_agent
