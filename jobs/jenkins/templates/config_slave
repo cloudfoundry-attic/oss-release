@@ -20,7 +20,7 @@
               <default>
                 <comparator class="hudson.util.CaseInsensitiveComparator"/>
               </default>
-              <int>26</int>
+              <int>27</int>
               <string>CREATE_CONTAINER</string>
               <string>/var/vcap/jobs/jenkins_slave/bin/create_container</string>
               <string>DEA_RUBY19</string>
@@ -73,6 +73,8 @@
               <string>/var/vcap/packages/golang</string>
               <string>VCAP_MEMCACHED</string>
               <string>/var/vcap/packages/memcached</string>
+              <string>VCAP_WARDEN_SERVICE</string>
+              <string>/var/vcap/packages/warden-service</string>
             </tree-map>
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>
