@@ -37,3 +37,4 @@ packages:
   - vblob
   - mysql-service
   - vpostgres
+  - warden-service

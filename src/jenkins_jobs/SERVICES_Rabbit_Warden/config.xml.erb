@@ -1,0 +1,183 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description></description>
+  <displayName>Rabbit Warden Unit Test</displayName>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+      <maxConcurrentPerNode>0</maxConcurrentPerNode>
+      <maxConcurrentTotal>0</maxConcurrentTotal>
+      <throttleEnabled>false</throttleEnabled>
+      <throttleOption>project</throttleOption>
+    </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name></name>
+        <refspec></refspec>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap-services.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/warden</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <disableSubmodules>false</disableSubmodules>
+    <recursiveSubmodules>false</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
+    <clean>false</clean>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <remotePoll>false</remotePoll>
+    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
+      <separator>#</separator>
+    </buildChooser>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir></relativeTargetDir>
+    <reference></reference>
+    <excludedRegions></excludedRegions>
+    <excludedUsers></excludedUsers>
+    <gitConfigName></gitConfigName>
+    <gitConfigEmail></gitConfigEmail>
+    <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
+    <scmName></scmName>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>true</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
+
+RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
+SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
+GIT_REALPATH=`readlink -nf $VCAP_GIT`
+WARDEN_SRV_REALPATH=`readlink -nf $VCAP_WARDEN_SERVICE`
+WARDEN_PKG=/var/vcap/packages/warden/warden
+
+BASE=$PWD/base
+RABBIT_SVC=$PWD/rabbit
+
+#
+# HACK - Base expects to be able to write to /var/vcap/sys/run/LOCK
+#
+SCRATCHPAD=$RABBIT_SVC/xxx_scratchpad
+rm -rf $SCRATCHPAD
+mkdir -p $SCRATCHPAD/log/warden
+mkdir -p $SCRATCHPAD/run/warden
+
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -x
+set -o errexit
+
+export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$PATH
+export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
+export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
+
+mkdir -p /var/vcap/sys/log/warden
+
+ls /var/vcap
+
+cd $WARDEN_PKG
+bundle --local install --deployment --without=devlopment test
+cat config/rabbit.yml
+nohup bundle exec rake warden:start[config/rabbit.yml] &gt;&gt; /var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
+sleep 5
+
+cd /tmp/rabbit_source/rabbit
+rm -rf .bundle
+rm -rf vendor/bundle
+
+cat lib/rabbit_service/rabbit_node.rb
+
+sed -i -e &quot;s/# rabbitmq_start_timeout: 5/rabbitmq_start_timeout: 30/g&quot; config/rabbit_node.yml
+cat config/rabbit_node.yml
+
+bundle install --deployment --without development production
+bundle exec nats-server --daemonize --pid /tmp/nats.pid
+bundle exec rake spec:ci
+
+cat /var/vcap/sys/log/warden/warden.log
+
+EOT
+
+echo &quot;creating the warden container for unit-test&quot;
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$VCAP_WARDEN_SERVICE,/var/vcap/packages/warden/warden,rw  disk_size_mb:4096 &quot;`
+
+echo &quot;enable vcap could execute sudo without password within warden&quot;
+sudo ls $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config
+set +e
+vcap_sudo_line=&quot;vcap ALL=(ALL) NOPASSWD:ALL&quot;
+vcap_chk_ret=`sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
+if test -z &quot;$vcap_chk_ret&quot;
+then
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
+fi
+set -e
+
+echo &quot;staring the unit test&quot;
+$WARDEN_REPL -e -x -c &quot;
+copy $HANDLE in $BASE /tmp/rabbit_source
+copy $HANDLE in $RABBIT_SVC /tmp/rabbit_source
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE sudo /bin/bash $TEST_RUNNER
+copy $HANDLE out /tmp/rabbit_source/rabbit/spec_reports $RABBIT_SVC vcap:vcap
+copy $HANDLE out /tmp/rabbit_source/rabbit/spec_coverage $RABBIT_SVC vcap:vcap
+destroy $HANDLE
+&quot;
+
+rm -f $TEST_RUNNER</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.tasks.ArtifactArchiver>
+      <artifacts>rabbit/spec_reports/**</artifacts>
+      <latestOnly>false</latestOnly>
+    </hudson.tasks.ArtifactArchiver>
+    <hudson.tasks.junit.JUnitResultArchiver>
+      <testResults>rabbit/spec_reports/*.xml</testResults>
+      <keepLongStdio>false</keepLongStdio>
+      <testDataPublishers/>
+    </hudson.tasks.junit.JUnitResultArchiver>
+    <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
+      <reportDir>rabbit/spec_coverage/rcov</reportDir>
+      <targets>
+        <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+          <metric>TOTAL_COVERAGE</metric>
+          <healthy>80</healthy>
+          <unhealthy>0</unhealthy>
+          <unstable>0</unstable>
+        </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+        <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+          <metric>CODE_COVERAGE</metric>
+          <healthy>80</healthy>
+          <unhealthy>0</unhealthy>
+          <unstable>0</unstable>
+        </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
+      </targets>
+    </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
+  </publishers>
+  <buildWrappers/>
+</project>
