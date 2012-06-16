@@ -1,10 +1,10 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <project>
   <actions/>
-  <description>CloudController unit tests</description>
-  <displayName>DEA Unit and Functional Tests</displayName>
+  <description>DEA unit tests</description>
+  <displayName>DEA Unit and Functional Tests (New)</displayName>
   <logRotator>
-    <daysToKeep>30</daysToKeep>
+    <daysToKeep>14</daysToKeep>
     <numToKeep>-1</numToKeep>
     <artifactDaysToKeep>-1</artifactDaysToKeep>
     <artifactNumToKeep>-1</artifactNumToKeep>
@@ -24,7 +24,7 @@
       <hudson.plugins.git.UserRemoteConfig>
         <name></name>
         <refspec>$GERRIT_REFSPEC</refspec>
-        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap.git</url>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/dea</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -59,35 +59,64 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers class="vector"/>
+  <triggers class="vector">
+    <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+      <spec></spec>
+      <gerritProjects>
+        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+          <compareType>PLAIN</compareType>
+          <pattern>dea</pattern>
+          <branches>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+              <compareType>REG_EXP</compareType>
+              <pattern>.*</pattern>
+            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+          </branches>
+        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+      </gerritProjects>
+      <silentMode>false</silentMode>
+      <escapeQuotes>true</escapeQuotes>
+      <buildStartMessage></buildStartMessage>
+      <buildFailureMessage></buildFailureMessage>
+      <buildSuccessfulMessage></buildSuccessfulMessage>
+      <buildUnstableMessage></buildUnstableMessage>
+      <buildUnsuccessfulFilepath></buildUnsuccessfulFilepath>
+      <customUrl></customUrl>
+    </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+  </triggers>
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
-rm -rvf $PWD/dea/spec_reports
-rm -rvf $PWD/tests/assets
+rm -rvf $PWD/spec_reports
 
 # Paths needed in the container
 DEA_RUBY18_REALPATH=`readlink -nf $DEA_RUBY18`
 DEA_RUBY19_REALPATH=`readlink -nf $DEA_RUBY19`
+GIT_REALPATH=$(readlink -nf $VCAP_GIT)
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
-export PATH=$DEA_RUBY19_REALPATH/bin:$PATH
-export VCAP_TEST_DEA_RUBY18=$DEA_RUBY18_REALPATH/bin/ruby
+set -o xtrace
+set -o errexit
+
 cd /tmp/dea
+export PATH=$GIT_REALPATH/bin:$DEA_RUBY19_REALPATH/bin:$PATH
+export VCAP_TEST_DEA_RUBY18=$DEA_RUBY18_REALPATH/bin/ruby
+
 bundle install --deployment --without development production
 bundle exec rake ci:spec
+
 EOT
 
-HANDLE=`$CREATE_CONTAINER $DEA_RUBY19_REALPATH $DEA_RUBY18_REALPATH`
+HANDLE=`$CREATE_CONTAINER $GIT_REALPATH $DEA_RUBY19_REALPATH $DEA_RUBY18_REALPATH`
 $WARDEN_REPL -x -c &quot;
-copy $HANDLE in $PWD/dea /tmp
+copy $HANDLE in $PWD/ /tmp/dea
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
-copy $HANDLE out /tmp/dea/spec_reports $PWD/dea vcap:vcap
+copy $HANDLE out /tmp/dea/spec_reports $PWD vcap:vcap
 destroy $HANDLE
 &quot;
 
@@ -96,11 +125,11 @@ rm -f $TEST_RUNNER</command>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>dea/spec_reports/**</artifacts>
+      <artifacts>spec_reports/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>dea/spec_reports/*.xml</testResults>
+      <testResults>spec_reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>

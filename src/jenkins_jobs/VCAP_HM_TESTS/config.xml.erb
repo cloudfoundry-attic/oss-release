@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description>CloudController unit tests</description>
-  <displayName>HealthManager Unit and Functional Tests</displayName>
+  <displayName>Health Manager Functional Tests (New)</displayName>
   <logRotator>
     <daysToKeep>30</daysToKeep>
     <numToKeep>-1</numToKeep>
@@ -24,7 +24,7 @@
       <hudson.plugins.git.UserRemoteConfig>
         <name></name>
         <refspec>$GERRIT_REFSPEC</refspec>
-        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap.git</url>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/cloud_controller</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -59,7 +59,31 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers class="vector"/>
+  <triggers class="vector">
+    <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+      <spec></spec>
+      <gerritProjects>
+        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+          <compareType>PLAIN</compareType>
+          <pattern>cloud_controller</pattern>
+          <branches>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+              <compareType>REG_EXP</compareType>
+              <pattern>.*</pattern>
+            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+          </branches>
+        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+      </gerritProjects>
+      <silentMode>false</silentMode>
+      <escapeQuotes>true</escapeQuotes>
+      <buildStartMessage></buildStartMessage>
+      <buildFailureMessage></buildFailureMessage>
+      <buildSuccessfulMessage></buildSuccessfulMessage>
+      <buildUnstableMessage></buildUnstableMessage>
+      <buildUnsuccessfulFilepath></buildUnsuccessfulFilepath>
+      <customUrl></customUrl>
+    </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+  </triggers>
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>

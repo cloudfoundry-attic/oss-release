@@ -14,8 +14,10 @@
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
       <maxConcurrentPerNode>0</maxConcurrentPerNode>
       <maxConcurrentTotal>4</maxConcurrentTotal>
+      <categories/>
       <throttleEnabled>true</throttleEnabled>
       <throttleOption>project</throttleOption>
+      <configVersion>1</configVersion>
     </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
   </properties>
   <scm class="hudson.scm.NullSCM"/>
@@ -56,7 +58,7 @@
           <configs>
             <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
           </configs>
-          <projects>VCAP_CC_TESTS,VCAP_DEA_TESTS,VCAP_ROUTER_TESTS,VCAP_HM_TESTS,VCAP_STAGER_TESTS,VCAP_STAGING_TESTS</projects>
+          <projects>VCAP_CC_TESTS.LEGACY,VCAP_DEA_TESTS.LEGACY,VCAP_ROUTER_TESTS.legacy,VCAP_HM_TESTS.LEGACY,VCAP_STAGER_TESTS,VCAP_STAGING_TESTS</projects>
           <condition>ALWAYS</condition>
           <triggerWithNoParameters>false</triggerWithNoParameters>
           <block>
