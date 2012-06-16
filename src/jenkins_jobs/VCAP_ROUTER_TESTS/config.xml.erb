@@ -2,7 +2,6 @@
 <project>
   <actions/>
   <description>Router Unit and Functional Tests</description>
-  <displayName>Router Unit and Functional Tests</displayName>
   <logRotator>
     <daysToKeep>30</daysToKeep>
     <numToKeep>-1</numToKeep>
@@ -23,8 +22,8 @@
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
         <name></name>
-        <refspec>$GERRIT_REFSPEC</refspec>
-        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap.git</url>
+        <refspec></refspec>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/router</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -32,7 +31,7 @@
         <name>*/master</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
-    <disableSubmodules>true</disableSubmodules>
+    <disableSubmodules>false</disableSubmodules>
     <recursiveSubmodules>false</recursiveSubmodules>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
     <authorOrCommitter>false</authorOrCommitter>
@@ -40,9 +39,7 @@
     <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
     <remotePoll>false</remotePoll>
-    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
-      <separator>#</separator>
-    </buildChooser>
+    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
@@ -59,19 +56,44 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers class="vector"/>
+  <triggers class="vector">
+    <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+      <spec></spec>
+      <gerritProjects>
+        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+          <compareType>PLAIN</compareType>
+          <pattern>router</pattern>
+          <branches>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+              <compareType>REG_EXP</compareType>
+              <pattern>.*</pattern>
+            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+          </branches>
+        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+      </gerritProjects>
+      <silentMode>false</silentMode>
+      <escapeQuotes>true</escapeQuotes>
+      <buildStartMessage></buildStartMessage>
+      <buildFailureMessage></buildFailureMessage>
+      <buildSuccessfulMessage></buildSuccessfulMessage>
+      <buildUnstableMessage></buildUnstableMessage>
+      <buildUnsuccessfulFilepath></buildUnsuccessfulFilepath>
+      <customUrl></customUrl>
+    </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+  </triggers>
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
-rm -rvf $PWD/router/spec_reports
-rm -rvf $PWD/tests/assets
+rm -rvf $PWD/spec_reports
+rm -rvf $PWD/assets
 
 # PATHS NEEDED IN THE CONTAINER
 DEA_RUBY19_REALPATH=`readlink -nf $DEA_RUBY19`
 DEA_RUBY19_BD=$DEA_RUBY19_REALPATH/bin
 GIT_REALPATH=$(readlink -nf $VCAP_GIT)
+
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
@@ -82,17 +104,18 @@ set -o xtrace
 
 export PATH=$GIT_REALPATH/bin:$DEA_RUBY19_BD:$PATH
 cd /tmp/router
-bundle install --deployment --without development production
+bundle install --no-color --deployment --without development production
+echo &apos;done bundle install&apos;
 bundle exec rake ci:spec
 EOT
 
 HANDLE=`$CREATE_CONTAINER $GIT_REALPATH $DEA_RUBY19_REALPATH`
 $WARDEN_REPL -c &quot;
-copy $HANDLE in $PWD/router /tmp
+copy $HANDLE in $PWD/ /tmp/router
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
-copy $HANDLE out /tmp/router/spec_reports $PWD/router vcap:vcap
+copy $HANDLE out /tmp/router/spec_reports $PWD/ vcap:vcap
 destroy $HANDLE
 &quot;
 
@@ -101,11 +124,11 @@ rm -f $TEST_RUNNER</command>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>router/spec_reports/**</artifacts>
+      <artifacts>spec_reports/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>router/spec_reports/*.xml</testResults>
+      <testResults>spec_reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>

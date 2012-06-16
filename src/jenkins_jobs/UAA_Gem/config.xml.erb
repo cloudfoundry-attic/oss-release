@@ -3,12 +3,12 @@
   <actions/>
   <description></description>
   <displayName>UAA Gem</displayName>
-  <logRotator>
-    <daysToKeep>30</daysToKeep>
-    <numToKeep>-1</numToKeep>
-    <artifactDaysToKeep>-1</artifactDaysToKeep>
-    <artifactNumToKeep>-1</artifactNumToKeep>
-  </logRotator>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -60,7 +60,7 @@
   <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
   <triggers class="vector"/>
-  <concurrentBuild>true</concurrentBuild>
+  <concurrentBuild>false</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
@@ -102,11 +102,6 @@ rm -f $TEST_RUNNER
       <artifacts>gem/coverage/**,gem/spec_reports/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
-    <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>gem/spec_reports/*xml</testResults>
-      <keepLongStdio>false</keepLongStdio>
-      <testDataPublishers/>
-    </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
       <reportDir>gem/coverage/rcov</reportDir>
       <targets>
@@ -124,6 +119,11 @@ rm -f $TEST_RUNNER
         </hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
       </targets>
     </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
+    <hudson.tasks.Mailer>
+      <recipients>cf-id@vmware.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
   </publishers>
   <buildWrappers/>
 </project>
