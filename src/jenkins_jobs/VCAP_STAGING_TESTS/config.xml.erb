@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description>Staging Unit and Functional tests</description>
-  <displayName>Staging Unit and Functional Tests</displayName>
+  <displayName>vcap_staging gem unit and functional tests (New)</displayName>
   <logRotator>
     <daysToKeep>30</daysToKeep>
     <numToKeep>-1</numToKeep>
@@ -24,7 +24,7 @@
       <hudson.plugins.git.UserRemoteConfig>
         <name></name>
         <refspec>$GERRIT_REFSPEC</refspec>
-        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap.git</url>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap-staging.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -59,18 +59,39 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers class="vector"/>
+  <triggers class="vector">
+    <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+      <spec></spec>
+      <gerritProjects>
+        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+          <compareType>PLAIN</compareType>
+          <pattern>vcap-staging</pattern>
+          <branches>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+              <compareType>REG_EXP</compareType>
+              <pattern>.*</pattern>
+            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+          </branches>
+        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+      </gerritProjects>
+      <silentMode>false</silentMode>
+      <escapeQuotes>true</escapeQuotes>
+      <buildStartMessage></buildStartMessage>
+      <buildFailureMessage></buildFailureMessage>
+      <buildSuccessfulMessage></buildSuccessfulMessage>
+      <buildUnstableMessage></buildUnstableMessage>
+      <buildUnsuccessfulFilepath></buildUnsuccessfulFilepath>
+      <customUrl></customUrl>
+    </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+  </triggers>
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
-STAGING_DIR=$PWD/staging
+STAGING_DIR=$PWD
 JAVA_DIR=$PWD/java
 SPEC_DIR=$STAGING_DIR/spec/reports
-
-rm -rvf $SPEC_DIR
-rm -rvf $PWD/tests/assets
 
 # Paths needed in the container
 DEA_RUBY18_REALPATH=`readlink -nf $DEA_RUBY18`
@@ -79,6 +100,8 @@ DEA_RUBY19_REALPATH=`readlink -nf $DEA_RUBY19`
 DEA_RUBY19_BD=$DEA_RUBY19_REALPATH/bin
 DEA_RUBY19_VER=`$DEA_RUBY19_BD/ruby --version | awk &apos;{ print $2 }&apos;`
 GIT_REALPATH=$(readlink -nf $VCAP_GIT)
+
+$GIT_REALPATH/bin/git submodule update --init --recursive
 
 TEST_RUNNER=`mktemp`
 
@@ -100,25 +123,25 @@ EOT
 chmod +x $TEST_RUNNER
 
 HANDLE=`$CREATE_CONTAINER $GIT_REALPATH $DEA_RUBY19_REALPATH $DEA_RUBY18_REALPATH`
-$WARDEN_REPL -c &quot;
-copy $HANDLE in $STAGING_DIR /tmp
-copy $HANDLE in $JAVA_DIR /tmp
+$WARDEN_REPL -xec &quot;
+copy $HANDLE in $STAGING_DIR/ /tmp/staging
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
 copy $HANDLE out /tmp/staging/spec/reports $STAGING_DIR/spec vcap:vcap
 destroy $HANDLE
 &quot;
-rm -f $TEST_RUNNER</command>
+rm -f $TEST_RUNNER
+</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>staging/spec/reports/**</artifacts>
+      <artifacts>spec/reports/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>staging/spec/reports/*.xml</testResults>
+      <testResults>spec/reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
