@@ -20,11 +20,11 @@ do
   cat ${config_path} | sed '
 /<logRotator>/,/<\/logRotator>/ d' | sed '
   /<keepDependencies>/ i \
-\  <logRotator> \
-\    <daysToKeep><%= properties.jenkins.days_to_keep || 30 %></daysToKeep> \
-\    <numToKeep><%= properties.jenkins.num_to_keep || -1 %></numToKeep> \
-\    <artifactDaysToKeep><%= properties.jenkins.artifact_days_to_keep || -1 %></artifactDaysToKeep> \
-\    <artifactNumToKeep><%= properties.jenkins.artifact_num_to_keep || -1 %></artifactNumToKeep> \
+\  <logRotator>\
+\    <daysToKeep><%= properties.jenkins.days_to_keep || 30 %></daysToKeep>\
+\    <numToKeep><%= properties.jenkins.num_to_keep || -1 %></numToKeep>\
+\    <artifactDaysToKeep><%= properties.jenkins.artifact_days_to_keep || -1 %></artifactDaysToKeep>\
+\    <artifactNumToKeep><%= properties.jenkins.artifact_num_to_keep || -1 %></artifactNumToKeep>\
 \  </logRotator>
 ' > /tmp/config.xml
   mv /tmp/config.xml ${config_path}
