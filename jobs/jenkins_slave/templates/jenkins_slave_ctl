@@ -50,6 +50,8 @@ case $1 in
     ;;
 
   stop)
+    # Stop the slave process
+    killall java
     rm -f $PIDFILE
     ;;
 
