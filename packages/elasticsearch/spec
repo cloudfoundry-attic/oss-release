@@ -1,0 +1,4 @@
+---
+name: elasticsearch
+files:
+- elasticsearch/elasticsearch-0.19.4.tar.gz

@@ -30,6 +30,7 @@ case $1 in
     cp $CONFIG_DIR/{id_rsa,id_rsa.pub,authorized_keys} /home/vcap/.ssh
     chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub,authorized_keys}
     chown -R vcap:vcap /home/vcap/.ssh
+    chown -R vcap:vcap /var/vcap/packages/elasticsearch/*
 
     # Refresh host key for gerrit
     <% if properties.gerrit.dev_ip %>
