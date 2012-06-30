@@ -1,0 +1,10 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+mkdir unpack_elasticsearch
+tar zxf elasticsearch/elasticsearch-0.19.4.tar.gz -C unpack_elasticsearch
+
+(
+  cd unpack_elasticsearch
+  cp -af elasticsearch-0.19.4/* $BOSH_INSTALL_TARGET
+)
