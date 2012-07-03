@@ -38,3 +38,4 @@ packages:
   - mysql-service
   - vpostgres
   - warden-service
+  - elasticsearch
