@@ -2,5 +2,6 @@ check process jenkins
   with pidfile /var/vcap/sys/run/jenkins/jenkins.pid
   start program "/var/vcap/jobs/jenkins/bin/jenkins_ctl start"
   stop program "/var/vcap/jobs/jenkins/bin/jenkins_ctl stop"
+  if failed host <%= properties.jenkins.address %> port <%= properties.jenkins.http_port %> protocol http with timeout <%= properties.jenkins.http_timeout || 5 %> seconds for <%= properties.jenkins.http_cycles || 10 %> cycles then restart
   group vcap
 
