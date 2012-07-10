@@ -95,7 +95,9 @@ begin
 
   repos.each do |repo|
     handle_pull_requests(log, config, client, org, repo["name"])
-    handle_issues(log, config, client, org, repo["name"])
+
+    # Turn off auto-closer for issues. Issue functionality is disabled on github.
+    # handle_issues(log, config, client, org, repo["name"])
   end
 
   log.info("Done")
