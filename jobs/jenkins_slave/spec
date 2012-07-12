@@ -39,3 +39,4 @@ packages:
   - vpostgres
   - warden-service
   - elasticsearch
+  - couchdb

@@ -1,0 +1,10 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+mkdir unpack_couchdb
+tar zxf couchdb/apache-couchdb-1.2.0.tar.gz -C unpack_couchdb
+
+(
+  cd unpack_couchdb
+  cp -af couchdb/* $BOSH_INSTALL_TARGET
+)
