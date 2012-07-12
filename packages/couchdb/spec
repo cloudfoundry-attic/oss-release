@@ -1,0 +1,4 @@
+---
+name: couchdb
+files:
+- couchdb/apache-couchdb-1.2.0.tar.gz
