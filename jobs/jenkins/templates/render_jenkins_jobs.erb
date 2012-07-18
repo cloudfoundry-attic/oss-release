@@ -6,6 +6,7 @@ export PATH=/var/vcap/packages/ruby/bin:$PATH
 export CF_CI_USER=<%= properties.jenkins_slave.gerrit_user.username %>
 export CF_GERRIT_ADDRESS=<%= properties.gerrit.address %>
 export CF_GERRIT_PORT=<%= properties.gerrit.port || 29418 %>
+export JENKINS_JOB_ROOT=/var/vcap/store/jenkins/jobs
 
 cd /var/vcap/packages/jenkins_jobs
 for template_path in `find . -name config.xml.erb`
@@ -15,7 +16,6 @@ do
   config_dir=`dirname ${config_path}`
   mkdir -p ${config_dir}
   erb ${template_path} > ${config_path}
-  chown -R vcap:vcap ${config_dir}
 
   cat ${config_path} | sed '
 /<logRotator>/,/<\/logRotator>/ d' | sed '
@@ -29,3 +29,7 @@ do
 ' > /tmp/config.xml
   mv /tmp/config.xml ${config_path}
 done
+
+if [ -d $JENKINS_JOB_ROOT ]; then
+  chown -R vcap:vcap $JENKINS_JOB_ROOT
+fi
