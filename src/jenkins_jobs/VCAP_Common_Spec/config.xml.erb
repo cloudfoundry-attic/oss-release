@@ -99,7 +99,7 @@ set -o nounset
 export VCAP_TEST_LOG=true
 export PATH=$GIT_REALPATH/bin:$RUBY19_REALPATH/bin:$PATH
 cd /tmp/common
-bundle install --no-color --deployment --without development production
+bundle install --no-color --path vendor/bundle --without development production
 bundle exec rake spec
 EOT
 

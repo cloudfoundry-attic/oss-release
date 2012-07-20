@@ -3,12 +3,12 @@
   <actions/>
   <description></description>
   <displayName>Rabbit Unit Test</displayName>
-  <logRotator> 
-    <daysToKeep>30</daysToKeep> 
-    <numToKeep>-1</numToKeep> 
-    <artifactDaysToKeep>-1</artifactDaysToKeep> 
-    <artifactNumToKeep>-1</artifactNumToKeep> 
-  </logRotator>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -71,7 +71,6 @@ ERLANG_REALPATH=`readlink -nf $VCAP_ERLANG`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
 
-BASE=$PWD/base
 RABBIT_SVC=$PWD/rabbit
 
 #
@@ -93,6 +92,7 @@ export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$RABBIT_REALPATH/sbin:/var/vc
 
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
+export CI_ENV=&apos;jenkins&apos;
 
 cd /tmp/rabbit_source/rabbit
 rm -rf .bundle
@@ -113,7 +113,6 @@ EOT
 
 HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$RABBIT_REALPATH,$RABBIT_REALPATH,ro bind_mount:$ERLANG_REALPATH,/var/vcap/packages/erlang,ro&quot;`
 $WARDEN_REPL -e -x -c &quot;
-copy $HANDLE in $BASE /tmp/rabbit_source
 copy $HANDLE in $RABBIT_SVC /tmp/rabbit_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER

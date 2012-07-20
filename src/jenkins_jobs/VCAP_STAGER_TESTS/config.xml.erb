@@ -24,7 +24,7 @@
       <hudson.plugins.git.UserRemoteConfig>
         <name></name>
         <refspec>$GERRIT_REFSPEC</refspec>
-        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap.git</url>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/stager</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
@@ -59,17 +59,40 @@
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
-  <triggers class="vector"/>
+  <triggers class="vector">
+    <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+      <spec></spec>
+      <gerritProjects>
+        <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+          <compareType>PLAIN</compareType>
+          <pattern>stager</pattern>
+          <branches>
+            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+              <compareType>REG_EXP</compareType>
+              <pattern>.*</pattern>
+            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
+          </branches>
+        </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
+      </gerritProjects>
+      <silentMode>false</silentMode>
+      <escapeQuotes>true</escapeQuotes>
+      <buildStartMessage></buildStartMessage>
+      <buildFailureMessage></buildFailureMessage>
+      <buildSuccessfulMessage></buildSuccessfulMessage>
+      <buildUnstableMessage></buildUnstableMessage>
+      <buildUnsuccessfulFilepath></buildUnsuccessfulFilepath>
+      <customUrl></customUrl>
+    </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTrigger>
+  </triggers>
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
-STAGER_DIR=$PWD/stager
+STAGER_DIR=$PWD
 SPEC_DIR=$STAGER_DIR/spec/reports
 
 rm -rvf $SPEC_DIR
-rm -rvf $PWD/tests/assets
 
 # Paths needed in the container
 DEA_RUBY18_REALPATH=`readlink -nf $DEA_RUBY18`
@@ -109,7 +132,7 @@ chmod +x $TEST_RUNNER
 
 HANDLE=`$CREATE_CONTAINER $GIT_REALPATH $DEA_RUBY19_REALPATH $DEA_RUBY18_REALPATH`
 $WARDEN_REPL -c &quot;
-copy $HANDLE in $STAGER_DIR /tmp
+copy $HANDLE in $STAGER_DIR/ /tmp/stager
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE $TEST_RUNNER
 copy $HANDLE out /tmp/stager/spec/reports $STAGER_DIR/spec vcap:vcap
@@ -120,11 +143,11 @@ rm -f $TEST_RUNNER</command>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>stager/spec/reports/**</artifacts>
+      <artifacts>spec/reports/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>stager/spec/reports/*.xml</testResults>
+      <testResults>spec/reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>

@@ -70,7 +70,6 @@ MEMCACHED_REALPATH=`readlink -nf $VCAP_MEMCACHED`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
 
-BASE=$PWD/base
 MEMCACHED_SVC=$PWD/memcached
 
 #
@@ -93,6 +92,7 @@ export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_MEMCACHED/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$VCAP_MEMCACHED/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$VCAP_MEMCACHED/lib:$LD_LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$VCAP_MEMCACHED/include:$C_INCLUDE_PATH
+export CI_ENV=&apos;jenkins&apos;
 
 cd /tmp/memcached_source/memcached
 
@@ -118,7 +118,6 @@ EOT
 
 HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$MEMCACHED_REALPATH,$VCAP_MEMCACHED,ro&quot;`
 $WARDEN_REPL -e -x -c &quot;
-copy $HANDLE in $BASE /tmp/memcached_source
 copy $HANDLE in $MEMCACHED_SVC /tmp/memcached_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER

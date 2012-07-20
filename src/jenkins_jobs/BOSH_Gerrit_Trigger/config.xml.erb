@@ -3,12 +3,12 @@
   <actions/>
   <description></description>
   <displayName>Platforms Gerrit Trigger</displayName>
-  <logRotator>
-    <daysToKeep>30</daysToKeep>
-    <numToKeep>-1</numToKeep>
-    <artifactDaysToKeep>-1</artifactDaysToKeep>
-    <artifactNumToKeep>-1</artifactNumToKeep>
-  </logRotator>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -56,7 +56,7 @@
           <configs>
             <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
           </configs>
-          <projects>BOSH_Agent_Unit_Tests,BOSH_Agent_Functional_Tests,BOSH_Director_Unit_Tests,BOSH_Director_Functional_Tests,BOSH_CLI_Unit_Tests_19,BOSH_Monitor_Unit_Tests,BOSH_Blobstore_Client_Unit_Tests_19,BOSH_Agent_Client_Unit_Tests,BOSH_Blobstore_Client_Unit_Tests_18,BOSH_Blobstore_Server_Functional_Tests,BOSH_Monit_API_Unit_Tests,BOSH_Ruby_VIM_SDK_Unit_Tests,BOSH_AWS_Registry_Unit_Tests,BOSH_AWS_CPI_Unit_Tests,BOSH_Common_Unit_tests_19</projects>
+          <projects>BOSH_Agent_Unit_Tests,BOSH_Agent_Functional_Tests,BOSH_Director_Unit_Tests,BOSH_Director_Functional_Tests,BOSH_CLI_Unit_Tests_19,BOSH_Monitor_Unit_Tests,BOSH_Blobstore_Client_Unit_Tests_19,BOSH_Agent_Client_Unit_Tests,BOSH_Blobstore_Client_Unit_Tests_18,BOSH_Blobstore_Server_Functional_Tests,BOSH_Monit_API_Unit_Tests,BOSH_Ruby_VIM_SDK_Unit_Tests,BOSH_AWS_Registry_Unit_Tests,BOSH_AWS_CPI_Unit_Tests</projects>
           <condition>ALWAYS</condition>
           <triggerWithNoParameters>false</triggerWithNoParameters>
           <block>
