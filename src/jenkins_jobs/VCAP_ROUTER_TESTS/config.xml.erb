@@ -109,6 +109,7 @@ cd /tmp/router
 bundle install --no-color --deployment --without development production
 echo &apos;done bundle install&apos;
 bundle exec rake ci:spec
+find /tmp -name router.log -exec cat {} \;
 EOT
 
 HANDLE=`$CREATE_CONTAINER $GIT_REALPATH $DEA_RUBY19_REALPATH`

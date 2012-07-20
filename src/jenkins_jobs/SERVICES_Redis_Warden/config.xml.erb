@@ -71,7 +71,6 @@ GIT_REALPATH=`readlink -nf $VCAP_GIT`
 WARDEN_SRV_REALPATH=`readlink -nf $VCAP_WARDEN_SERVICE`
 WARDEN_PKG=/var/vcap/packages/warden/warden
 
-BASE=$PWD/base
 REDIS_SVC=$PWD/redis
 
 #
@@ -91,20 +90,24 @@ set -o errexit
 export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
+export CI_ENV=&apos;jenkins&apos;
 
 mkdir -p /var/vcap/sys/log/warden
 
 cd $WARDEN_PKG
 bundle --local install --deployment --without=devlopment test
 cat config/redis.yml
-nohup bundle exec rake warden:start[config/redis.yml] &gt;&gt; /var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
-sleep 5
 
 cd /tmp/redis_source/redis
 rm -rf .bundle
 rm -rf vendor/bundle
+bundle install --path vendor/bundle
 
-bundle install --deployment --without development production
+cd $WARDEN_PKG
+nohup bundle exec rake warden:start[config/redis.yml] &gt;&gt; /var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
+sleep 5
+
+cd /tmp/redis_source/redis
 bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci
 
@@ -131,7 +134,6 @@ set -e
 
 echo &quot;staring the unit test&quot;
 $WARDEN_REPL -e -x -c &quot;
-copy $HANDLE in $BASE /tmp/redis_source
 copy $HANDLE in $REDIS_SVC /tmp/redis_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER

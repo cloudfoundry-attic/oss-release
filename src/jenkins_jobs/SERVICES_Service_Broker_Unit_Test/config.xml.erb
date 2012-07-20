@@ -3,12 +3,12 @@
   <actions/>
   <description></description>
   <displayName>Service Broker Unit Test</displayName>
-  <logRotator> 
-    <daysToKeep>30</daysToKeep> 
-    <numToKeep>-1</numToKeep> 
-    <artifactDaysToKeep>-1</artifactDaysToKeep> 
-    <artifactNumToKeep>-1</artifactNumToKeep> 
-  </logRotator>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -69,7 +69,6 @@ RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
 
-BASE=$PWD/base
 SB_SVC=$PWD/service_broker
 
 #
@@ -90,6 +89,7 @@ echo &quot;started testing&quot;
 export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
+export CI_ENV=&apos;jenkins&apos;
 
 cd /tmp/sb_source/service_broker
 
@@ -106,7 +106,6 @@ EOT
 
 HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw&quot;`
 $WARDEN_REPL -e -x -c &quot;
-copy $HANDLE in $BASE /tmp/sb_source
 copy $HANDLE in $SB_SVC /tmp/sb_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER

@@ -71,7 +71,6 @@ GIT_REALPATH=`readlink -nf $VCAP_GIT`
 JAVA_REALPATH=`readlink -nf $DEA_JAVA`
 NEO_REALPATH=`readlink -nf $VCAP_NEO4J`
 
-BASE=$PWD/base
 NEO_SVC=$PWD/neo4j
 
 #
@@ -89,6 +88,7 @@ set -o errexit
 export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:/var/vcap/packages/java/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
+export CI_ENV=&apos;jenkins&apos;
 
 cd /tmp/neo_source/neo4j
 
@@ -112,7 +112,6 @@ EOT
 
 HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw, bind_mount:$JAVA_REALPATH,/var/vcap/packages/java,ro bind_mount:$NEO_REALPATH,/var/vcap/packages/neo4j,ro&quot;`
 $WARDEN_REPL -e -x -c &quot;
-copy $HANDLE in $BASE /tmp/neo_source
 copy $HANDLE in $NEO_SVC /tmp/neo_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER

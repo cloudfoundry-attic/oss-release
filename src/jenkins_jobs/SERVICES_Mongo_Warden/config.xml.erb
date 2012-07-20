@@ -72,7 +72,6 @@ MONGODB_REALPATH=`readlink -nf $VCAP_MONGODB`
 WARDEN_SRV_REALPATH=`readlink -nf $VCAP_WARDEN_SERVICE`
 WARDEN_PKG=/var/vcap/packages/warden/warden
 
-BASE=$PWD/base
 MONGO_SVC=$PWD/mongodb
 
 #
@@ -92,25 +91,27 @@ set -o errexit
 export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$MONGODB_REALPATH/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
+export CI_ENV=&apos;jenkins&apos;
 
-mkdir -p /var/vcap/sys/log/warden
+sudo mkdir -p /var/vcap/sys/log/warden
 
 cd $WARDEN_PKG
+bundle config
 bundle --local install --deployment --without=devlopment test
+
+cd /tmp/mongo_source/mongodb
+mkdir -p /tmp/mongo_backup
+rm -rf .bundle
+rm -rf vendor/bundle
+sed -i -e &quot;s/mongodump_path: mongodump/mongodump_path: \/usr\/bin\/mongodump/g&quot; config/mongodb_backup.yml
+bundle config
+bundle install --path vendor/bundle
+
+cd $WARDEN_PKG
 nohup bundle exec rake warden:start[config/mongodb.yml] &gt;&gt; /var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
 sleep 5
 
 cd /tmp/mongo_source/mongodb
-
-mkdir -p /tmp/mongo_backup
-
-rm -rf .bundle
-rm -rf vendor/bundle
-
-#sed -i -e &quot;161 s/\.*/sleep 1000/&quot; lib/mongodb_service/mongodb_node.rb
-sed -i -e &quot;s/mongodump_path: mongodump/mongodump_path: \/usr\/bin\/mongodump/g&quot; config/mongodb_backup.yml
-
-bundle install --deployment --without development production
 bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci
 
@@ -135,7 +136,6 @@ set -e
 
 echo &quot;staring the unit test&quot;
 $WARDEN_REPL -e -x -c &quot;
-copy $HANDLE in $BASE /tmp/mongo_source
 copy $HANDLE in $MONGO_SVC /tmp/mongo_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER

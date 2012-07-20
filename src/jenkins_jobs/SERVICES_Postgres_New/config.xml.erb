@@ -3,12 +3,12 @@
   <actions/>
   <description></description>
   <displayName>Postgres Unit Test</displayName>
-  <logRotator> 
-    <daysToKeep>30</daysToKeep> 
-    <numToKeep>-1</numToKeep> 
-    <artifactDaysToKeep>-1</artifactDaysToKeep> 
-    <artifactNumToKeep>-1</artifactNumToKeep> 
-  </logRotator>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -70,7 +70,6 @@ POSTGRES_REALPATH=`readlink -nf $VCAP_VPOSTGRES`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
 
-BASE=$PWD/base
 POSTGRES_SVC=$PWD/postgresql
 
 #
@@ -93,6 +92,7 @@ export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_POSTGRES/bin:$VCAP_POST
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$VCAP_POSTGRES/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$VCAP_POSTGRES/lib:$LD_LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$VCAP_POSTGRES/include:$C_INCLUDE_PATH
+export CI_ENV=&apos;jenkins&apos;
 
 /var/vcap/packages/postgres/jobs/postgres_ctl start
 
@@ -105,9 +105,6 @@ sed -i &apos;s/base_dir: \/var\/vcap\/services\/postgresql\//base_dir: \/tmp\/va
 sed -i &apos;s/\/var\/vcap\/sys\/run\/postgresql_node.pid/\/tmp\/var\/vcap\/sys\/run\/postgresql_node.pid/g&apos; config/postgresql_node.yml
 sed -i &apos;s/\/var\/vcap\/sys\/run\/postgresql_service.pid/\/tmp\/var\/vcap\/sys\/run\/postgres_service.pid/g&apos; config/postgresql_gateway.yml
 sed -i &apos;s/local_db: sqlite3:\/var\/vcap\/services\/postgresql\/postgresql_node.db/local_db: sqlite3:postgresql_node.db/g&apos; config/postgresql_node.yml
-#sed -i &apos;s/logger.level = Logger::ERROR/logger.level = Logger::DEBUG/g&apos; spec/spec_helper.rb
-#sed -i &apos;s/nats:\/\/localhost:4222/nats:\/\/yang:yang@localhost:4111/g&apos; config/postgresql_node.yml
-#sed -i &apos;s/nats:\/\/localhost:4222/nats:\/\/yang:yang@localhost:4111/g&apos; config/postgresql_gateway.yml
 
 cat config/postgresql_node.yml
 cat config/postgresql_gateway.yml
@@ -121,7 +118,6 @@ EOT
 
 HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$POSTGRES_REALPATH,$VCAP_POSTGRES,ro&quot;`
 $WARDEN_REPL -e -x -c &quot;
-copy $HANDLE in $BASE /tmp/psql_source
 copy $HANDLE in $POSTGRES_SVC /tmp/psql_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
