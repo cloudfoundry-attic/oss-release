@@ -1,0 +1,3 @@
+[submodule "src/warden"]
+	path = src/warden
+	url = https://github.com/cloudfoundry/warden.git
