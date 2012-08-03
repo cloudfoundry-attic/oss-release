@@ -7,3 +7,16 @@ if [ ! -f /var/vcap/store/jenkins_slave/tmp/ubuntu.iso ]; then
   wget -b -r --tries=10 -O /var/vcap/store/jenkins_slave/tmp/ubuntu.iso http://releases.ubuntu.com/lucid/ubuntu-10.04.4-server-amd64.iso
   chown -R vcap:vcap /var/vcap/store/jenkins_slave/tmp/
 fi
+
+PACKAGE_ROOT_DIR=/var/vcap/packages
+ENABLE_ZABBIX_AGENT=<%= properties.jenkins.enable_zabbix_agent||0 %>
+
+# install zabbix agent
+if [ $ENABLE_ZABBIX_AGENT = 1 ]; then
+  dpkg -iE $PACKAGE_ROOT_DIR/zabbix_agent/bds-zabbix_0.1-39_all.deb
+else
+  zabbix_installed=`dpkg -l | grep -c bds-zabbix`
+  if [ $zabbix_installed -gt 0 ] ; then
+    dpkg -P bds-zabbix
+  fi
+fi
