@@ -171,8 +171,8 @@ chown vcap:vcap $STATIC_DIR/logo.<%= properties.gerrit.logo_version %>.cache.png
 if [ $ENABLE_ZABBIX_AGENT = 1 ]; then
   dpkg -iE $PACKAGE_ROOT_DIR/zabbix_agent/bds-zabbix_0.1-39_all.deb
 else
-  zabbix_installed=`dpkg -l | grep -c zabbix-agent`
+  zabbix_installed=`dpkg -l | grep -c bds-zabbix`
   if [ $zabbix_installed -gt 0 ] ; then
-    dpkg -P zabbix-agent
+    dpkg -P bds-zabbix
   fi
 fi

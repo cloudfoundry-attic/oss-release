@@ -40,3 +40,4 @@ packages:
   - warden-service
   - elasticsearch
   - couchdb
+  - zabbix_agent

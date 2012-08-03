@@ -8,7 +8,7 @@
       <launcher class="hudson.plugins.sshslaves.SSHLauncher">
         <host>SLAVE_CONFIG_IP</host>
         <port>22</port>
-        <jvmOptions>-Xmx2048m</jvmOptions>
+        <jvmOptions>-Xmx4096m</jvmOptions>
         <javaPath>/var/vcap/packages/java/bin/java</javaPath>
       </launcher>
       <label></label>
