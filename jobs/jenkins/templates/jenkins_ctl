@@ -15,7 +15,7 @@ JENKINS_WAR=$PACKAGE_DIR/jenkins.war
 HTTP_PORT=<%= properties.jenkins.http_port || 8080 %>
 JENKINS_ARGS="--webroot=$WEBROOT --httpPort=$HTTP_PORT --ajp13Port=-1"
 
-COMMAND="java -Xmx2048m -jar $JENKINS_WAR $JENKINS_ARGS"
+COMMAND="java -Xmx4096m -jar $JENKINS_WAR $JENKINS_ARGS"
 
 case "$1" in
   start)
