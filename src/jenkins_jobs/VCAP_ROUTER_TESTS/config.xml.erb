@@ -100,7 +100,7 @@ GIT_REALPATH=$(readlink -nf $VCAP_GIT)
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 #!/bin/bash
-set -o errexit
+#set -o errexit
 set -o nounset
 set -o xtrace
 

@@ -92,6 +92,7 @@ export LIBRARY_PATH=$SQLITE_REALPATH/lib:$VCAP_MYSQLCLIENT/lib/mysql:$VCAP_MYSQL
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 export LD_LIBRARY_PATH=$VCAP_MYSQLCLIENT/lib/mysql:$VCAP_MYSQL/lib/mysql:$LD_LIBRARY_PATH
 
+mkdir -p /var/vcap/packages/couchdb
 mkdir -p /tmp/log
 cp -r /var/vcap/packages/erlang/* /usr/
 cp -r /tmp/couchdb_bin/*/* /var/vcap/packages/couchdb/
