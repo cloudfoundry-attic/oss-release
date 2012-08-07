@@ -1,0 +1,24 @@
+#!/bin/bash
+
+ZABBIX_AGENT=/usr/sbin/zabbix_agentd
+ZABBIX_PID_DIR=/var/run/zabbix-agent
+
+case $1 in
+
+  start)
+    zabbix_running=`ps -ef | grep $ZABBIX_AGENT | grep -c -v "grep"`
+    [ $zabbix_running -eq 0 ] && [ -d $ZABBIX_PID_DIR ] && mkdir -p $ZABBIX_PID_DIR
+
+    /etc/init.d/zabbix-agent start
+    ;;
+
+  stop)
+    killall zabbix_agentd
+    ;;
+
+  *)
+  echo "Usage: zabbix_agent_ctl {start|stop}" ;;
+
+esac
+exit 0
+

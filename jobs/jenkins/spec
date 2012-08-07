@@ -3,6 +3,7 @@ name: jenkins
 templates:
   jenkins_ctl: bin/jenkins_ctl
   jenkins_init.ctl.erb: bin/jenkins_init.ctl
+  zabbix_agent_ctl: bin/zabbix_agent_ctl
   change_tmp: bin/change_tmp
   id_rsa.erb: config/id_rsa
   id_rsa.pub.erb: config/id_rsa.pub

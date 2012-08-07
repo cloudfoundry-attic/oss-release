@@ -5,3 +5,10 @@ check process jenkins
   if failed host <%= properties.jenkins.address %> port <%= properties.jenkins.http_port %> send "GET / HTTP/1.0\r\nHost: <%= properties.jenkins.address %>\r\n\r\n" expect "HTTP/[0-9\.]{3} (200|503).*\r\n" with timeout <%= properties.jenkins.http_timeout || 5 %> seconds for <%= properties.jenkins.http_cycles || 10 %> cycles then restart
   group vcap
 
+<% if properties.jenkins.enable_zabbix_agent==1 %>
+check process zabbix
+  with pidfile /var/run/zabbix-agent/zabbix_agentd.pid
+  start program "/var/vcap/jobs/jenkins/bin/zabbix_agent_ctl start"
+  stop program "/var/vcap/jobs/jenkins/bin/zabbix_agent_ctl stop"
+  group vcap
+<% end %>
