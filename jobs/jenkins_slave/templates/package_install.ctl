@@ -14,6 +14,11 @@ ENABLE_ZABBIX_AGENT=<%= properties.jenkins.enable_zabbix_agent||0 %>
 # install zabbix agent
 if [ $ENABLE_ZABBIX_AGENT = 1 ]; then
   dpkg -iE $PACKAGE_ROOT_DIR/zabbix_agent/bds-zabbix_0.1-39_all.deb
+  zabbix_running=`ps -ef | grep zabbix | grep -c -v "grep"`
+  if [ $zabbix_running -eq 0 ]; then
+    mkdir -p "/var/run/zabbix-agent"
+    /etc/init.d/zabbix-agent start
+  fi
 else
   zabbix_running=`ps -ef | grep zabbix | grep -c -v "grep"`
   if [ $zabbix_running -gt 0 ]; then
