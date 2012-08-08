@@ -4,3 +4,11 @@ check process gerrit
   stop program "/var/vcap/jobs/gerrit/bin/gerrit_ctl stop"
   if failed host <%= properties.gerrit.address %> port <%= properties.gerrit.http_port %> protocol http with timeout <%= properties.gerrit.http_timeout || 5 %> seconds for <%= properties.gerrit.http_cycles || 10 %> cycles then restart
   group vcap
+
+<% if properties.gerrit.enable_zabbix_agent==1 %>
+check process zabbix
+  with pidfile /var/run/zabbix-agent/zabbix_agentd.pid
+  start program "/var/vcap/jobs/gerrit/bin/zabbix_agent_ctl start"
+  stop program "/var/vcap/jobs/gerrit/bin/zabbix_agent_ctl stop"
+  group vcap
+<% end %>

@@ -9,3 +9,11 @@ check process warden
   start program "/var/vcap/jobs/jenkins_slave/bin/warden_ctl start"
   stop program "/var/vcap/jobs/jenkins_slave/bin/warden_ctl stop"
   group vcap
+
+<% if properties.jenkins.enable_zabbix_agent==1 %>
+check process zabbix
+  with pidfile /var/run/zabbix-agent/zabbix_agentd.pid
+  start program "/var/vcap/jobs/jenkins_slave/bin/zabbix_agent_ctl start"
+  stop program "/var/vcap/jobs/jenkins_slave/bin/zabbix_agent_ctl stop"
+  group vcap
+<% end %>

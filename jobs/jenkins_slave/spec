@@ -2,6 +2,7 @@
 name: jenkins_slave
 templates:
   jenkins_slave_ctl: bin/jenkins_slave_ctl
+  zabbix_agent_ctl: bin/zabbix_agent_ctl
   package_install.ctl: bin/package_install.ctl
   change_tmp: bin/change_tmp
   warden.yml: config/warden.yml
