@@ -1,0 +1,44 @@
+#!/bin/bash
+REPO_DIR=/var/vcap/store/gerrit_backup
+LOG_DIR=/var/vcap/sys/log/gerrit_backup
+RUN_DIR=/var/vcap/sys/run/gerrit_backup
+JOB_DIR=/var/vcap/jobs/gerrit_backup
+CONFIG_DIR=$JOB_DIR/config
+PIDFILE=$RUN_DIR/backup.pid
+TERMINATE_BACKUP=/tmp/terminate_backup
+
+case $1 in
+
+  start)
+    mkdir -p $LOG_DIR
+    mkdir -p $RUN_DIR
+    mkdir -p $REPO_DIR
+    chown vcap:vcap $REPO_DIR
+
+    echo $$ > $PIDFILE
+
+    mkdir -p /home/vcap/.ssh
+    chmod 0700 /home/vcap/.ssh
+
+    cp $CONFIG_DIR/{id_rsa,id_rsa.pub,authorized_keys} /home/vcap/.ssh
+    chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub,authorized_keys}
+    chown -R vcap:vcap /home/vcap/.ssh
+
+    # Refresh host key for cloudfoundry
+    su - vcap -c 'ssh-keygen -f /home/vcap/.ssh/known_hosts  -R reviews.cloudfoundry.org'
+    su - vcap -c 'ssh-keyscan reviews.cloudfoundry.org >> /home/vcap/.ssh/known_hosts'
+
+    su - vcap -c "$JOB_DIR/bin/run_backup"
+    ;;
+
+  stop)
+    echo "Stopping Gerrit_backup "
+    touch $TERMINATE_BACKUP
+    chown vcap:vcap $TERMINATE_BACKUP
+    kill_and_wait $PIDFILE
+    ;;
+
+  *)
+  echo "Usage: backup_ctl {start|stop}" ;;
+esac
+exit 0

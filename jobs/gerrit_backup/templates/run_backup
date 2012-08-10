@@ -1,0 +1,47 @@
+#!/bin/bash
+REPO_DIR=/var/vcap/store/gerrit_backup
+LOG_DIR=/var/vcap/sys/log/gerrit_backup
+TERMINATE_BACKUP=/tmp/terminate_backup
+JOB_DIR=/var/vcap/jobs/gerrit_backup
+GIT_DIR=/var/vcap/packages/git
+
+export PATH=$GIT_DIR/bin:$PATH
+LAST_BAK_FILE=$REPO_DIR/last_backup_time
+interval=<%= properties.gerrit_backup.interval || 6 %>
+max_backup=<%= properties.gerrit_backup.max_backup || 20 %>
+while true
+do
+  [ -f $TERMINATE_BACKUP ] && rm $TERMINATE_BACKUP && exit 1
+
+  if [ -f $LAST_BAK_FILE ]; then
+    last=`head -1 $LAST_BAK_FILE`
+  else
+    last=0
+  fi
+
+  now=`date +%s`
+  interval_secs=$((interval * 60 * 60))
+  if (( $now - $last > $interval_secs )); then
+    repo_dir=${REPO_DIR}/git_`date +"%Y-%m-%d(%H-%M-%S)"`
+    [ -d $repo_dir ] || mkdir -p $repo_dir
+    cat $JOB_DIR/config/repoes | while read repo
+    do
+      if [ ! -z "$repo" ]; then
+        git_path="ssh://ci-bot@reviews.cloudfoundry.org:29418/${repo}.git"
+        [ ! -d $repo_dir/${repo}.git ] && echo git clone --mirror $git_path $repo_dir/${repo}.git
+      fi
+    done
+    echo $now > $LAST_BAK_FILE
+  fi
+
+  count_backup=`ls ${REPO_DIR} | sort | grep git_ | wc -l`
+  gap=$((count_backup-max_backup))
+  if(( $gap > 0 ));then
+    ls ${REPO_DIR} | sort | grep git_ | head -$gap | while read git_sub_dir
+    do
+      rm -rf ${REPO_DIR}/${git_sub_dir}
+    done
+  fi
+
+  sleep 20
+done

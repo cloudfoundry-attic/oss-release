@@ -1,0 +1,6 @@
+check process gerrit_backup
+  with pidfile /var/vcap/sys/run/gerrit_backup/backup.pid
+  start program "/var/vcap/jobs/gerrit_backup/bin/backup_ctl start"
+  stop program "/var/vcap/jobs/gerrit_backup/bin/backup_ctl stop"
+  group vcap
+

@@ -1,0 +1,11 @@
+---
+name: gerrit_backup
+templates:
+  backup_ctl: bin/backup_ctl
+  run_backup: bin/run_backup
+  repoes.erb: config/repoes
+  id_rsa.erb: config/id_rsa
+  id_rsa.pub.erb: config/id_rsa.pub
+  authorized_keys.erb: config/authorized_keys
+packages:
+  - git
