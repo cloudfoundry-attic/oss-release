@@ -68,7 +68,7 @@ RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
 JAVA_REALPATH=`readlink -nf $DEA_JAVA`
 MVN_REALPATH=`readlink -nf $VCAP_MAVEN22`
-VMC=$PWD
+WORKSPACE_NAME=`basename $WORKSPACE`
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
@@ -76,14 +76,15 @@ cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 set -o errexit
 export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$MVN_REALPATH/bin:$PATH
 export JAVA_HOME=$JAVA_REALPATH
-cd $VMC
+cd /tmp/$WORKSPACE_NAME
 rm -rf vendor/bundle
 bundle install --no-color --path vendor/bundle
 bundle exec rake spec
 EOT
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$VMC,$VMC,rw bind_mount:$JAVA_REALPATH,$JAVA_REALPATH,ro bind_mount:$MVN_REALPATH,$MVN_REALPATH,ro&quot;`
-$WARDEN_REPL -e -x -c &quot;
+HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $GIT_REALPATH $JAVA_REALPATH $MVN_REALPATH`
+$WARDEN_REPL -c &quot;
+copy $HANDLE in $WORKSPACE /tmp/
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER

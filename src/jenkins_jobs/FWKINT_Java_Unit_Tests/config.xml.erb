@@ -69,6 +69,7 @@
 
 JAVA_REALPATH=`readlink -nf $DEA_JAVA`
 MVN_REALPATH=`readlink -nf $VCAP_MAVEN22`
+WORKSPACE_NAME=`basename $WORKSPACE`
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
@@ -78,15 +79,17 @@ set -o errexit
 export PATH=$MVN_REALPATH/bin:$PATH
 export JAVA_HOME=$JAVA_REALPATH
 
-cd $WORKSPACE
+cd /tmp/$WORKSPACE_NAME
 mvn clean install test emma:emma
 EOT
 
-HANDLE=`$WARDEN_REPL -c &quot;create bind_mount:$JAVA_REALPATH,$JAVA_REALPATH,ro bind_mount:$MVN_REALPATH,$MVN_REALPATH,ro bind_mount:$WORKSPACE,$WORKSPACE,rw&quot;`
-$WARDEN_REPL -e -c &quot;
+HANDLE=`$CREATE_CONTAINER $JAVA_REALPATH $MVN_REALPATH`
+$WARDEN_REPL -c &quot;
+copy $HANDLE in $WORKSPACE /tmp/
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
+copy $HANDLE out /tmp/$WORKSPACE_NAME/* $WORKSPACE vcap:vcap
 destroy $HANDLE
 &quot;
 
