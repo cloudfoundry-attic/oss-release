@@ -42,3 +42,4 @@ packages:
   - elasticsearch
   - couchdb
   - zabbix_agent
+  - gdb

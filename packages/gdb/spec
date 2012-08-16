@@ -1,0 +1,5 @@
+---
+name: gdb
+dependencies:
+files:
+- gdb/gdb-7.4.1.tar.gz
