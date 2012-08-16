@@ -1,0 +1,10 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+tar xf gdb/gdb-7.4.1.tar.gz
+(
+  cd gdb-7.4.1
+  ./configure --prefix=${BOSH_INSTALL_TARGET}
+  make
+  make install
+)
