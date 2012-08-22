@@ -1,0 +1,38 @@
+#!/bin/bash
+STORE_DIR=/var/vcap/store/mysql
+LOG_DIR=/var/vcap/sys/log/mysql
+RUN_DIR=/var/vcap/sys/run/mysqld
+MYSQL_DIR=/var/vcap/packages/mysql
+JOB_DIR=/var/vcap/jobs/gerrit_mysql
+CONFIG_DIR=$JOB_DIR/config
+PIDFILE=$RUN_DIR/mysqld.pid
+
+case $1 in
+
+  start)
+    $MYSQL_DIR/libexec/mysql.server start $CONFIG_DIR/my.cnf
+
+    <% if properties.gerrit_mysql.replication==1 %>
+    # Passwdless ssh host key pair(for mysql slave)
+    mkdir -p /home/vcap/.ssh
+    chmod 0700 /home/vcap/.ssh
+
+    cp $CONFIG_DIR/{id_rsa,id_rsa.pub} /home/vcap/.ssh
+    chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub}
+    chown -R vcap:vcap /home/vcap/.ssh
+
+    # Refresh host key for slave
+    su - vcap -c "$JOB_DIR/bin/setup_slave"
+    <% end %>
+    ;;
+
+  stop)
+    echo "Stopping Gerrit_mysql"
+    $MYSQL_DIR/libexec/mysql.server stop $CONFIG_DIR/my.cnf
+    rm $PIDFILE
+    ;;
+
+  *)
+  echo "Usage: mysql_ctl {start|stop}" ;;
+esac
+exit 0

@@ -1,0 +1,11 @@
+export LD_LIBRARY_PATH=/var/vcap/packages/mysql/lib/mysql
+export PATH=/var/vcap/packages/mysql/bin
+
+hostname=`/bin/hostname`
+password=<%= properties.gerrit_mysql.password %>
+address=<%= properties.gerrit_mysql.address %>
+user=<%= properties.gerrit_mysql.user %>
+dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
+
+echo "create database ${dbname};\ngrant all on ${dbname}.* to ${user}@'%' identified by '${password}';\nflush privileges;\n" | /var/vcap/packages/mysql/bin/mysql -uroot -S /var/vcap/sys/run/mysqld/mysqld.sock
+

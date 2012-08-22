@@ -1,0 +1,16 @@
+export LD_LIBRARY_PATH=/var/vcap/packages/mysql/lib/mysql
+export PATH=/var/vcap/packages/mysql/bin
+
+hostname=`/bin/hostname`
+password=<%= properties.gerrit_mysql.password %>
+address=<%= properties.gerrit_mysql.address %>
+user=<%= properties.gerrit_mysql.user %>
+dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
+
+# TEMPORARY HACK
+echo "${address} ${hostname}" >> /etc/hosts
+
+/var/vcap/packages/mysql/bin/mysqladmin -u root -S /var/vcap/sys/run/mysqld/mysqld.sock
+/var/vcap/packages/mysql/bin/mysqladmin -u root -h ${hostname} -S /var/vcap/sys/run/mysqld/mysqld.sock
+
+

@@ -1,0 +1,59 @@
+#!/bin/bash
+STORE_DIR=/var/vcap/store/mysql
+LOG_DIR=/var/vcap/sys/log/mysql
+RUN_DIR=/var/vcap/sys/run/mysqld
+JOB_DIR=/var/vcap/jobs/gerrit_mysql_slave
+MYSQL_DIR=/var/vcap/packages/mysql
+CONFIG_DIR=$JOB_DIR/config
+PIDFILE=$RUN_DIR/mysqld.pid
+
+case $1 in
+
+  start)
+    mkdir -p /home/vcap/.ssh
+    chmod 0700 /home/vcap/.ssh
+
+    cp $CONFIG_DIR/{id_rsa,id_rsa.pub,authorized_keys} /home/vcap/.ssh
+    chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub,authorized_keys}
+    chown -R vcap:vcap /home/vcap/.ssh
+
+    # Refresh host key for slave
+    su - vcap -c 'ssh-keygen -f /home/vcap/.ssh/known_hosts  -R <%= properties.gerrit_mysql_slave.address %>'
+    su - vcap -c 'ssh-keyscan <%= properties.gerrit_mysql.address %> >> /home/vcap/.ssh/known_hosts'
+
+    slave_id=2
+    for ip_addr in <%= properties.gerrit_mysql_slave.slaves_ip.join(' ') %>
+    do
+      ifconfig eth0 | grep $ip_addr
+      [ $? == 0 ] && break
+      slave_id=`expr $slave_id + 1`
+    done
+
+    cat $CONFIG_DIR/my.cnf | sed "
+/^server-id = / d" | sed "
+/server-id =/i \
+server-id = $slave_id
+" | sed "
+/^bind-address = / d" | sed "
+/bind-address =/i \
+bind-address = $ip_addr
+"> /tmp/my.cnf
+    mv /tmp/my.cnf $CONFIG_DIR/my.cnf
+
+    cat /etc/sudoers | grep "vcap  ALL=(ALL) NOPASSWD: ALL" > /dev/null 2>&1
+    [ $? != 0 ] && echo "vcap  ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+
+    $MYSQL_DIR/libexec/mysql.server start $CONFIG_DIR/my.cnf
+
+    ;;
+
+  stop)
+    echo "Stopping Gerrit_mysql_slave"
+    $MYSQL_DIR/libexec/mysql.server stop $CONFIG_DIR/my.cnf
+    rm $PIDFILE
+    ;;
+
+  *)
+  echo "Usage: mysql_slave_ctl {start|stop}" ;;
+esac
+exit 0

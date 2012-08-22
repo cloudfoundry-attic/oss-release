@@ -1,0 +1,42 @@
+#!/bin/bash
+STORE_DIR=/var/vcap/store/mysql
+MYSQL_DIR=/var/vcap/packages/mysql
+RUN_DIR=/var/vcap/sys/run/mysqld
+CONFIG_DIR=$JOB_DIR/config
+PIDFILE=$RUN_DIR/mysqld.pid
+DB_DUMP_FILE=$STORE_DIR/reviewdb.sql
+
+MYSQL_SLAVE_JOB_DIR=/var/vcap/jobs/gerrit_mysql_slave
+
+export LD_LIBRARY_PATH=$MYSQL_DIR/lib/mysql
+export PATH=$MYSQL_DIR/bin:$PATH
+
+address=<%= properties.gerrit_mysql.address %>
+user=<%= properties.gerrit_mysql.user %>
+password=<%= properties.gerrit_mysql.password %>
+repl_user=<%= properties.gerrit_mysql.repl_user || "gerrit2_repl" %>
+repl_password=<%= properties.gerrit_mysql.repl_password %>
+dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
+
+echo "CREATE USER '$repl_user' IDENTIFIED BY '$repl_password';
+GRANT REPLICATION SLAVE ON *.* TO '$repl_user';
+FLUSH TABLES WITH READ LOCK;" | mysql -uroot -S $RUN_DIR/mysqld.sock
+
+mysqldump -h $address reviewdb > $DB_DUMP_FILE -u $user -p$password
+master_info=`echo "SHOW MASTER STATUS" | mysql -uroot -S /var/vcap/sys/run/mysqld/mysqld.sock | tail -1`
+
+echo "UNLOCK TABLES" | mysql -uroot -S /var/vcap/sys/run/mysqld/mysqld.sock
+
+log_file=`echo $master_info | awk '{print $1}'`
+log_pos=`echo $master_info | awk '{print $2}'`
+for ip_addr in <%= properties.gerrit_mysql_slave.slaves_ip.join(' ') %>
+do
+  ssh-keygen -f /home/vcap/.ssh/known_hosts -R $ip_addr
+  ssh-keyscan $ip_addr >> /home/vcap/.ssh/known_hosts
+
+  mysql -h $ip_addr reviewdb < $DB_DUMP_FILE -u $user -p$password
+
+  ssh vcap@$ip_addr "$MYSQL_SLAVE_JOB_DIR/bin/config_slave $address $log_file $log_pos"
+  ssh vcap@$ip_addr "sudo /var/vcap/bosh/bin/monit restart mysql_slave"
+done
+

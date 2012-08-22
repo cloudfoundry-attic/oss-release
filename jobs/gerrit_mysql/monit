@@ -1,5 +1,5 @@
 check process gerrit_mysql
   with pidfile /var/vcap/sys/run/mysqld/mysqld.pid
-  start program "/var/vcap/packages/mysql/libexec/mysql.server start /var/vcap/jobs/gerrit_mysql/config/my.cnf"
-  stop program "/var/vcap/packages/mysql/libexec/mysql.server stop /var/vcap/jobs/gerrit_mysql/config/my.cnf"
+  start program "/var/vcap/jobs/gerrit_mysql/bin/mysql_ctl start"
+  stop program "/var/vcap/jobs/gerrit_mysql/bin/mysql_ctl stop"
   group vcap
