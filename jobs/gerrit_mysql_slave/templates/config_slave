@@ -1,0 +1,28 @@
+#!/bin/bash
+RUN_DIR=/var/vcap/sys/run/mysqld
+MYSQL_DIR=/var/vcap/packages/mysql
+PIDFILE=$RUN_DIR/mysqld.pid
+MYSQL_SOCK=$RUN_DIR/mysqld.sock
+
+export LD_LIBRARY_PATH=$MYSQL_DIR/lib/mysql
+export PATH=$MYSQL_DIR/bin:$PATH
+
+master_address=$1
+log_file=$2
+log_pos=$3
+user=<%= properties.gerrit_mysql.user %>
+password=<%= properties.gerrit_mysql.password %>
+repl_user=<%= properties.gerrit_mysql.repl_user || "gerrit2_repl" %>
+repl_password=<%= properties.gerrit_mysql.repl_password %>
+dbname=<%= properties.gerrit_mysql.dbname || "reviewdb" %>
+
+echo "STOP SLAVE;
+CHANGE MASTER TO
+MASTER_HOST='$master_address',
+MASTER_USER='$repl_user',
+MASTER_PASSWORD='$password',
+MASTER_LOG_FILE='$log_file',
+MASTER_LOG_POS=$log_pos,
+MASTER_CONNECT_RETRY=10;
+START SLAVE;" | mysql -uroot -S $MYSQL_SOCK
+
