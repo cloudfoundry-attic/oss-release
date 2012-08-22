@@ -9,6 +9,7 @@ export PATH=$GIT_DIR/bin:$PATH
 LAST_BAK_FILE=$REPO_DIR/last_backup_time
 interval=<%= properties.gerrit_backup.interval || 6 %>
 max_backup=<%= properties.gerrit_backup.max_backup || 20 %>
+repo_host=<%= properties.gerrit_backup.repo_host || "reviews.cloudfoundry.org" %>
 while true
 do
   [ -f $TERMINATE_BACKUP ] && rm $TERMINATE_BACKUP && exit 1
@@ -28,7 +29,7 @@ do
     do
       if [ ! -z "$repo" ]; then
         git_path="ssh://ci-bot@reviews.cloudfoundry.org:29418/${repo}.git"
-        [ ! -d $repo_dir/${repo}.git ] && echo git clone --mirror $git_path $repo_dir/${repo}.git
+        [ ! -d $repo_dir/${repo}.git ] && git clone --mirror $git_path $repo_dir/${repo}.git
       fi
     done
     echo $now > $LAST_BAK_FILE

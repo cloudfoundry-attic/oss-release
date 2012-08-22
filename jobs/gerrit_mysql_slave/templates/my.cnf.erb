@@ -3,7 +3,7 @@
 # escpecially if they contain "#" chars...
 # Remember to edit /etc/mysql/debian.cnf when changing the socket location.
 [client]
-port = <%= properties.gerrit_mysql.port||3306 %>
+port = <%= properties.gerrit_mysql_slave.port||3306 %>
 socket = /var/vcap/sys/run/mysqld/mysqld.sock
 
 # Here is entries for some specific programs
@@ -21,7 +21,7 @@ nice = 0
 user = vcap
 pid-file = /var/vcap/sys/run/mysqld/mysqld.pid
 socket = /var/vcap/sys/run/mysqld/mysqld.sock
-port = <%= properties.gerrit_mysql.port||3306 %>
+port = <%= properties.gerrit_mysql_slave.port||3306 %>
 basedir = /usr
 datadir = /var/vcap/store/mysql
 tmpdir = /tmp
@@ -34,7 +34,7 @@ old_passwords = 1
 #
 # Instead of skip-networking the default is now to listen only on
 # localhost which is more compatible and is not less secure.
-bind-address = <%= @properties.gerrit_mysql.address %>
+# bind-address = $slave_ip
 #
 # * Fine Tuning
 #
@@ -72,10 +72,8 @@ query_cache_size = 16M
 # The following can be used as easy to replay backup logs or for replication.
 # note: if you are setting up a replication slave, see README.Debian about
 # other settings you may need to change.
-<% if properties.gerrit_mysql_slave %>
-server-id = 1
+# server-id = $slave_id
 log_bin = /var/vcap/sys/log/mysql/mysql-bin.log
-<% end %>
 expire_logs_days = 10
 max_binlog_size = 100M
 #binlog_do_db = include_database_name
