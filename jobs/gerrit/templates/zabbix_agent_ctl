@@ -7,7 +7,7 @@ case $1 in
 
   start)
     zabbix_running=`ps -ef | grep $ZABBIX_AGENT | grep -c -v "grep"`
-    [ $zabbix_running -eq 0 ] && [ -d $ZABBIX_PID_DIR ] && mkdir -p $ZABBIX_PID_DIR
+    [ $zabbix_running -eq 0 ] && [ -d $ZABBIX_PID_DIR ] || mkdir -p $ZABBIX_PID_DIR
 
     /etc/init.d/zabbix-agent start
     ;;
