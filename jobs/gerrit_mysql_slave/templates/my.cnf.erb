@@ -34,7 +34,7 @@ old_passwords = 1
 #
 # Instead of skip-networking the default is now to listen only on
 # localhost which is more compatible and is not less secure.
-bind-address = <%= @properties.gerrit_mysql.address %>
+# bind-address = $slave_ip
 #
 # * Fine Tuning
 #
@@ -72,10 +72,8 @@ query_cache_size = 16M
 # The following can be used as easy to replay backup logs or for replication.
 # note: if you are setting up a replication slave, see README.Debian about
 # other settings you may need to change.
-<% if properties.gerrit_mysql.slaves_ip %>
-server-id = 1
+# server-id = $slave_id
 log_bin = /var/vcap/sys/log/mysql/mysql-bin.log
-<% end %>
 expire_logs_days = 10
 max_binlog_size = 100M
 #binlog_do_db = include_database_name

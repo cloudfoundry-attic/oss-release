@@ -1,0 +1,5 @@
+check process gerrit_mysql_slave
+  with pidfile /var/vcap/sys/run/mysqld/mysqld.pid
+  start program "/var/vcap/jobs/gerrit_mysql_slave/bin/mysql_slave_ctl start"
+  stop program "/var/vcap/jobs/gerrit_mysql_slave/bin/mysql_slave_ctl stop"
+  group vcap

@@ -1,13 +1,14 @@
 ---
-name: gerrit_mysql
+name: gerrit_mysql_slave
 templates:
   my.cnf.erb: config/my.cnf
   my.bootstrap.erb: bin/my.bootstrap
   my.configure.erb: bin/my.configure
-  mysql_ctl: bin/mysql_ctl
-  setup_slave: bin/setup_slave
+  mysql_slave_ctl: bin/mysql_slave_ctl
+  config_slave: bin/config_slave
   id_rsa.erb: config/id_rsa
   id_rsa.pub.erb: config/id_rsa.pub
+  authorized_keys.erb: config/authorized_keys
 packages:
   - mysql
 
