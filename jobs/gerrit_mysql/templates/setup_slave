@@ -28,9 +28,11 @@ repl_user=<%= properties.gerrit_mysql.repl_user || "gerrit2_repl" %>
 repl_password=<%= properties.gerrit_mysql.repl_password %>
 dbname=<%= properties.gerrit_mysql.dbname||"reviewdb" %>
 
-echo "CREATE USER '$repl_user' IDENTIFIED BY '$repl_password';
-GRANT REPLICATION SLAVE ON *.* TO '$repl_user';
-FLUSH TABLES WITH READ LOCK;" | mysql -uroot -S $MYSQL_SOCK
+echo "CREATE USER '$repl_user' IDENTIFIED BY '$repl_password';" | mysql -uroot -S $MYSQL_SOCK
+
+echo "GRANT REPLICATION SLAVE ON *.* TO '$repl_user';" | mysql -uroot -S $MYSQL_SOCK
+
+echo "FLUSH TABLES WITH READ LOCK;" | mysql -uroot -S $MYSQL_SOCK
 
 mysqldump -h $address reviewdb > $DB_DUMP_FILE -u $user -p$password
 master_info=`echo "SHOW MASTER STATUS" | mysql -uroot -S $MYSQL_SOCK | tail -1`
@@ -47,6 +49,6 @@ do
   mysql -h $ip_addr reviewdb < $DB_DUMP_FILE -u $user -p$password
 
   ssh vcap@$ip_addr "$MYSQL_SLAVE_JOB_DIR/bin/config_slave $address $log_file $log_pos"
-  ssh vcap@$ip_addr "sudo /var/vcap/bosh/bin/monit restart mysql_slave"
+  ssh vcap@$ip_addr "sudo /var/vcap/bosh/bin/monit restart gerrit_mysql_slave"
 done
 <% end %>
