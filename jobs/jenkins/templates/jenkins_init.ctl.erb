@@ -9,12 +9,22 @@ NOT_UPGRADE_SITE_CONFIG=<%= properties.jenkins.not_upgrade_site_config||0 %>
 NOT_UPGRADE_JOBS=<%= properties.jenkins.not_upgrade_jobs||0 %>
 ENABLE_ZABBIX_AGENT=<%= properties.jenkins.enable_zabbix_agent||0 %>
 
+jenkins_address=<% properties.jenkins.address %>
+jenkins_backup_address=<% properties.jenkins.backup_address %>
+
 if [ $NOT_UPGRADE_SITE_CONFIG != 1 ]; then
   # Grab all the slaves to the master config file
   cat $JOB_DIR/config/config_head > $JOB_DIR/config/config.xml
 
+  ifconfig eth0 | grep $jenkins_address
+  if [ $? == 0 ]; then
+    slave_address=<%= properties.jenkins.slaves_ip.join(' ') %>
+  else
+    slave_address=<%= properties.jenkins.backup_slaves_ip.join(' ') %>
+  fi
+
   slave_id=1
-  for ip_addr in <%= properties.jenkins_slave.slaves_ip.join(' ') %>
+  for ip_addr in $slave_address
   do
     cat $JOB_DIR/config/config_slave|sed -e "s/SLAVE_CONFIG_NAME/jenk${slave_id}/g" -e "s/SLAVE_CONFIG_IP/${ip_addr}/g" >> $JOB_DIR/config/config.xml
     slave_id=`expr $slave_id + 1`
@@ -44,6 +54,10 @@ mkdir -p /home/vcap/.ssh
 cp $CONFIG_DIR/{id_rsa,id_rsa.pub} /home/vcap/.ssh
 chmod 0600 /home/vcap/.ssh/{id_rsa,id_rsa.pub}
 chown -R vcap:vcap /home/vcap/.ssh
+if [ ! -z "$jenkins_backup_address" ]; then
+  su - vcap -c ssh-keygen -f /home/vcap/.ssh/known_hosts -R $jenkins_backup_address
+  su - vcap -c ssh-keygen $jenkins_backup_address >> /home/vcap/.ssh/known_hosts
+fi
 
 # SSH Keyfile for gerrit-trigger
 cp /var/vcap/jobs/jenkins/config/gerrit_trigger_key $DATA_DIR
