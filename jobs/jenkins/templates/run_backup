@@ -1,0 +1,69 @@
+#!/bin/bash
+RUN_DIR=/var/vcap/sys/run/jenkins
+DATA_DIR=/var/vcap/store/jenkins
+LOG_DIR=/var/vcap/store/log
+BACKUP_LOG=jenkins_backup.log
+TERMINATE_BACKUP=/tmp/terminate_backup
+MONIT_FILE=/var/vcap/jobs/jenkins/jenkins.monitrc
+PIDFILE=$RUN_DIR/jenkins.pid
+
+log() {
+  timenow=`date "+%Y-%m-%d %H:%M:%S"`
+  find $LOG_DIR -maxdepth 1 -ctime +5 -name $BACKUP_LOG | grep "$BACKUP_LOG"
+  [ $? == 0 ] && mv $LOG_DIR/$BACKUP_LOG $LOG_DIR/${BACKUP_LOG}.1
+  echo "$timenow $1" >> $LOG_DIR/$BACKUP_LOG
+}
+
+jenkins_master_id=1
+jenkins_address=<%= properties.jenkins.address %>
+/sbin/ifconfig | grep $jenkins_address
+[ $? == 0 ] || jenkins_master_id=2
+
+jenkins_backup_address=<%= properties.jenkins.backup_address %>
+[ -z "$jenkins_backup_address" ] && exit 1
+
+if [ $jenkins_master_id == 2 ]; then
+  cat $MONIT_FILE | grep "$jenkins_backup_address"
+  if [ $? != 0 ]; then
+    cat $MONIT_FILE | sed -e "s/$jenkins_address/$jenkins_backup_address/g" > /tmp/jenkins.monitrc
+    sudo mv /tmp/jenkins.monitrc $MONIT_FILE
+    sudo /var/vcap/bosh/bin/monit reload
+    sleep 20
+    sudo /var/vcap/bosh/bin/monit restart all
+  fi
+  [ -f $TERMINATE_BACKUP ] && rm $TERMINATE_BACKUP
+  exit 0
+fi
+
+LAST_BAK_FILE=$DATA_DIR/last_backup_time
+interval=<%= properties.jenkins.backup_interval || 6 %>
+
+[ -f $TERMINATE_BACKUP ] && rm $TERMINATE_BACKUP
+while true
+do
+  sleep 30
+  [ -f $TERMINATE_BACKUP ] && exit 0
+
+  if [ -f $LAST_BAK_FILE ]; then
+    last=`head -1 $LAST_BAK_FILE`
+  else
+    last=0
+  fi
+
+  backup_flag=0
+  now=`date +%s`
+  interval_secs=$((interval * 60 * 60))
+
+  ps $JENKINS_PID
+  if [ $? == 0 ] && (( $now - $last > $interval_secs )); then
+    log "Prepare for starting sync to $jenkins_backup_address:$DATA_DIR/"
+    rsync -avz $DATA_DIR/jobs vcap@$jenkins_backup_address:$DATA_DIR/ | grep "jobs" >> $LOG_DIR/$BACKUP_LOG
+    [ $? == 0 ] && backup_flag=1
+    echo $now > $LAST_BAK_FILE
+  fi
+
+  if [ $backup_flag == 1 ]; then
+    log "Retart remote jenkins $jenkins_backup_address"
+    ssh vcap@$jenkins_backup_address "sudo /var/vcap/bosh/bin/monit restart jenkins"
+  fi
+done
