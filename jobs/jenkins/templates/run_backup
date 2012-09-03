@@ -1,0 +1,42 @@
+#!/bin/bash
+RUN_DIR=/var/vcap/sys/run/jenkins
+DATA_DIR=/var/vcap/store/jenkins
+TERMINATE_BACKUP=/tmp/terminate_backup
+PIDFILE=$RUN_DIR/jenkins.pid
+
+jenkins_address=<%= properties.jenkins.address %>
+/sbin/ifconfig | grep $jenkins_address
+[ $? == 0 ] || exit 1
+
+jenkins_backup_address=<%= properties.jenkins.backup_address %>
+[ -z "$jenkins_backup_address" ] && exit 1
+
+LAST_BAK_FILE=$DATA_DIR/last_backup_time
+interval=<%= properties.jenkins.backup_interval || 6 %>
+
+while true
+do
+  sleep 20
+  [ -f $TERMINATE_BACKUP ] && rm $TERMINATE_BACKUP && exit 0
+
+  if [ -f $LAST_BAK_FILE ]; then
+    last=`head -1 $LAST_BAK_FILE`
+  else
+    last=0
+  fi
+
+  backup_flag=0
+  now=`date +%s`
+  interval_secs=$((interval * 60 * 60))
+
+  ps $JENKINS_PID
+  if [ $? == 0 ] && (( $now - $last > $interval_secs )); then
+    rsync -avz $DATA_DIR/jobs vcap@$jenkins_backup_address:$DATA_DIR/ | grep "jobs"
+    [ $? == 0 ] && backup_flag=1
+    echo $now > $LAST_BAK_FILE
+  fi
+
+  if [ $backup_flag==1 ]; then
+    ssh vcap@$jenkins_backup_address "sudo /var/vcap/bosh/bin/monit restart jenkins"
+  fi
+done
