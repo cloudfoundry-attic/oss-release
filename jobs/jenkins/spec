@@ -16,6 +16,7 @@ templates:
   hudson.tasks.Maven.xml: config/hudson.tasks.Maven.xml
   gerrit_trigger_key.erb: config/gerrit_trigger_key
   render_jenkins_jobs.erb: bin/render_jenkins_jobs
+  authorized_keys.erb: config/authorized_keys
 packages:
   - java
   - git
