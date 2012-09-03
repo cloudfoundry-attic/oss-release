@@ -12,3 +12,11 @@ check process zabbix
   stop program "/var/vcap/jobs/jenkins/bin/zabbix_agent_ctl stop"
   group vcap
 <% end %>
+
+<% if properties.jenkins.backup_address %>
+check process jenkins_backup
+  with pidfile /var/vcap/sys/run/jenkins/jenkins_backup.pid
+  start program "/var/vcap/jobs/jenkins/bin/backup_ctl start"
+  stop program "/var/vcap/jobs/jenkins/bin/backup_ctl stop"
+  group vcap
+<% end %>

@@ -1,0 +1,27 @@
+#!/bin/bash
+JOB_DIR=/var/vcap/jobs/jenkins
+RUN_DIR=/var/vcap/sys/run/jenkins
+PIDFILE=$RUN_DIR/jenkins_backup.pid
+TERMINATE_BACKUP=/tmp/terminate_backup
+
+case $1 in
+
+  start)
+    mkdir -p $RUN_DIR
+
+    echo $$ > $PIDFILE
+
+    su - vcap -c "$JOB_DIR/bin/run_backup"
+    ;;
+
+  stop)
+    echo "Stopping Jenkins_backup "
+    touch $TERMINATE_BACKUP
+    chown vcap:vcap $TERMINATE_BACKUP
+    kill_and_wait $PIDFILE
+    ;;
+
+  *)
+  echo "Usage: backup_ctl {start|stop}" ;;
+esac
+exit 0

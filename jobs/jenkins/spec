@@ -4,6 +4,8 @@ templates:
   jenkins_ctl: bin/jenkins_ctl
   jenkins_init.ctl.erb: bin/jenkins_init.ctl
   zabbix_agent_ctl: bin/zabbix_agent_ctl
+  backup_ctl: bin/backup_ctl
+  run_backup: bin/run_backup
   change_tmp: bin/change_tmp
   id_rsa.erb: config/id_rsa
   id_rsa.pub.erb: config/id_rsa.pub
@@ -16,6 +18,7 @@ templates:
   hudson.tasks.Maven.xml: config/hudson.tasks.Maven.xml
   gerrit_trigger_key.erb: config/gerrit_trigger_key
   render_jenkins_jobs.erb: bin/render_jenkins_jobs
+  authorized_keys.erb: config/authorized_keys
 packages:
   - java
   - git
