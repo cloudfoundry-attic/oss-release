@@ -1,0 +1,33 @@
+#!/bin/bash
+LOG_DIR=/var/vcap/store/log/
+TERMINATE_BACKUP=/tmp/terminate_backup
+STANDBY_LOG=jenkins_standby.log
+
+log() {
+  timenow=`date "+%Y-%m-%d %H:%M:%S"`
+  find $LOG_DIR -maxdepth 1 -ctime +5 -name $STANDBY_LOG | grep "$STANDBY_LOG"
+  [ $? == 0 ] && mv $LOG_DIR/$STANDBY_LOG $LOG_DIR/${STANDBY_LOG}.1
+  echo "$timenow $1" >> $LOG_DIR/$STANDBY_LOG
+}
+
+jenkins_address=<%= properties.jenkins.address %>
+/sbin/ifconfig | grep $jenkins_address
+[ $? == 0 ] && exit 0
+
+[ -f $TERMINATE_BACKUP ] && rm $TERMINATE_BACKUP
+while true
+do
+  sleep 10
+  [ -f $TERMINATE_BACKUP ] && exit 0
+
+  status=`curl -o /dev/null -s -w %{http_code} http://<%= properties.jenkins.address %>:<%= properties.jenkins.http_port %>`
+  if (( $status == 200 )); then
+    log "The jenkins $jenkins_address is back, cut connection to gerrit <%= properties.gerrit.address %>"
+    iptables -L | grep <%= properties.gerrit.address %>
+    [ $? == 0 ] || iptables -A OUTPUT -p ALL -d <%= properties.gerrit.address %> -j DROP
+  else
+    log "The jenkins $jenkins_address is error due to $status, open connection to gerrit <%= properties.gerrit.address %>"
+    iptables -L | grep <%= properties.gerrit.address %>
+    [ $? == 0 ] && iptables -D OUTPUT 1
+  fi
+done
