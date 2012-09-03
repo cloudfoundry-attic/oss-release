@@ -62,6 +62,13 @@ http {
 <% end %>
 
 <% if properties.jenkins %>
+  upstream jenkins {
+    server              <%= properties.jenkins.address %>:<%= properties.jenkins.http_port || 8080 %> max_fails=<%= properties.jenkins.max_fails || 3 %> fail_timeout=<%= properties.jenkins.fail_timeout || "60s" %>;
+  <% if properties.jenkins.backup_address %>
+    server              <%= properties.jenkins.backup_address %>:<%= properties.jenkins.http_port || 8080 %> backup;
+  <% end %>
+  }
+
   server {
     listen       80;
     server_name  "<%= properties.jenkins.external_domain %>";
@@ -78,7 +85,7 @@ http {
       proxy_send_timeout          30;
       proxy_read_timeout          30;
 
-      proxy_pass                   http://<%= properties.jenkins.address %>:<%= properties.jenkins.http_port || 8080 %>;
+      proxy_pass                  http://jenkins;
     }
   }
 <% end %>
