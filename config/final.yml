@@ -6,4 +6,4 @@ blobstore:
   options: 
     tag: BOSH
     url: https://blob.cfblob.com
-    uid: a9e98ad4b63a44e5b52c6a47ac22dc48/oss-release-uid
+    uid: a9e98ad4b63a44e5b52c6a47ac22dc48/oss-release-uid2
