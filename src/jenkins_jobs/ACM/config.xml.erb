@@ -2,21 +2,19 @@
 <project>
   <actions/>
   <description></description>
-  <logRotator> 
-    <daysToKeep>30</daysToKeep> 
-    <numToKeep>-1</numToKeep> 
-    <artifactDaysToKeep>-1</artifactDaysToKeep> 
-    <artifactNumToKeep>-1</artifactNumToKeep> 
-  </logRotator>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
       <maxConcurrentPerNode>0</maxConcurrentPerNode>
       <maxConcurrentTotal>0</maxConcurrentTotal>
-      <categories/>
       <throttleEnabled>false</throttleEnabled>
       <throttleOption>project</throttleOption>
-      <configVersion>1</configVersion>
     </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM">
@@ -53,6 +51,7 @@
     <gitConfigName></gitConfigName>
     <gitConfigEmail></gitConfigEmail>
     <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
   <canRoam>true</canRoam>
@@ -130,7 +129,7 @@ rm -f $TEST_RUNNER</command>
       </targets>
     </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
     <hudson.tasks.Mailer>
-      <recipients>jdsa@vmware.com</recipients>
+      <recipients>jdsa@vmware.com cf-id-notifications@rbcon.com</recipients>
       <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
       <sendToIndividuals>false</sendToIndividuals>
     </hudson.tasks.Mailer>

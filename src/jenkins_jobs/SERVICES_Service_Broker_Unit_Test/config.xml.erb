@@ -68,15 +68,9 @@
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
+WARDEN_DEPOT=$WARDEN_INSTANCES
 
 SB_SVC=$PWD/service_broker
-
-#
-# HACK - Base expects to be able to write to /var/vcap/sys/run/LOCK
-#
-SCRATCHPAD=$SB_SVC/xxx_scratchpad
-rm -rf $SCRATCHPAD
-mkdir $SCRATCHPAD
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
@@ -84,19 +78,20 @@ cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 set -x
 set -o errexit
 
-echo &quot;started testing&quot;
-
 export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 export CI_ENV=&apos;jenkins&apos;
+
+# nats expects to write in /var/vcap/sys/run
+sudo mkdir -p /var/vcap/sys/run
+sudo chown -R vcap:vcap /var/vcap/sys/run
 
 cd /tmp/sb_source/service_broker
 
 rm -rf .bundle
 rm -rf vendor/bundle
 
-# change the sqlite3 db directory
 sed -i &quot;s/local_db: sqlite3:\/var\/vcap\/services\/broker\/service_broker.d/local_db: sqlite3:service_broker.db/g&quot; config/service_broker.yml
 
 bundle install --deployment --without development production
@@ -104,7 +99,22 @@ bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci
 EOT
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw&quot;`
+HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $GIT_REALPATH $SQLITE_REALPATH`
+
+echo &quot;enable vcap could execute sudo without password within warden&quot;
+sudo ls $WARDEN_DEPOT/$HANDLE/ssh/ssh_config
+set +e
+vcap_sudo_line=&quot;vcap ALL=(ALL) NOPASSWD:ALL&quot;
+vcap_chk_ret=`sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
+if test -z &quot;$vcap_chk_ret&quot;
+then
+  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
+  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
+fi
+set -e
+
 $WARDEN_REPL -e -x -c &quot;
 copy $HANDLE in $SB_SVC /tmp/sb_source
 copy $HANDLE in $TEST_RUNNER /tmp

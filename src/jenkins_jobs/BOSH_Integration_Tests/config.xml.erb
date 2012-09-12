@@ -5,7 +5,7 @@
   <displayName>Integration Tests</displayName>
   <logRotator>
     <daysToKeep>30</daysToKeep>
-    <numToKeep>30</numToKeep>
+    <numToKeep>-1</numToKeep>
     <artifactDaysToKeep>-1</artifactDaysToKeep>
     <artifactNumToKeep>-1</artifactNumToKeep>
   </logRotator>
@@ -110,5 +110,14 @@ destroy $HANDLE
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
   </publishers>
-  <buildWrappers/>
+  <buildWrappers>
+    <hudson.plugins.build__timeout.BuildTimeoutWrapper>
+      <timeoutMinutes>3</timeoutMinutes>
+      <failBuild>false</failBuild>
+      <writingDescription>false</writingDescription>
+      <timeoutPercentage>200</timeoutPercentage>
+      <timeoutType>elastic</timeoutType>
+      <timeoutMinutesElasticDefault>120</timeoutMinutesElasticDefault>
+    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
+  </buildWrappers>
 </project>
