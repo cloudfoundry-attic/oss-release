@@ -114,6 +114,8 @@ set -o xtrace
 export VCAP_RUNTIME_RUBY18=$DEA_RUBY18_BD/ruby
 export VCAP_RUNTIME_RUBY19=$DEA_RUBY19_BD/ruby
 export VCAP_RUNTIME_RUBY19_VER=$DEA_RUBY19_VER
+export VCAP_RUNTIME_NODE04=$DEA_NODE04
+export VCAP_RUNTIME_NODE06=$DEA_NODE06
 export PATH=$GIT_REALPATH/bin:$DEA_RUBY19_BD:$PATH
 cd /tmp/staging
 bundle install --deployment --without development production
