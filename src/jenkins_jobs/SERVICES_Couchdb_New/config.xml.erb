@@ -70,16 +70,9 @@ COUCHDB_REALPATH=`readlink -nf $VCAP_COUCHDB`
 ERLANG_REALPATH=`readlink -nf $VCAP_ERLANG`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
-WARDEN_PKG=/var/vcap/packages/warden/warden
+WARDEN_DEPOT=$WARDEN_INSTANCES
 
 COUCHDB_SVC=$PWD/couchdb
-
-#
-# HACK - Base expects to be able to write to /var/vcap/sys/run/LOCK
-#
-SCRATCHPAD=$COUCHDB_SVC/xxx_scratchpad
-rm -rf $SCRATCHPAD
-mkdir $SCRATCHPAD
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
@@ -92,6 +85,10 @@ export LIBRARY_PATH=$SQLITE_REALPATH/lib:$VCAP_MYSQLCLIENT/lib/mysql:$VCAP_MYSQL
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 export LD_LIBRARY_PATH=$VCAP_MYSQLCLIENT/lib/mysql:$VCAP_MYSQL/lib/mysql:$LD_LIBRARY_PATH
 
+# nats expects to write in /var/vcap/sys/run
+mkdir -p /var/vcap/sys/run
+chown -R vcap:vcap /var/vcap/sys/run
+
 mkdir -p /var/vcap/packages/couchdb
 mkdir -p /tmp/log
 cp -r /var/vcap/packages/erlang/* /usr/
@@ -101,8 +98,6 @@ yes | sudo apt-get install xulrunner-1.9.2-dev
 
 find /usr/lib -maxdepth 1 -type d -name &quot;xulrunner-*&quot; | grep -v &apos;addons&apos; &gt; /tmp/new.xulrunner.conf
 cp /tmp/new.xulrunner.conf /etc/ld.so.conf.d/xulrunner.conf &amp;&amp; /sbin/ldconfig
-
-#ls /usr/lib/xulrunner-1.9.2*
 
 yes | sudo apt-get install libicu-dev
 
@@ -131,20 +126,20 @@ bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci
 EOT
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$VCAP_ERLANG,$VCAP_ERLANG,ro disk_size_mb:4096 &quot;`
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$VCAP_ERLANG,$VCAP_ERLANG,ro disk_size_mb:4096 &quot;`
 
 # use root here because we need to copy something into the /usr/bin directory
 echo &quot;enable vcap could execute sudo without password within warden&quot;
-sudo ls $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config
+sudo ls $WARDEN_DEPOT/$HANDLE/ssh/ssh_config
 set +e
 vcap_sudo_line=&quot;vcap ALL=(ALL) NOPASSWD:ALL&quot;
-vcap_chk_ret=`sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
+vcap_chk_ret=`sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
 if test -z &quot;$vcap_chk_ret&quot;
 then
-  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
-  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
-  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
-  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
+  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
+  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
 fi
 set -e
 
