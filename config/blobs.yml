@@ -3,3 +3,207 @@ gdb/gdb-7.4.1.tar.gz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjEyMDRlNGU4NmVlOGUyYzkwNTA0ZWU3%0ANTVjZDczNiIsInNpZyI6Imxhblgwc3ljeWFQR0ZjbExpQmtBKzYyakROaz0i%0AfQ==%0A
   sha: 8aa908f01a6e572d356721297a741f622af6c407
   size: 27365650
+ttf_dejavu/ttf_dejavu_2.30-2.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEwMDRlNGU3ZDUxNzYxOGYwNTA1MmU1%0AYmI5YjJmMCIsInNpZyI6IlpRWDl1M2ZURHM0Lys5alJjK3JrNU9JSFVjOD0i%0AfQ==%0A
+  sha: b12ca8740e9ad5897e2b2cda45c82ce5b358aaea
+  size: 4496658
+ruby/rubygems-1.7.2.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjEyMDRlNGU4NmVlMTUxYmMwNTA1MmU1%0AYzFiMDI3MiIsInNpZyI6IlRsSlRSVWRuSUZrY3hxMlpKamNQa2tQRFZEdz0i%0AfQ==%0A
+  sha: d878ae52f40eb71e59708afc57303172f0327fad
+  size: 245606
+ruby/rubygems-1.8.24.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjIwMDRlNGU4ZWM2YjQ0YjYwNTA1MmU1%0AYzQyNzlmNiIsInNpZyI6IkpIYVhoQkdQazd4RXRueTVSb3VMc1JiMmZEST0i%0AfQ==%0A
+  sha: 30f27047e74f7943117736a0d3e224994fee0905
+  size: 380101
+ruby/ruby-1.8.7-p302.tar.bz2:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjIyMDRlNGU5ODY0M2Q5YWUwNTA1MmU1%0AYzVkMjE5NCIsInNpZyI6Im1HTUVNdmpNWWlEWEx4ODVEQnFVSW0vbStxWT0i%0AfQ==%0A
+  sha: d93bd2f1099f3473b496cda2422b27a8da2beb00
+  size: 4184764
+ruby/ruby-1.9.2-p180.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjEwMDRlNGU3ZDUxNDc0NWYwNTA1MmU1%0AYzdmMWY1ZiIsInNpZyI6IkJzQWg1WWh5bndnQUNrenJuRm1rT1BwR2Jycz0i%0AfQ==%0A
+  sha: 6a482bc07239b37bcadf68dda63c65d20dc19ebe
+  size: 11158935
+ruby/ruby-1.8.7-p357.tar.bz2:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjEyMDRlNGU4NmVlOGUyYzkwNTA1MmU1%0AY2EzNGI4NCIsInNpZyI6Im9haVBNWVJxTmxEaE1ZM3RXbWpBbkplY0xUUT0i%0AfQ==%0A
+  sha: ba5ec0ab663976f00fb405be6cfef546bcf0e4e9
+  size: 4208157
+warden_service/warden-service.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjIwMDRlNGU4ZWM2NDZlMjEwNTA1MmU1%0AY2QyYjI0ZiIsInNpZyI6InM1NDRKOElmbUxNdWNOdWtZTk5NT2svL1F3az0i%0AfQ==%0A
+  sha: a08307c5051aa155831d91bb09b562334677bc2a
+  size: 185472587
+sqlite/sqlite-autoconf-3070500.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjIyMDRlNGU5ODYzOGI3NjMwNTA1MmU1%0AZGI0NjhhYyIsInNpZyI6ImxVK3hDU2NMWE51SGhJazlmcUFtSEQ4bjQybz0i%0AfQ==%0A
+  sha: 4e1338497b8da50b84307191bb3418e9ec5715d7
+  size: 1551070
+node/node-v0.6.8.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjEwMDRlNGU3ZDUxMWY1NTMwNTA1MmU1%0AZGNiNTM3ZiIsInNpZyI6Im9CUGs2WUY1aEJnR09hdXJnUk9GQzhJbUh5TT0i%0AfQ==%0A
+  sha: c3f755b5dfd0de3f306d06573fa9433d845623dd
+  size: 10488841
+node/node-v0.4.12.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjEyMDRlNGU4NmVlMTUxYmMwNTA1MmU1%0AZGU4NjZjOCIsInNpZyI6InJQMkNHZ2svSlBCelUzRHROUTNHQ05rd1Biaz0i%0AfQ==%0A
+  sha: 1c6e34b90ad6b989658ee85e0d0cb16797b16460
+  size: 12421469
+debian_nfs_server/nfs-kernel-server_1%3a1.2.0-4ubuntu4.1_amd64.deb:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjIwMDRlNGU4ZWM2NDdhNTQwNTA1MmU1%0AZTFlNDY2NyIsInNpZyI6Ik0rb2xUY0o1SzJTY0owbGJycXoxYXUxS1FMYz0i%0AfQ==%0A
+  sha: a44b3f8319984bace61f21bb6d15cee1419e5bf3
+  size: 169618
+misc/tcl8-1.5.11rc1-src.tar:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjIyMDRlNGU5ODY0M2Q5YWUwNTA1MmU1%0AZTM4Yjg0ZSIsInNpZyI6InRybFEwWnUwZFl6dlIxMkZZM2dOMmY2L3pNUT0i%0AfQ==%0A
+  sha: c9f5a466f1a791d499a5bc757771291a3c9af0d4
+  size: 23408640
+misc/expect5.45.tar:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjEwMDRlNGU3ZDUxMWY4MjEwNTA1MmU1%0AZTYxYTg0MSIsInNpZyI6IjVVUkx4ZmxUK3VBaHduYzdhQnRKOG9QMGFHOD0i%0AfQ==%0A
+  sha: b8f475cf06a9c018ccd5cb82729a73b024d95d6d
+  size: 2498560
+mongodb/mongodb-linux-x86_64-1.8.1.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjEyMDRlNGU4NmVlMzk2OTIwNTA1MmU1%0AZTdjZDQyZiIsInNpZyI6Ik9VbndKR3pxdC85MVhVSmNKZkt6U2VlRGNmMD0i%0AfQ==%0A
+  sha: aa7f025ddea8ff24a1a66b5da3128df57b1c87d8
+  size: 27911404
+memcached/memcached-linux-x86_64-1.4.13.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjIwMDRlNGU4ZWM2NDZlMjEwNTA1MmU1%0AZWE3NjBhMCIsInNpZyI6Im9xVi9QMEU0WWl3dzFjdklNOGsrSSs3a21POD0i%0AfQ==%0A
+  sha: 632afa4f19fc7741878ced4a239304b7be82f228
+  size: 689699
+gerrit/gerrit-2.2.2.1.war:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjIyMDRlNGU5ODYzOGI3NjMwNTA1MmU1%0AZWMyNTgxNiIsInNpZyI6IkUxSm8zdEpZTUhDcytSSmp6TWZMOXJvVXpnTT0i%0AfQ==%0A
+  sha: 1eed29ff6e4675b625464115fa31382ca7e4ceef
+  size: 26152940
+gerrit/gerrit-2.1.7.war:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjEwMDRlNGU3ZDUxMWY1NTMwNTA1MmU1%0AZWVkMDllZSIsInNpZyI6IlpaM1dLdm8vd1NQbkhzbGE5Tm0vV0JLUXN5ND0i%0AfQ==%0A
+  sha: 0ce0e274bb86cb07aceb5d36a94b0e595aad3392
+  size: 18045975
+gerrit/hooks.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEyMDRlNGU4NmVlNTM5MjEwNTA1MmU1%0AZjE3ZDc0YyIsInNpZyI6IkhXSzdPNmZ2cjM3c1JYTGF6Z3pmelJJYzZDMD0i%0AfQ==%0A
+  sha: 04d018213a22125c68bec03afc935dae259f5de8
+  size: 543134
+gerrit/bcpg-jdk16-146.jar:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjIwMDRlNGU4ZWM2YjQ0YjYwNTA1MmU1%0AZjMzYjRjOSIsInNpZyI6IlVHNXFZL3kvaGE5bEdnR1lzTEF1dkVZK2JnZz0i%0AfQ==%0A
+  sha: 38c2557ffcc8f2a0d4326ccb86116986986775c9
+  size: 174074
+erlang/erlang.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjIyMDRlNGU5ODY0M2Q5YWUwNTA1MmU1%0AZjUwMDNlNiIsInNpZyI6IjhuYXhSTjk4NmNlQ2FMZ1pFSUs3bkVoVEs0ST0i%0AfQ==%0A
+  sha: 83d210e45174dee0719ff31d039a1f92ad384dcf
+  size: 54212730
+mysql/server-5.1.54-rel12.5-188-Linux-x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjEwMDRlNGU3ZDUxOTA2Y2QwNTA1MmU1%0AZjg5ZDRmOCIsInNpZyI6IklRSTFEMlJiMG9FZlRXUEYxVlM3R3hybHFrTT0i%0AfQ==%0A
+  sha: a2d4694a12289a87bfb7fcef35c7b6a4284e5fc3
+  size: 33824010
+mysql/service-patch.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjEyMDRlNGU4NmVlMzk2OTIwNTA1MmU1%0AZmJiZWQ3MCIsInNpZyI6IjJyT25UdndzbU5ZKzdQWkIzZlVnU2VnbFpFMD0i%0AfQ==%0A
+  sha: 7e41e2a4d2c5a62cafdf6467708d1c6e0fec67f2
+  size: 3269
+mysql/client-5.1.54-rel12.5-188-Linux-x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjIwMDRlNGU4ZWM2ODQwNzcwNTA1MmU1%0AZmQ1YTA3ZiIsInNpZyI6ImYwZUJFT1ZTTkpuV1N4Tms1Y3JjTUpCVVNjST0i%0AfQ==%0A
+  sha: 4a29cf608bcc16d7498a7ee27c88925ec52dadb8
+  size: 4233644
+java/jre_jdk_1.6.0_24-amd64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjIyMDRlNGU5ODYzZjI4ZjMwNTA1MmU1%0AZmY1ZjAzNSIsInNpZyI6IlA0SFZ2QjVTQXN6YTBUSDdKQ05QZ3Rramw1Zz0i%0AfQ==%0A
+  sha: e6f0c4bd020523716dd325f391c2e5d361115715
+  size: 66504097
+redis/redis-2.2.4.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEwMDRlNGU3ZDUxNzYxOGYwNTA1MmU2%0AMDM5Y2Q2MCIsInNpZyI6IjJDV0xpeWJ2S3ppUWpxTE53NUtYSk9zWnlrRT0i%0AfQ==%0A
+  sha: 063e6e9f615ceda664d0691a6ea59befb22ebc40
+  size: 447499
+maven22/apache-maven-2.2.1-bin.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEyMDRlNGU4NmVlNTM5MjEwNTA1MmU2%0AMDUxMGVhNiIsInNpZyI6IlVGeC9pWTUxbmx4V202Q1RIejhSbXc1RkhvND0i%0AfQ==%0A
+  sha: 3ac63025e5860c4d856e172ab556d14b52f9b1f1
+  size: 2840961
+golang/go1.0.1.src.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjIwMDRlNGU4ZWM2NDdhNTQwNTA1MmU2%0AMDZiMTY0YiIsInNpZyI6ImhwUXh3V2l4cTNZaThYUTRGZnVaQWxSdmtBOD0i%0AfQ==%0A
+  sha: fc8a6d6725f7f2bf7c94685c5fd0880c9b7f67f6
+  size: 9617092
+zabbix_agent/bds-zabbix_0.1-39_all.deb:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIyMDRlNGU5ODYzZDA3NjMwNTA1MmU2%0AMDhhNGQ4ZCIsInNpZyI6Ink2bUR4U3dKdy9halhHVytYZENhSDkyL3lVdz0i%0AfQ==%0A
+  sha: 540bd2ea1fcf465b5d2db983ac3e9f1f4ffb8bac
+  size: 410458
+go2xunit/go2xunit-0.1.0.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjEwMDRlNGU3ZDUxNDc0NWYwNTA1MmU2%0AMGEzZmY2NyIsInNpZyI6InRSNDMyMEk3ZysvSGMzSUZXTW1uaDd4M1dFYz0i%0AfQ==%0A
+  sha: 624bfb8266120534dc30ab7194fc8a4260925ffc
+  size: 21490
+rabbitmq/rabbitmq.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjEyMDRlNGU4NmVlMTUyOTQwNTA1MmU2%0AMGJjOTc4NyIsInNpZyI6ImQ1bkx0MzBlRGlKTzJuRGwrSjlwOWlBT0hrdz0i%0AfQ==%0A
+  sha: 55f26c0e45da83a22f75385b0eba789c316f6082
+  size: 1779430
+vblob/vblob.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjIwMDRlNGU4ZWM2ODQwNzcwNTA1MmU2%0AMGQ2MzQ1NCIsInNpZyI6IlE3ZHNDbDR5VXNTK0d1RG9zV0pERVB6MldiOD0i%0AfQ==%0A
+  sha: 569b322aca26e7d9d1b05308a044bb9a53d38118
+  size: 542347
+nginx/lbase64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjIyMDRlNGU5ODYzOGI3NjMwNTA1MmU2%0AMGViODY0NyIsInNpZyI6IlZCb09XU1J1WFUzcWd1UDVsT2dFbFRFYkdscz0i%0AfQ==%0A
+  sha: 5692619dae780dbdf9edc994f9dcd7dce7b24646
+  size: 2503
+nginx/lua-openssl-0.1.1.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjEwMDRlNGU3ZDUxZDk1MGUwNTA1MmU2%0AMTAzNDhhMSIsInNpZyI6Ilh3c0dxQVhDeXhaYnNZa091Q3E3MytCMGJxTT0i%0AfQ==%0A
+  sha: 27f38b3f7d44f59690ed081f892891a35a5ebfaa
+  size: 69253
+nginx/headers-more-v0.15rc1.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjEyMDRlNGU4NmVlMTUxYmMwNTA1MmU2%0AMTFhNDc3NyIsInNpZyI6Ing2Tmd0eUhUallpUFBhcitqVGt4L2pyektEYz0i%0AfQ==%0A
+  sha: ba7bf757be8004d9dbffbe583396620cfcbed788
+  size: 25490
+nginx/nginx-lua.v0.3.1rc24.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjIwMDRlNGU4ZWM2YjQ0YjYwNTA1MmU2%0AMTMyOGJmOSIsInNpZyI6InA2RDJpNWYyTUxzdjRBMmRFWmJFMUdUbE1XND0i%0AfQ==%0A
+  sha: f06e390cc81f82b05a06451bf7b287b7d4fb1640
+  size: 207185
+nginx/nginx_upload_module-2.2.0.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjIyMDRlNGU5ODYzOTI2YjEwNTA1MmU2%0AMTQ3OTY4ZiIsInNpZyI6InZNdXprUi9jOS9MZitVdlF4VGlxeVJlTzAwUT0i%0AfQ==%0A
+  sha: 93d6e83e613a0ce2ed057a434b344fa1b6609b47
+  size: 25796
+nginx/lua-cjson-1.0.3.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjEwMDRlNGU3ZDUxMWY4MjEwNTA1MmU2%0AMTVjOTJkYSIsInNpZyI6IlNyMXR5RGVJSmgvRmFvaWhoM1l3MklUb0ppaz0i%0AfQ==%0A
+  sha: 7335961ff6619a7eae824e8cf9432100ca377476
+  size: 31780
+nginx/devel-kit-v0.2.17rc2.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjEyMDRlNGU4NmVlMzk2OTIwNTA1MmU2%0AMTZlNmY1YyIsInNpZyI6IjhOQ1pCbXJRc2luelI0eDJoL2JlQjNOU3dpTT0i%0AfQ==%0A
+  sha: 7eadfe53d674972c0f7f27d7b26eff95829bc0b2
+  size: 64964
+nginx/nginx-0.8.54.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjIwMDRlNGU4ZWM2ODQwNzcwNTA1MmU2%0AMTgzN2UwNiIsInNpZyI6IkFtZDN2ZUMrdlU5K2s5b3VFZC90V0ZZM2dPYz0i%0AfQ==%0A
+  sha: 4d63c35b8974dba42cc62dd5046ae89df3528e34
+  size: 650001
+nginx/pcre-8.12.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjIyMDRlNGU5ODYzOGI3NjMwNTA1MmU2%0AMTk4MjUyZiIsInNpZyI6ImZySVdxN2tCWDM5TGF3LzdsREF5dk84WThUOD0i%0AfQ==%0A
+  sha: b3ab606864606c9f980045653554bf4a12cadde2
+  size: 1316863
+nginx/lua-5.1.4.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEwMDRlNGU3ZDUxNzYxOGYwNTA1MmU2%0AMWE5YjRiZSIsInNpZyI6Ik01YkVBN2VLWkdUZ20vYU5KbFYweGNCTVdSUT0i%0AfQ==%0A
+  sha: 2b11c8e60306efb7f0734b747588f57995493db7
+  size: 216679
+neo4j/neo4j.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjEyMDRlNGU4NmVlYmU1OTEwNTA1MmU2%0AMWMwM2MxZCIsInNpZyI6IjBQYTRDRVJEMXJNcHZWYnhMT0RHOGdZbk5wOD0i%0AfQ==%0A
+  sha: 0bc828cddbf35495cc8e128115373b5397d4b525
+  size: 46937414
+couchdb/apache-couchdb-1.2.0.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjIwMDRlNGU4ZWM2NDdhNTQwNTA1MmU2%0AMjA4NmVlNiIsInNpZyI6Imc2K3BraHdDaUlBWkJUdEhpWlRLTWU0S1NKOD0i%0AfQ==%0A
+  sha: 73c27b3e2b779dbc9e176965727c4b4b8a1053de
+  size: 1172827
+git/git-1.7.8.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIyMDRlNGU5ODYzZDA3NjMwNTA1MmU2%0AMjFkMGFmMCIsInNpZyI6Ik9pQitPME1XR3lBVnNwUWpzaGtDbXJ5REpwQT0i%0AfQ==%0A
+  sha: 7453e737e008f7319a5eca24a9ef3c5fb1f13398
+  size: 3538330
+elasticsearch/elasticsearch-0.19.4.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjEwMDRlNGU3ZDUxNDc0NWYwNTA1MmU2%0AMjM0NjBhNyIsInNpZyI6ImJBdGFvd3BkUE9qOG1pbWNDYjlUS3h2dVV4Zz0i%0AfQ==%0A
+  sha: b76fc859887f262ed0420c2cd8cd93c5c2b17e63
+  size: 13861592
+postgres/postgres-9.0.3-1.amd64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjEyMDRlNGU4NmVlOGUyYzkwNTA1MmU2%0AMjUzMTdkZiIsInNpZyI6InFDSEgyNGxraXU1MHRTUWtlRnBxYWVScGxNMD0i%0AfQ==%0A
+  sha: e47ee9c841ecde4df121f44df282aeb3c50a48d2
+  size: 16203511
+postgres/postgresql-9.0.3.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjIwMDRlNGU4ZWM2NDZlMjEwNTA1MmU2%0AMjc4OTM0ZCIsInNpZyI6ImREMkVUajZkVVFnMm5GRWsxaEo3T3lMTGdzYz0i%0AfQ==%0A
+  sha: c8fb5d1d7930e78211e554bb5751183a8148d0ee
+  size: 18335858
+postgres/postgres-9.0.3-1.i386.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjIyMDRlNGU5ODYzZjI4ZjMwNTA1MmU2%0AMjljMWZhZSIsInNpZyI6ImQzMGhkbncvSFBwRFZlOTR0WHRyeDBPUlNRcz0i%0AfQ==%0A
+  sha: b2bde31e720eb219bfdc9f1b784f985ecca2cbfb
+  size: 15111387
+jenkins/jenkins.war:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjEwMDRlNGU3ZDUxZDk1MGUwNTA1MmU2%0AMmJkNjMyYiIsInNpZyI6IjNOeXljQldNREx1OHNmM0FOcCt5VXBydHhabz0i%0AfQ==%0A
+  sha: 5394a7876dc07df2f9d5ad2581df4a9569dc2cac
+  size: 48777309
+jenkins/plugins.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjEyMDRlNGU4NmVlMTUxYmMwNTA1MmU2%0AMmY3NjdlNyIsInNpZyI6IlNXUFRuQXR3cFdtOVJ3UG1jUGJ1N0hGQWVIUT0i%0AfQ==%0A
+  sha: 6b42af7bf73537b65025a1d43281f671fb8fe702
+  size: 37722252
+vpostgres/vpostgres.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIwMDRlNGU4ZWM2NWY2N2YwNTA1MmU2%0AMzJkZDFlMyIsInNpZyI6Im0zbGUyTnQvZ3R0ZW9zZE1zckdWaDc5T0Ivaz0i%0AfQ==%0A
+  sha: adfebccef8c102d145cf00284f9b19b99087e0b4
+  size: 16459135
