@@ -10,7 +10,7 @@ create_args = create_args.join(" ")
 warden_repl_path =
   ENV['WARDEN_REPL_PATH'] || '/var/vcap/packages/warden/warden/bin/warden-repl'
 
-output = `#{warden_repl_path} -c 'create #{create_args}'`
+output = `#{warden_repl_path} -c 'create #{create_args} disk_size_mb:2048'`
 
 if $?.exitstatus == 0
   puts output.gsub(/\"/,"")
