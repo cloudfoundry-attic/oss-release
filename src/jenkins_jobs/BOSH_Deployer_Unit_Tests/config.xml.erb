@@ -66,6 +66,7 @@
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
 GIT_REALPATH=`readlink -nf /var/vcap/packages/git`
+SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 VCAP_RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
 DEPLOYER=$PWD/deployer
 RAKE_SUPPORT_DIR=$PWD/rake
@@ -78,13 +79,15 @@ cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 set -o errexit
 set -o nounset
 export PATH=$VCAP_RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$PATH
+export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
+export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 cd /tmp/deployer
 bundle install --local --path vendor/bundle --without development production
 cd spec
 bundle exec rake spec:unit:ci
 EOT
 
-HANDLE=`$CREATE_CONTAINER $VCAP_RUBY19_REALPATH $GIT_REALPATH`
+HANDLE=`$CREATE_CONTAINER $VCAP_RUBY19_REALPATH $GIT_REALPATH $SQLITE_REALPATH`
 $WARDEN_REPL -c &quot;
 copy $HANDLE in $RAKE_SUPPORT_DIR /tmp
 copy $HANDLE in $DEPLOYER /tmp
