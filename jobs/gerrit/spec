@@ -31,6 +31,8 @@ templates:
   contact_information.pub: config/contact_information.pub
   id_rsa.erb: config/id_rsa
   id_rsa.pub.erb: config/id_rsa.pub
+  reviewbot_user.yml.erb: config/reviewbot_user.yml
+  notification_config.yml.erb: config/notification_config.yml
 packages:
   - git
   - ruby
