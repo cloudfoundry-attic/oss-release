@@ -40,7 +40,7 @@
               <string>WARDEN_REPL</string>
               <string>/var/vcap/packages/warden/warden/bin/warden-repl</string>
               <string>WARDEN_INSTANCES</string>
-              <string>/var/vcap/packages/warden/warden/root/linux/instances</string>
+              <string>/var/vcap/data/warden/depot</string>
               <string>VCAP_GIT</string>
               <string>/var/vcap/packages/git</string>
               <string>VCAP_REDIS22</string>
