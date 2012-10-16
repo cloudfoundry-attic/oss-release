@@ -63,6 +63,7 @@ cp -pf $JOB_DIR/config/replication.config $CONFIG_DIR/
 rm -rf $HOOKS_DIR
 cp -r $PACKAGE_DIR/hooks $HOOKS_DIR
 cp -pf $JOB_DIR/config/gerrit_hooks.yml $HOOKS_DIR/patchset_notification/config/
+cp -pf $JOB_DIR/config/notification_config.yml $HOOKS_DIR/patchset_notification/config/
 chown -R vcap:vcap $HOOKS_DIR
 
 # SSH keyfile for reviewbot(which setup reviewers automatically)
@@ -151,6 +152,21 @@ chmod +x /etc/cron.hourly/email_new_users
   export LD_LIBRARY_PATH=/var/vcap/packages/mysqlclient/lib/mysql:$LD_LIBRARY_PATH
   cd $PACKAGE_ROOT_DIR/create_batch_gerrit_account
   bundle exec ruby create_batch_gerrit_account.rb $JOB_DIR/config/mysql.yml $JOB_DIR/config/gerrit_trigger.yml
+)
+
+# Update the review bot batch account
+(
+  set -o errexit
+  export PATH=$PACKAGE_ROOT_DIR/ruby/bin:$PATH
+  export LD_LIBRARY_PATH=/var/vcap/packages/mysqlclient/lib/mysql:$LD_LIBRARY_PATH
+
+  # set the pub key for the reviewbot
+  pub_key=`cat $PACKAGE_DIR/review.pub`
+  sed -i '/.*public_key:.*/d' $JOB_DIR/config/reviewbot_user.yml
+  echo -n "public_key: \"$pub_key\"" >> $JOB_DIR/config/reviewbot_user.yml
+
+  cd $PACKAGE_ROOT_DIR/create_batch_gerrit_account
+  bundle exec ruby create_batch_gerrit_account.rb $JOB_DIR/config/mysql.yml $JOB_DIR/config/reviewbot_user.yml
 )
 
 # Configure site header
