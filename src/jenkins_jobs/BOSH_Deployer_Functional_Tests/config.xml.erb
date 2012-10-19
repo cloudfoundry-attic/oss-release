@@ -5,7 +5,7 @@
   <displayName>Deployer Functional Tests</displayName>
   <logRotator>
     <daysToKeep>30</daysToKeep>
-    <numToKeep>50</numToKeep>
+    <numToKeep>-1</numToKeep>
     <artifactDaysToKeep>-1</artifactDaysToKeep>
     <artifactNumToKeep>-1</artifactNumToKeep>
   </logRotator>
@@ -97,8 +97,7 @@ run $HANDLE $TEST_RUNNER
 copy $HANDLE out /tmp/deployer/ci_result $DEPLOYER vcap:vcap
 destroy $HANDLE
 &quot;
-rm -f $TEST_RUNNER
-</command>
+rm -f $TEST_RUNNER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

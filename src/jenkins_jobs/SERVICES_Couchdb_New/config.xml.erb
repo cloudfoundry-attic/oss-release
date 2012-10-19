@@ -94,6 +94,7 @@ mkdir -p /tmp/log
 cp -r /var/vcap/packages/erlang/* /usr/
 cp -r /tmp/couchdb_bin/*/* /var/vcap/packages/couchdb/
 sudo apt-get update
+ln -s /usr/lib/insserv/insserv /sbin/insserv
 yes | sudo apt-get install xulrunner-1.9.2-dev
 
 find /usr/lib -maxdepth 1 -type d -name &quot;xulrunner-*&quot; | grep -v &apos;addons&apos; &gt; /tmp/new.xulrunner.conf

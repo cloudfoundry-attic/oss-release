@@ -55,7 +55,8 @@
     <includedRegions></includedRegions>
     <scmName></scmName>
   </scm>
-  <canRoam>true</canRoam>
+  <assignedNode>jenk1</assignedNode>
+  <canRoam>false</canRoam>
   <disabled>false</disabled>
   <blockBuildWhenDownstreamBuilding>true</blockBuildWhenDownstreamBuilding>
   <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
@@ -143,8 +144,7 @@ run $HANDLE $TEST_RUNNER
 copy $HANDLE out /tmp/staging/spec/reports $STAGING_DIR/spec vcap:vcap
 destroy $HANDLE
 &quot;
-rm -f $TEST_RUNNER
-</command>
+rm -f $TEST_RUNNER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

@@ -101,9 +101,17 @@ mkdir -p /tmp/elasticsearch/instances
 rm -rf .bundle
 rm -rf vendor/bundle
 
-sed -i &quot;s/local_db: sqlite3:\/var\/vcap\/services\/elasticsearch\/elasticsearch_node.db/local_db: sqlite3:\/tmp\/elasticsearch_node.db/g&quot; config/elasticsearch_node.yml
-sed -i &quot;s/elasticsearch_log_dir: \/var\/vcap\/sys\/log\/elasticsearch/elasticsearch_log_dir: \/tmp/g&quot; config/elasticsearch_node.yml
+#sed -i &quot;s/local_db: sqlite3:\/var\/vcap\/services\/elasticsearch\/elasticsearch_node.db/local_db: sqlite3:\/tmp\/elasticsearch_node.db/g&quot; config/elasticsearch_node.yml
+#sed -i &quot;s/elasticsearch_log_dir: \/var\/vcap\/sys\/log\/elasticsearch/elasticsearch_log_dir: \/tmp/g&quot; config/elasticsearch_node.yml
 
+sudo cp -r /var/vcap/packages/elasticsearch /tmp/
+sudo mv /tmp/elasticsearch /tmp/elasticsearch_proc
+sudo chown -R vcap:vcap /tmp/elasticsearch_proc
+
+sed -i &quot;s/elasticsearch_path: \/var\/vcap\/packages\/elasticsearch\/bin\/elasticsearch/elasticsearch_path: \/tmp\/elasticsearch_proc\/bin\/elasticsearch/g&quot; config/elasticsearch_node.yml
+sed -i &quot;s/elasticsearch_plugin_dir: \/var\/vcap\/packages\/elasticsearch\/plugins/elasticsearch_plugin_dir: \/tmp\/elasticsearch_proc\/plugins/g&quot; config/elasticsearch_node.yml
+
+cat config/elasticsearch_node.yml
 bundle install --deployment --without development production
 bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci

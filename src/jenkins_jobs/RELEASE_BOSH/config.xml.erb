@@ -3,21 +3,19 @@
   <actions/>
   <description></description>
   <displayName>Bosh Release</displayName>
-  <logRotator> 
-    <daysToKeep>30</daysToKeep> 
-    <numToKeep>-1</numToKeep> 
-    <artifactDaysToKeep>-1</artifactDaysToKeep> 
-    <artifactNumToKeep>-1</artifactNumToKeep> 
-  </logRotator>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
       <maxConcurrentPerNode>0</maxConcurrentPerNode>
       <maxConcurrentTotal>0</maxConcurrentTotal>
-      <categories/>
       <throttleEnabled>false</throttleEnabled>
       <throttleOption>project</throttleOption>
-      <configVersion>1</configVersion>
     </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
   </properties>
   <scm class="hudson.plugins.git.GitSCM">
@@ -91,12 +89,19 @@
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:/var/vcap/packages/git/bin:$PATH
 
+git submodule sync
+git submodule foreach --recursive &apos;git submodule sync&apos;
+git submodule update --init --recursive
+
+git clean -fdx jobs packages src
+
 mkdir -p $WORKSPACE/TOOLS
 GEM_HOME=$WORKSPACE/TOOLS gem install bosh_cli --no-rdoc --no-ri
 
 # Paths needed in the container
 VCAP_RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
 VCAP_GIT_REALPATH=`readlink -nf /var/vcap/packages/git`
+WORKSPACE_NAME=`basename $WORKSPACE`
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
@@ -111,13 +116,8 @@ if [ ! -x vendor/bundle/ruby/1.9.1/bin/bundle ]; then
   env GEM_PATH=vendor/bundle/ruby/1.9.1 GEM_HOME=vendor/bundle/ruby/1.9.1 gem install bundler
 fi
 
-cd $WORKSPACE
-
-git submodule sync
-git submodule foreach --recursive &apos;git submodule sync&apos;
-git submodule update --init --recursive
-
-git clean -fdx jobs packages src
+cp -rf $WORKSPACE /tmp/
+cd /tmp/$WORKSPACE_NAME
 
 GEM_PATH=$WORKSPACE/TOOLS $WORKSPACE/TOOLS/bin/bosh --non-interactive reset release
 
@@ -128,7 +128,7 @@ GEM_PATH=$WORKSPACE/TOOLS $WORKSPACE/TOOLS/bin/bosh --non-interactive sync blobs
 GEM_PATH=$WORKSPACE/TOOLS $WORKSPACE/TOOLS/bin/bosh --non-interactive create release --dry-run --force
 EOT
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$VCAP_RUBY19_REALPATH,$VCAP_RUBY19_REALPATH,ro bind_mount:$VCAP_GIT_REALPATH,$VCAP_GIT_REALPATH,ro bind_mount:$WORKSPACE,$WORKSPACE,rw&quot;`
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$VCAP_RUBY19_REALPATH,$VCAP_RUBY19_REALPATH,ro bind_mount:$VCAP_GIT_REALPATH,$VCAP_GIT_REALPATH,ro  bind_mount:$WORKSPACE,$WORKSPACE,ro disk_size_mb:8196&quot;`
 
 $WARDEN_REPL -x -e -c &quot;
 copy $HANDLE in $TEST_RUNNER /tmp
