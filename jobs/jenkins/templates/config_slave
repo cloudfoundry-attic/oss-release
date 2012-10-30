@@ -20,7 +20,7 @@
               <default>
                 <comparator class="hudson.util.CaseInsensitiveComparator"/>
               </default>
-              <int>29</int>
+              <int>30</int>
               <string>CREATE_CONTAINER</string>
               <string>/var/vcap/jobs/jenkins_slave/bin/create_container</string>
               <string>DEA_RUBY19</string>
@@ -39,6 +39,8 @@
               <string>/var/vcap/packages/ruby</string>
               <string>WARDEN_REPL</string>
               <string>/var/vcap/packages/warden/warden/bin/warden-repl</string>
+              <string>WARDEN_REPL_V2</string>
+              <string>/var/vcap/packages/warden/warden/bin/warden</string>
               <string>WARDEN_INSTANCES</string>
               <string>/var/vcap/data/warden/depot</string>
               <string>VCAP_GIT</string>
