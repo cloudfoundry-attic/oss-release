@@ -57,7 +57,7 @@ do
   ps $JENKINS_PID
   if [ $? == 0 ] && (( $now - $last_backup > $backup_interval_secs )); then
     log "Prepare for starting sync to $jenkins_backup_address:$DATA_DIR/"
-    rsync -avz $DATA_DIR/jobs vcap@$jenkins_backup_address:$DATA_DIR/ | grep "jobs" >> $LOG_DIR/$BACKUP_LOG
+    rsync -avz --delete $DATA_DIR/jobs vcap@$jenkins_backup_address:$DATA_DIR/ | grep "jobs" >> $LOG_DIR/$BACKUP_LOG
     echo $now > $LAST_BAK_FILE
   fi
 
