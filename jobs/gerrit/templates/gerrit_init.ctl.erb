@@ -55,6 +55,14 @@ chmod -R 600 $JOB_DIR/config/
 # General Configurations
 cp -pf $JOB_DIR/config/gerrit.config $CONFIG_DIR/
 cp -pf $JOB_DIR/config/secure.config $CONFIG_DIR/
+<% if properties.gerrit.http_port && properties.gerrit.http_port < 1024 %>
+# set up iptables if the gerrit port is designated as below 1024
+is_rule_set=`/sbin/iptables -t nat -L | grep DNAT | grep -c -v "grep"`
+if [ $is_rule_set -lt 1 ]; then
+  /sbin/iptables -t nat -A PREROUTING -p tcp -d <%= properties.gerrit.external_domain %> --dport <%= properties.gerrit.http_port %> -j DNAT --to <%= properties.gerrit.address %>:8080
+  /sbin/iptables -t nat -A OUTPUT -p tcp -d <%= properties.gerrit.external_domain %> --dport <%= properties.gerrit.http_port %> -j DNAT --to <%= properties.gerrit.address %>:8080
+fi
+<% end %>
 
 # Replication setup
 cp -pf $JOB_DIR/config/replication.config $CONFIG_DIR/

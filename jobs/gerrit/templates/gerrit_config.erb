@@ -42,7 +42,11 @@
   listenAddress = *:<%= properties.gerrit.ssh_port || 29418 %>
 
 [httpd]
-  listenUrl = proxy-http://<%= properties.gerrit.address %>:<%= properties.gerrit.http_port || 8080 %>/
+<% if !properties.gerrit.http_port || (properties.gerrit.http_port < 1024) %>
+  listenUrl = proxy-http://<%= properties.gerrit.address %>:8080/
+<% else %>
+  listenUrl = proxy-http://<%= properties.gerrit.address %>:<%= properties.gerrit.http_port %>/
+<% end %>
 
 [cache]
   directory = cache
