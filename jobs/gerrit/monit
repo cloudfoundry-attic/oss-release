@@ -2,7 +2,11 @@ check process gerrit
   with pidfile /var/vcap/sys/run/gerrit/gerrit.pid
   start program "/var/vcap/jobs/gerrit/bin/gerrit_ctl start"
   stop program "/var/vcap/jobs/gerrit/bin/gerrit_ctl stop"
+<% if !properties.gerrit.http_port || (properties.gerrit.http_port < 1024) %>
+  if failed host <%= properties.gerrit.address %> port 8080 protocol http with timeout <%= properties.gerrit.http_timeout || 5 %> seconds for <%= properties.gerrit.http_cycles || 10 %> cycles then restart
+<% else %>
   if failed host <%= properties.gerrit.address %> port <%= properties.gerrit.http_port %> protocol http with timeout <%= properties.gerrit.http_timeout || 5 %> seconds for <%= properties.gerrit.http_cycles || 10 %> cycles then restart
+ <% end %>
   group vcap
 
 <% if properties.gerrit.enable_zabbix_agent==1 %>
