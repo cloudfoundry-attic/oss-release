@@ -1,4 +1,0 @@
----
-name: warden-service
-files:
-- warden_service/warden-service.tgz
