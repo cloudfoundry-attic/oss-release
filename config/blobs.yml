@@ -27,10 +27,6 @@ ruby/ruby-1.8.7-p357.tar.bz2:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjEyMDRlNGU4NmVlOGUyYzkwNTA1MmU1%0AY2EzNGI4NCIsInNpZyI6Im9haVBNWVJxTmxEaE1ZM3RXbWpBbkplY0xUUT0i%0AfQ==%0A
   sha: ba5ec0ab663976f00fb405be6cfef546bcf0e4e9
   size: 4208157
-warden_service/warden-service.tgz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjIwMDRlNGU4ZWM2NDZlMjEwNTA1MmU1%0AY2QyYjI0ZiIsInNpZyI6InM1NDRKOElmbUxNdWNOdWtZTk5NT2svL1F3az0i%0AfQ==%0A
-  sha: a08307c5051aa155831d91bb09b562334677bc2a
-  size: 185472587
 sqlite/sqlite-autoconf-3070500.tar.gz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjIyMDRlNGU5ODYzOGI3NjMwNTA1MmU1%0AZGI0NjhhYyIsInNpZyI6ImxVK3hDU2NMWE51SGhJazlmcUFtSEQ4bjQybz0i%0AfQ==%0A
   sha: 4e1338497b8da50b84307191bb3418e9ec5715d7
@@ -207,3 +203,7 @@ vpostgres/vpostgres.tgz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIwMDRlNGU4ZWM2NWY2N2YwNTA1MmU2%0AMzJkZDFlMyIsInNpZyI6Im0zbGUyTnQvZ3R0ZW9zZE1zckdWaDc5T0Ivaz0i%0AfQ==%0A
   sha: adfebccef8c102d145cf00284f9b19b99087e0b4
   size: 16459135
+wardenized_services/wardenized_services.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjEyMDRlNGU4NmVlMzk2OTIwNTA5NzRl%0AZDQ4MzUyYyIsInNpZyI6IjRVOXNucmRjaVU3cXdaZzI3L1RoK29VT1U0OD0i%0AfQ==%0A
+  sha: 072cb3ffc526471d78a89c624e91dd60c9c5aa95
+  size: 477551550

@@ -3,12 +3,12 @@
   <actions/>
   <description></description>
   <displayName>vBlob Warden Unit Test</displayName>
-  <logRotator>
-    <daysToKeep>30</daysToKeep>
-    <numToKeep>-1</numToKeep>
-    <artifactDaysToKeep>-1</artifactDaysToKeep>
-    <artifactNumToKeep>-1</artifactNumToKeep>
-  </logRotator>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -23,13 +23,13 @@
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
         <name></name>
-        <refspec>$GERRIT_REFSPEC</refspec>
+        <refspec></refspec>
         <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap-services.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
     <branches>
       <hudson.plugins.git.BranchSpec>
-        <name>$GERRIT_BRANCH</name>
+        <name>master</name>
       </hudson.plugins.git.BranchSpec>
     </branches>
     <disableSubmodules>false</disableSubmodules>
@@ -40,9 +40,7 @@
     <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
     <remotePoll>false</remotePoll>
-    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
-      <separator>#</separator>
-    </buildChooser>
+    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
     <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
@@ -71,15 +69,17 @@ GIT_REALPATH=`readlink -nf $VCAP_GIT`
 WARDEN_SRV_REALPATH=`readlink -nf $VCAP_WARDEN_SERVICE`
 WARDEN_PKG=/var/vcap/packages/warden/warden
 
-VBLOB_SVC=$PWD/vblob
+VBLOB_SVC=$PWD/ng/vblob
+rm -rf VBLOB_SVC/spec_reports
 
-#
-# HACK - Base expects to be able to write to /var/vcap/sys/run/LOCK
-#
-SCRATCHPAD=$VBLOB_SVC/xxx_scratchpad
-rm -rf $SCRATCHPAD
-mkdir -p $SCRATCHPAD/log/warden
-mkdir -p $SCRATCHPAD/run/warden
+echo &quot;creating the warden container for unit-test&quot;
+HANDLE=`$WARDEN_REPL_V2 -- create --bind_mounts[0].src_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].dst_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].mode RO \
+--bind_mounts[1].src_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].dst_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].mode RO \
+--bind_mounts[2].src_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].dst_path $SQLITE_REALPATH --bind_mounts[2].mode RO \
+--bind_mounts[3].src_path &quot;$VCAP_WARDEN_SERVICE&quot; --bind_mounts[3].dst_path &quot;$WARDEN_PKG&quot; --bind_mounts[3].mode RO \
+--bind_mounts[4].src_path &quot;$WARDEN_SRV_REALPATH/root/linux/base/rootfs&quot; --bind_mounts[4].dst_path &quot;/var/vcap/data/warden/rootfs&quot; --bind_mounts[4].mode RO \
+--bind_mounts[5].src_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[5].dst_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[5].mode RW \
+| cut -d &quot; &quot; -f 3`
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
@@ -92,50 +92,68 @@ export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 export CI_ENV=&apos;jenkins&apos;
 
+# nats expects to write in /var/vcap/sys/run
+sudo mkdir -p /var/vcap/sys/run
+sudo chown -R vcap:vcap /var/vcap/sys/run
+
+# prepare the log dir for warden
 mkdir -p /var/vcap/sys/log/warden
 
+# echo the address of github into the /etc/hosts in case warden cannot find it
+sudo echo &quot;207.97.227.239 github.com&quot; &gt;&gt; /etc/hosts
+
+# dynamically generate the config for the warden server
+cat &gt; /tmp/warden_server.yml &lt;&lt;-EOF
+---
+server:
+  container_klass: Warden::Container::Linux
+  container_grace_time: 300
+  unix_domain_permissions: 0777
+  container_rootfs_path: /var/vcap/data/warden/rootfs
+  container_depot_path: /var/vcap/data/warden/depot/$HANDLE
+  container_limits_conf:
+    nofile: 8192
+    nproc: 512
+    as: 4194304
+  quota:
+    disk_quota_enabled: false
+
+logging:
+  level: debug2
+
+network:
+  pool_start_address: 20.254.0.0
+  pool_size: 256
+
+user:
+  pool_start_uid: 10000
+  pool_size: 256
+EOF
+
+# start the warden server
 cd $WARDEN_PKG
-bundle --local install --deployment --without=devlopment test
-cat config/vblob.yml
+nohup bundle exec rake warden:start[/tmp/warden_server.yml] &gt;&gt; /var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
+sleep 5
 
 cd /tmp/vblob_source/vblob
 rm -rf .bundle
 rm -rf vendor/bundle
-sed -i &quot;s/local_db: sqlite3:\/var\/vcap\/services\/vblob\/vblob_node.db/local_db: sqlite3:vblob_node.db/g&quot; config/vblob_node.yml
-#sed -i &quot;s/nodejs_path: node/nodejs_path: \/var\/vcap\/packages\/dea_node04\/bin\/node/g&quot; config/vblob_node.yml
-sed -i &quot;s/vblobd_log_dir: \/var\/vcap\/sys\/service-log\/vblob/vblobd_log_dir: \/tmp\/var\/vcap\/sys\/service-log\/vblob/g&quot; config/vblob_node.yml
-sed -i &quot;s/base_dir: \/var\/vcap\/services\/vblob\/instances/base_dir: \/tmp\/var\/vcap\/services\/vblob\/instances/g&quot; config/vblob_node.yml
-sed -i &quot;s/image_dir: \/var\/vcap\/services\/vblob\/vblob_image/image_dir: \/tmp\/vblob\/vblob_image/g&quot; config/vblob_node.yml
-sed -i &quot;s/\/var\/vcap\/sys\/run\/vblob_node.pid/\/tmp\/var\/vcap\/sys\/run\/vblob_node.pid/g&quot; config/vblob_node.yml
-sed -i &quot;s/\/var\/vcap\/sys\/run\/vblob_node.pid/\/tmp\/var\/vcap\/sys\/run\/vblob_node.pid/g&quot; config/vblob_gateway.yml
-bundle install --path vendor/bundle
 
-cd $WARDEN_PKG
-nohup bundle exec rake warden:start[config/vblob.yml] &gt;&gt; /var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
-sleep 5
-
-cd /tmp/vblob_source/vblob
-bundle exec nats-server --daemonize --pid /tmp/nats.pid
+bundle install --deployment
 bundle exec rake spec:ci
-
-cat /var/vcap/sys/log/warden/warden.log
-
 EOT
 
-echo &quot;creating the warden container for unit-test&quot;
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$SCRATCHPAD,/var/vcap/sys/run,rw bind_mount:$VCAP_WARDEN_SERVICE,/var/vcap/packages/warden/warden,rw  disk_size_mb:4096 &quot;`
-
 echo &quot;enable vcap could execute sudo without password within warden&quot;
-sudo ls $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config
+sudo ls $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config
 set +e
 vcap_sudo_line=&quot;vcap ALL=(ALL) NOPASSWD:ALL&quot;
-vcap_chk_ret=`sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
+vcap_chk_ret=`sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
 if test -z &quot;$vcap_chk_ret&quot;
 then
-  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
-  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
-  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
-  sudo ssh -T -F $WARDEN_PKG/root/linux/instances/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
 fi
 set -e
 
@@ -155,16 +173,16 @@ rm -f $TEST_RUNNER</command>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>vblob/spec_reports/**</artifacts>
+      <artifacts>ng/vblob/spec_reports/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>vblob/spec_reports/*.xml</testResults>
+      <testResults>ng/vblob/spec_reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-      <reportDir>vblob/spec_coverage/rcov</reportDir>
+      <reportDir>ng/vblob/spec_coverage/rcov</reportDir>
       <targets>
         <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
           <metric>TOTAL_COVERAGE</metric>
