@@ -68,6 +68,7 @@
 GIT_REALPATH=`readlink -nf /var/vcap/packages/git`
 VCAP_RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
 AGENT=$PWD/agent
+MICRO=$PWD/micro
 RAKE_SUPPORT_DIR=$PWD/rake
 
 rm -rvf $AGENT/ci_result
@@ -88,6 +89,7 @@ HANDLE=`$CREATE_CONTAINER $VCAP_RUBY19_REALPATH $GIT_REALPATH`
 $WARDEN_REPL -c &quot;
 copy $HANDLE in $RAKE_SUPPORT_DIR /tmp
 copy $HANDLE in $AGENT /tmp
+copy $HANDLE in $MICRO /tmp
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE $TEST_RUNNER
