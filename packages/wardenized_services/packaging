@@ -1,0 +1,10 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+mkdir unpack_wardenized_services
+tar zxf wardenized_services/wardenized_services.tar.gz -C unpack_wardenized_services
+(
+  cd unpack_wardenized_services
+  rm -rf ${BOSH_INSTALL_TARGET}
+  cp -af 1.1 ${BOSH_INSTALL_TARGET}
+)

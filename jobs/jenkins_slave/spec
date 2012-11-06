@@ -38,7 +38,7 @@ packages:
   - vblob
   - mysql-service
   - vpostgres
-  - warden-service
+  - wardenized_services
   - elasticsearch
   - couchdb
   - zabbix_agent

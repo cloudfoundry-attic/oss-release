@@ -2,7 +2,7 @@
 <project>
   <actions/>
   <description></description>
-  <displayName>Rabbit Warden Unit Test</displayName>
+  <displayName>Postgres Warden Unit Test</displayName>
   <logRotator>
     <daysToKeep>30</daysToKeep>
     <numToKeep>-1</numToKeep>
@@ -23,7 +23,7 @@
     <userRemoteConfigs>
       <hudson.plugins.git.UserRemoteConfig>
         <name></name>
-        <refspec></refspec>
+        <refspec>refs/changes/70/10970/5</refspec>
         <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/vcap-services.git</url>
       </hudson.plugins.git.UserRemoteConfig>
     </userRemoteConfigs>
@@ -40,7 +40,9 @@
     <wipeOutWorkspace>false</wipeOutWorkspace>
     <pruneBranches>false</pruneBranches>
     <remotePoll>false</remotePoll>
-    <buildChooser class="hudson.plugins.git.util.DefaultBuildChooser"/>
+    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
+      <separator>#</separator>
+    </buildChooser>
     <gitTool>Default</gitTool>
     <submoduleCfg class="list"/>
     <relativeTargetDir></relativeTargetDir>
@@ -66,22 +68,21 @@
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
-GO_REALPATH=`readlink -nf $VCAP_GOLANG`
+POSTGRES_REALPATH=`readlink -nf $VCAP_VPOSTGRES`
 WARDEN_SRV_REALPATH=`readlink -nf $VCAP_WARDEN_SERVICE`
 WARDEN_PKG=/var/vcap/packages/warden/warden
 
-RABBIT_SVC=$PWD/ng/rabbit
-TOOLS=$PWD/tools
-rm -rf RABBIT_SVC/spec_reports
+POSTGRES_SVC=$PWD/ng/postgresql
+rm -rf POSTGRES_SVC/spec_reports
 
-# create the warden container for unit-test
+echo &quot;creating the warden container for unit-test&quot;
 HANDLE=`$WARDEN_REPL_V2 -- create --bind_mounts[0].src_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].dst_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].mode RO \
 --bind_mounts[1].src_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].dst_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].mode RO \
---bind_mounts[2].src_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].dst_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].mode RO \
+--bind_mounts[2].src_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].dst_path $SQLITE_REALPATH --bind_mounts[2].mode RO \
 --bind_mounts[3].src_path &quot;$VCAP_WARDEN_SERVICE&quot; --bind_mounts[3].dst_path &quot;$WARDEN_PKG&quot; --bind_mounts[3].mode RO \
---bind_mounts[4].src_path &quot;$GO_REALPATH&quot; --bind_mounts[4].dst_path &quot;$GO_REALPATH&quot; --bind_mounts[4].mode RO \
---bind_mounts[5].src_path &quot;$WARDEN_SRV_REALPATH/root/linux/base/rootfs&quot; --bind_mounts[5].dst_path &quot;/var/vcap/data/warden/rootfs&quot; --bind_mounts[5].mode RO \
---bind_mounts[6].src_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[6].dst_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[6].mode RW \
+--bind_mounts[4].src_path &quot;$WARDEN_SRV_REALPATH/root/linux/base/rootfs&quot; --bind_mounts[4].dst_path &quot;/var/vcap/data/warden/rootfs&quot; --bind_mounts[4].mode RO \
+--bind_mounts[5].src_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[5].dst_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[5].mode RW \
+--bind_mounts[6].src_path &quot;$POSTGRES_REALPATH&quot; --bind_mounts[6].dst_path &quot;$VCAP_POSTGRES&quot; --bind_mounts[6].mode RO \
 | cut -d &quot; &quot; -f 3`
 
 TEST_RUNNER=`mktemp`
@@ -90,27 +91,30 @@ cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 set -x
 set -o errexit
 
-export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$GO_REALPATH/bin:$PATH
-export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
-export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
+export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_POSTGRES/bin:$PATH
+export LIBRARY_PATH=$SQLITE_REALPATH/lib:$VCAP_POSTGRES/lib:$LIBRARY_PATH
+export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$VCAP_POSTGRES/include:$C_INCLUDE_PATH
+export LD_LIBRARY_PATH=$VCAP_POSTGRES/lib:$LD_LIBRARY_PATH
 export CI_ENV=&apos;jenkins&apos;
 
 # nats expects to write in /var/vcap/sys/run
-sudo mkdir -p /var/vcap/sys/run
-sudo chown -R vcap:vcap /var/vcap/sys/run
+mkdir -p /var/vcap/sys/run
+chown vcap:vcap -R /var/vcap/sys/run
+
+# prepare the filesystem for postgresql
+mkdir -p /tmp/var/vcap/store
+chown vcap:vcap -R /tmp/var/vcap/store
+mkdir -p /tmp/var/vcap/sys
+chown vcap:vcap -R /tmp/var/vcap/sys
+
+# start the postgres process outside the warden container
+su - vcap -c &quot;/var/vcap/packages/postgres/jobs/postgres_ctl start&quot;
 
 # prepare the log dir for warden
 mkdir -p /var/vcap/sys/log/warden
 
 # echo the address of github into the /etc/hosts in case warden cannot find it
 sudo echo &quot;207.97.227.239 github.com&quot; &gt;&gt; /etc/hosts
-
-# prepare the go proxy for rabbit
-export GOROOT=$GO_REALPATH
-cd /tmp/tools/bandwidth_proxy
-export GOPATH=/tmp/tools/bandwidth_proxy
-go install bandwidth_proxy
-cp -r /tmp/tools/bandwidth_proxy /var/vcap/packages
 
 # dynamically generate the config for the warden server
 cat &gt; /tmp/warden_server.yml &lt;&lt;-EOF
@@ -132,7 +136,7 @@ logging:
   level: debug2
 
 network:
-  pool_start_address: 30.254.0.0
+  pool_start_address: 70.254.0.0
   pool_size: 256
 
 user:
@@ -145,11 +149,25 @@ cd $WARDEN_PKG
 nohup bundle exec rake warden:start[/tmp/warden_server.yml] &gt;&gt; /var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
 sleep 5
 
-# do the unit test
-cd /tmp/rabbit_source/rabbit
+cd /tmp/postgresql_source/postgresql
+rm -rf .bundle
+rm -rf vendor/bundle
+sed -i &apos;s/use_warden: false/use_warden: true/g&apos; config/postgresql_node.yml
 bundle install --deployment
 bundle exec rake spec:ci
+EOT
 
+CREATE_LOOP=`mktemp`
+cat &lt;&lt;-EOT &gt; $CREATE_LOOP
+#!/bin/bash
+loop_device_count=128
+for i in \$(seq 0 \$(expr \$loop_device_count - 1)); do
+  file=/dev/loop\${i}
+  if [ ! -b \${file} ]; then
+    mknod -m0660 \${file} b 7 \${i}
+    chown root.disk \${file}
+  fi
+done
 EOT
 
 echo &quot;enable vcap could execute sudo without password within warden&quot;
@@ -168,13 +186,15 @@ set -e
 
 echo &quot;staring the unit test&quot;
 $WARDEN_REPL -e -x -c &quot;
-copy $HANDLE in $RABBIT_SVC /tmp/rabbit_source
-copy $HANDLE in $TOOLS /tmp
+copy $HANDLE in $POSTGRES_SVC /tmp/postgresql_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
+copy $HANDLE in $CREATE_LOOP /tmp
+run $HANDLE chmod +x $CREATE_LOOP
+run $HANDLE sudo /bin/bash $CREATE_LOOP
 run $HANDLE sudo /bin/bash $TEST_RUNNER
-copy $HANDLE out /tmp/rabbit_source/rabbit/spec_reports $RABBIT_SVC vcap:vcap
-copy $HANDLE out /tmp/rabbit_source/rabbit/spec_coverage $RABBIT_SVC vcap:vcap
+copy $HANDLE out /tmp/postgresql_source/postgresql/spec_reports $POSTGRES_SVC vcap:vcap
+copy $HANDLE out /tmp/postgresql_source/postgresql/spec_coverage $POSTGRES_SVC vcap:vcap
 destroy $HANDLE
 &quot;
 
@@ -183,16 +203,16 @@ rm -f $TEST_RUNNER</command>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>ng/rabbit/spec_reports/**</artifacts>
+      <artifacts>ng/postgresql/spec_reports/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>ng/rabbit/spec_reports/*.xml</testResults>
+      <testResults>ng/postgresql/spec_reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-      <reportDir>ng/rabbit/spec_coverage/rcov</reportDir>
+      <reportDir>ng/postgresql/spec_coverage/rcov</reportDir>
       <targets>
         <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
           <metric>TOTAL_COVERAGE</metric>

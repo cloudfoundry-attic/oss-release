@@ -76,7 +76,7 @@
               <string>VCAP_MEMCACHED</string>
               <string>/var/vcap/packages/memcached</string>
               <string>VCAP_WARDEN_SERVICE</string>
-              <string>/var/vcap/packages/warden-service</string>
+              <string>/var/vcap/packages/wardenized_services</string>
               <string>VCAP_ELASTIC</string>
               <string>/var/vcap/packages/elasticsearch</string>
               <string>VCAP_COUCHDB</string>
