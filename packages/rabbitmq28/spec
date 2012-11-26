@@ -1,0 +1,4 @@
+---
+name: rabbitmq28
+files:
+- rabbitmq/rabbitmq-2.8.tar.gz

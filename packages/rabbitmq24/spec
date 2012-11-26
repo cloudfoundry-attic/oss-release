@@ -1,0 +1,4 @@
+---
+name: rabbitmq24
+files:
+- rabbitmq/rabbitmq-2.4.tar.gz

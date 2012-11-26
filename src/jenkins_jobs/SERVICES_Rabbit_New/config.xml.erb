@@ -66,20 +66,24 @@
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
-RABBIT_REALPATH=`readlink -nf $VCAP_RABBITMQ`
+RABBITMQ24_REALPATH=`readlink -nf $VCAP_RABBITMQ24`
+RABBITMQ28_REALPATH=`readlink -nf $VCAP_RABBITMQ28`
 ERLANG_REALPATH=`readlink -nf $VCAP_ERLANG`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
+
+RABBITMQ24_INNERPATH=/var/vcap/packages/rabbitmq-2.4
+RABBITMQ28_INNERPATH=/var/vcap/packages/rabbitmq-2.8
 WARDEN_DEPOT=$WARDEN_INSTANCES
 
 RABBIT_SVC=$PWD/rabbit
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
-#!/bin/bash 
+#!/bin/bash
 set -x
 set -o errexit
-export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$RABBIT_REALPATH/sbin:/var/vcap/packages/erlang/bin:$PATH
+export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_ERLANG/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 export CI_ENV=&apos;jenkins&apos;
@@ -94,14 +98,13 @@ rm -rf vendor/bundle
 
 sed -i &quot;s/local_db: sqlite3:\/var\/vcap\/services\/rabbit\/rabbit_node.db/local_db: sqlite3:rabbit_node.db/g&quot; config/rabbit_node.yml
 sed -i &quot;s/$# rabbitmq_start_timeout: 5/$rabbitmq_start_timeout: 9/g&quot; config/rabbit_node.yml
-sed -i &quot;s/\/home\/tangrui\/rabbitmq_server-2.4.1\/sbin\/rabbitmq-server/rabbitmq-server/g&quot; config/rabbit_node.yml
 
 bundle install --deployment --without development production
 bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci
 EOT
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$RABBIT_REALPATH,$RABBIT_REALPATH,ro bind_mount:$ERLANG_REALPATH,/var/vcap/packages/erlang,ro&quot;`
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$RABBITMQ24_REALPATH,$RABBITMQ24_INNERPATH,ro bind_mount:$RABBITMQ28_REALPATH,$RABBITMQ28_INNERPATH,ro bind_mount:$ERLANG_REALPATH,$VCAP_ERLANG,ro&quot;`
 
 echo &quot;enable vcap could execute sudo without password within warden&quot;
 sudo ls $WARDEN_DEPOT/$HANDLE/ssh/ssh_config

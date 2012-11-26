@@ -32,7 +32,8 @@ packages:
   - mysqlclient
   - mysql
   - mongodb
-  - rabbitmq
+  - rabbitmq24
+  - rabbitmq28
   - erlang
   - neo4j
   - vblob
