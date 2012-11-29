@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<project>
+  <actions/>
+  <description>Login Server Unit Tests</description>
+  <keepDependencies>false</keepDependencies>
+  <properties>
+    <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+      <maxConcurrentPerNode>0</maxConcurrentPerNode>
+      <maxConcurrentTotal>0</maxConcurrentTotal>
+      <throttleEnabled>false</throttleEnabled>
+      <throttleOption>project</throttleOption>
+    </hudson.plugins.throttleconcurrents.ThrottleJobProperty>
+  </properties>
+  <scm class="hudson.plugins.git.GitSCM">
+    <configVersion>2</configVersion>
+    <userRemoteConfigs>
+      <hudson.plugins.git.UserRemoteConfig>
+        <name></name>
+        <refspec>$GERRIT_REFSPEC</refspec>
+        <url>ssh://<%= ENV['CF_CI_USER'] %>@<%= ENV['CF_GERRIT_ADDRESS'] %>:<%= ENV['CF_GERRIT_PORT'] %>/login-server.git</url>
+      </hudson.plugins.git.UserRemoteConfig>
+    </userRemoteConfigs>
+    <branches>
+      <hudson.plugins.git.BranchSpec>
+        <name>*/master</name>
+      </hudson.plugins.git.BranchSpec>
+    </branches>
+    <disableSubmodules>false</disableSubmodules>
+    <recursiveSubmodules>false</recursiveSubmodules>
+    <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
+    <authorOrCommitter>false</authorOrCommitter>
+    <clean>false</clean>
+    <wipeOutWorkspace>false</wipeOutWorkspace>
+    <pruneBranches>false</pruneBranches>
+    <remotePoll>false</remotePoll>
+    <buildChooser class="com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.GerritTriggerBuildChooser">
+      <separator>#</separator>
+    </buildChooser>
+    <gitTool>Default</gitTool>
+    <submoduleCfg class="list"/>
+    <relativeTargetDir></relativeTargetDir>
+    <reference></reference>
+    <excludedRegions></excludedRegions>
+    <excludedUsers></excludedUsers>
+    <gitConfigName></gitConfigName>
+    <gitConfigEmail></gitConfigEmail>
+    <skipTag>false</skipTag>
+    <includedRegions></includedRegions>
+    <scmName></scmName>
+  </scm>
+  <canRoam>true</canRoam>
+  <disabled>false</disabled>
+  <blockBuildWhenDownstreamBuilding>false</blockBuildWhenDownstreamBuilding>
+  <blockBuildWhenUpstreamBuilding>false</blockBuildWhenUpstreamBuilding>
+  <triggers class="vector"/>
+  <concurrentBuild>false</concurrentBuild>
+  <builders>
+    <hudson.tasks.Shell>
+      <command>export PATH=$VCAP_RUBY19/bin:$PATH
+
+JAVA_REALPATH=`readlink -nf $DEA_JAVA`
+MVN_REALPATH=`readlink -nf $VCAP_MAVEN22`
+WORKSPACE_NAME=`basename $WORKSPACE`
+MAVEN_LOCAL_REPO=/tmp/$WORKSPACE_NAME/.m2
+
+TEST_RUNNER=`mktemp`
+cat &lt;&lt;-EOT &gt; $TEST_RUNNER
+#!/bin/bash
+set -o errexit
+
+export PATH=$MVN_REALPATH/bin:$PATH
+export JAVA_HOME=$JAVA_REALPATH
+export MAVEN_OPTS=-Denforcer.skip=true
+
+cp -rf $WORKSPACE /tmp/
+cd /tmp/$WORKSPACE_NAME
+
+mvn clean -Dmaven.repo.local=$MAVEN_LOCAL_REPO
+mvn -U test emma:emma -Dmaven.repo.local=$MAVEN_LOCAL_REPO
+
+EOT
+
+HANDLE=`$WARDEN_REPL -c &quot;create bind_mount:$JAVA_REALPATH,$JAVA_REALPATH,ro bind_mount:$MVN_REALPATH,$MVN_REALPATH,ro bind_mount:$WORKSPACE,$WORKSPACE,ro&quot;`
+$WARDEN_REPL -e -c &quot;
+copy $HANDLE in $TEST_RUNNER /tmp
+run $HANDLE chmod +x $TEST_RUNNER
+run $HANDLE $TEST_RUNNER
+copy $HANDLE out /tmp/$WORKSPACE_NAME/* $WORKSPACE vcap:vcap
+copy $HANDLE out $MAVEN_LOCAL_REPO $WORKSPACE vcap:vcap
+destroy $HANDLE
+&quot;
+
+rm -f $TEST_RUNNER</command>
+    </hudson.tasks.Shell>
+  </builders>
+  <publishers>
+    <hudson.plugins.emma.EmmaPublisher>
+      <includes></includes>
+      <healthReports>
+        <minClass>0</minClass>
+        <maxClass>50</maxClass>
+        <minMethod>0</minMethod>
+        <maxMethod>25</maxMethod>
+        <minBlock>0</minBlock>
+        <maxBlock>25</maxBlock>
+        <minLine>0</minLine>
+        <maxLine>25</maxLine>
+      </healthReports>
+    </hudson.plugins.emma.EmmaPublisher>
+    <hudson.tasks.Mailer>
+      <recipients>cf-id-notifications@rbcon.com</recipients>
+      <dontNotifyEveryUnstableBuild>false</dontNotifyEveryUnstableBuild>
+      <sendToIndividuals>false</sendToIndividuals>
+    </hudson.tasks.Mailer>
+  </publishers>
+  <buildWrappers/>
+</project>
