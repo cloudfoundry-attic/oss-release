@@ -7,7 +7,16 @@ export CF_CI_USER=<%= properties.jenkins_slave.gerrit_user.username %>
 export CF_GERRIT_ADDRESS=<%= properties.gerrit.address %>
 export CF_GERRIT_PORT=<%= properties.gerrit.port || 29418 %>
 
-cd /var/vcap/packages/jenkins_jobs
+JOB_REPO=<%= properties.site_specific.github_repo %>
+JOB_DIR=/var/vcap/packages/jenkins_jobs
+
+if [ -z $JOB_REPO ]; then
+  rm -rf /tmp/job_repo
+  su vcap -c "/var/vcap/packages/git/bin/git clone $JOB_REPO /tmp/job_repo"
+  JOB_DIR=/tmp/job_repo/<%= properties.site_specific.jenkins_job_config %>
+fi
+
+cd $JOB_DIR
 for template_path in `find . -name config.xml.erb`
 do
   echo Rendering ${template_path}
