@@ -93,7 +93,7 @@ git submodule sync
 git submodule foreach --recursive &apos;git submodule sync&apos;
 git submodule update --init --recursive
 
-git clean -fdx jobs packages src
+git clean -ffdx jobs packages src
 
 mkdir -p $WORKSPACE/TOOLS
 GEM_HOME=$WORKSPACE/TOOLS gem install bosh_cli --no-rdoc --no-ri

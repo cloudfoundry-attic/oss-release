@@ -3,12 +3,12 @@
   <actions/>
   <description>Agent Functional Tests</description>
   <displayName>Agent Functional Tests</displayName>
-  <logRotator>
-    <daysToKeep>30</daysToKeep>
-    <numToKeep>-1</numToKeep>
-    <artifactDaysToKeep>-1</artifactDaysToKeep>
-    <artifactNumToKeep>-1</artifactNumToKeep>
-  </logRotator>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -97,8 +97,7 @@ run $HANDLE cat /tmp/test_output
 copy $HANDLE out /tmp/agent/ci_result $AGENT vcap:vcap
 destroy $HANDLE
 &quot;
-rm -f $TEST_RUNNER
-</command>
+rm -f $TEST_RUNNER</command>
     </hudson.tasks.Shell>
   </builders>
   <publishers>

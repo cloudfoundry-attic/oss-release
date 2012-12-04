@@ -110,7 +110,18 @@ DEA_NODE06_BD=$DEA_NODE06_REALPATH/bin
 
 GIT_REALPATH=$(readlink -nf $VCAP_GIT)
 
+rm -rf vendor/buildpacks/ruby
+ls
+ls vendor/buildpacks/
+pwd
+$GIT_REALPATH/bin/git submodule sync
+cat .gitmodules
+cat .git/config
+set +e
 $GIT_REALPATH/bin/git submodule update --init --recursive
+cat vendor/buildpacks/ruby/.git/config 
+set -e
+
 
 TEST_RUNNER=`mktemp`
 
