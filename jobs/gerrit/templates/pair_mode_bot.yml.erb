@@ -1,0 +1,7 @@
+---
+<% if properties.gerrit.pair_mode %>
+user: <%= properties.gerrit.pair_mode.pair_mode_bot.username %>
+full_name: <%= properties.gerrit.pair_mode.pair_mode_bot.full_name %>
+email: <%= properties.gerrit.pair_mode.pair_mode_bot.email %>
+public_key: <%= properties.gerrit.replication_rsa_keys.public %>
+<% end %>

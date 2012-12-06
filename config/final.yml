@@ -1,6 +1,6 @@
 --- 
 final_name: oss_tools
-min_cli_version: 0.19.5
+min_cli_version: 0.19.6
 blobstore: 
   provider: atmos
   options: 

@@ -33,6 +33,8 @@ templates:
   id_rsa.pub.erb: config/id_rsa.pub
   reviewbot_user.yml.erb: config/reviewbot_user.yml
   notification_config.yml.erb: config/notification_config.yml
+  pair_mode_bot.yml.erb: config/pair_mode_bot.yml
+  ref-updated.erb: bin/ref-updated
 packages:
   - git
   - ruby

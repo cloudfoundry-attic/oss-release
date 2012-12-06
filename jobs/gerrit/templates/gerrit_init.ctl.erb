@@ -72,7 +72,11 @@ rm -rf $HOOKS_DIR
 cp -r $PACKAGE_DIR/hooks $HOOKS_DIR
 cp -pf $JOB_DIR/config/gerrit_hooks.yml $HOOKS_DIR/patchset_notification/config/
 cp -pf $JOB_DIR/config/notification_config.yml $HOOKS_DIR/patchset_notification/config/
+<% if properties.gerrit.pair_mode %>
+cp -pf $JOB_DIR/bin/ref-updated $HOOKS_DIR
+<% end %>
 chown -R vcap:vcap $HOOKS_DIR
+
 
 # SSH keyfile for reviewbot(which setup reviewers automatically)
 chown vcap:vcap $PACKAGE_DIR/review*
@@ -137,7 +141,7 @@ cp /var/vcap/jobs/gerrit/bin/close_pull_requests /etc/cron.hourly
 chmod +x /etc/cron.hourly/close_pull_requests
 <% end %>
 
-# Send out email digests of users registered in the last hour
+# Send out email digests of esers registered in the last hour
 rm -f /etc/cron.hourly/email_new_users
 <% if properties.gerrit.new_user_notifier %>
 cp /var/vcap/jobs/gerrit/bin/email_new_users /etc/cron.hourly
@@ -151,6 +155,9 @@ chmod +x /etc/cron.hourly/email_new_users
   export LD_LIBRARY_PATH=/var/vcap/packages/mysqlclient/lib/mysql:$LD_LIBRARY_PATH
   cd $PACKAGE_ROOT_DIR/create_batch_gerrit_account
   bundle exec ruby create_batch_gerrit_account.rb $JOB_DIR/config/mysql.yml $JOB_DIR/config/jenkins_user.yml
+<% if properties.gerrit.pair_mode %>
+  bundle exec ruby create_batch_gerrit_account.rb $JOB_DIR/config/mysql.yml $JOB_DIR/config/pair_mode_bot.yml
+<% end %>
 )
 
 # Update the gerrit-trigger batch account
