@@ -5,14 +5,82 @@
   <numExecutors>0</numExecutors>
   <mode>NORMAL</mode>
   <useSecurity>true</useSecurity>
-  <authorizationStrategy class="hudson.security.GlobalMatrixAuthorizationStrategy">
-    <% if properties.jenkins.admins %>
-      <% for admin_email in properties.jenkins.admins %>
-      <permission>hudson.model.Hudson.Administer:<%= admin_email %></permission>
+  <authorizationStrategy class="com.michelin.cio.hudson.plugins.rolestrategy.RoleBasedAuthorizationStrategy">
+    <roleMap type="globalRoles">
+      <role name="admin" pattern=".*">
+        <permissions>
+          <permission>hudson.model.Computer.Delete</permission>
+          <permission>hudson.model.Run.Delete</permission>
+          <permission>hudson.model.Item.Workspace</permission>
+          <permission>hudson.model.Item.Build</permission>
+          <permission>hudson.model.Item.Configure</permission>
+          <permission>hudson.model.Item.Delete</permission>
+          <permission>hudson.model.View.Configure</permission>
+          <permission>hudson.model.View.Create</permission>
+          <permission>hudson.model.Hudson.RunScripts</permission>
+          <permission>hudson.model.View.Delete</permission>
+          <permission>hudson.scm.SCM.Tag</permission>
+          <permission>hudson.model.Item.Read</permission>
+          <permission>hudson.model.Hudson.Administer</permission>
+          <permission>hudson.model.Computer.Disconnect</permission>
+          <permission>hudson.model.Hudson.Read</permission>
+          <permission>hudson.model.Computer.Create</permission>
+          <permission>hudson.model.Item.Create</permission>
+          <permission>hudson.model.Computer.Configure</permission>
+          <permission>hudson.model.Computer.Connect</permission>
+          <permission>hudson.model.Run.Update</permission>
+        </permissions>
+        <assignedSIDs>
+        <% if properties.jenkins.admins %>
+          <% for admin_email in properties.jenkins.admins %>
+          <sid><%= admin_email %></sid>
+          <% end %>
+        <% end %>
+        </assignedSIDs>
+      </role>
+      <role name="authenticated users" pattern=".*">
+        <permissions>
+          <permission>hudson.model.Hudson.Read</permission>
+          <permission>hudson.model.Item.Read</permission>
+        </permissions>
+        <assignedSIDs>
+          <sid>authenticated</sid>
+        </assignedSIDs>
+      </role>
+      <role name="anonymous users" pattern=".*">
+        <permissions>
+          <permission>hudson.model.Hudson.Read</permission>
+          <permission>hudson.model.Item.Read</permission>
+        </permissions>
+        <assignedSIDs>
+          <sid>anonymous</sid>
+        </assignedSIDs>
+      </role>
+    </roleMap>
+    <roleMap type="projectRoles">
+      <% for team in properties.jenkins.views %>
+      <role name="<%= team.name %>" pattern="<%= team.regex %>">
+        <permissions>
+          <permission>hudson.model.Item.Build</permission>
+          <permission>hudson.model.Item.Configure</permission>
+          <permission>hudson.model.Item.Delete</permission>
+          <permission>hudson.model.Item.Workspace</permission>
+          <permission>hudson.model.Run.Delete</permission>
+          <permission>com.sonyericsson.hudson.plugins.gerrit.trigger.PluginImpl.ManualTrigger</permission>
+          <permission>hudson.model.Item.Read</permission>
+          <permission>hudson.scm.SCM.Tag</permission>
+          <permission>hudson.model.Run.Update</permission>
+        </permissions>
+        <assignedSIDs>
+        <% if team.members %>
+          <% for member in team.members.split(",") %>
+          <sid><%= member %></sid>
+          <% end %>
+        <% end %>
+        </assignedSIDs>
+      </role>
       <% end %>
-    <% end %>
-    <permission>hudson.model.Hudson.Read:anonymous</permission>
-    <permission>hudson.model.Item.Read:anonymous</permission>
+    </roleMap>
   </authorizationStrategy>
   <securityRealm class="hudson.plugins.openid.OpenIdSsoSecurityRealm">
     <endpoint>https://www.google.com/accounts/o8/id</endpoint>

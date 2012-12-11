@@ -192,9 +192,9 @@ jenkins/jenkins.war:
   sha: 5394a7876dc07df2f9d5ad2581df4a9569dc2cac
   size: 48777309
 jenkins/plugins.tgz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjEyMDRlNGU4NmVlMTUxYmMwNTA4ZTM4%0AMzM0MWE4YSIsInNpZyI6Ijk2dGcxeFp0amJSNFRtUy9WWDk3WHpHK25mQT0i%0AfQ==%0A
-  sha: 4a8379cad661675d9f25155f67dfc2f6ae119df8
-  size: 37736999
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEwMDRlNGU3ZDUxNzYxOGYwNTBjNmE5%0AMjVhMzM2MCIsInNpZyI6ImNoSk00UURkbFJrUnFVdTZ4KzQrbGEzV2tuYz0i%0AfQ==%0A
+  sha: 774981bd9c7d796d19c19faa5d88bf5658846649
+  size: 37307569
 vpostgres/vpostgres.tgz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIwMDRlNGU4ZWM2NWY2N2YwNTA1MmU2%0AMzJkZDFlMyIsInNpZyI6Im0zbGUyTnQvZ3R0ZW9zZE1zckdWaDc5T0Ivaz0i%0AfQ==%0A
   sha: adfebccef8c102d145cf00284f9b19b99087e0b4
