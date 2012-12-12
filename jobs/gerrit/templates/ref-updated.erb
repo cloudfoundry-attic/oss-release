@@ -1,0 +1,73 @@
+#!/bin/bash
+#ref-updated --oldrev <old rev> --newrev <new rev> --refname <ref name> --project <project name>     --submitter <submitter>
+
+trace() {
+  #echo "$*" >>/tmp/ref-updated.log
+  return 0
+}
+
+call_gerrit() {
+<% if properties.gerrit.pair_mode %>
+  ssh -p <%= properties.gerrit.ssh_port %> -i ~/.ssh/id_rsa <%= properties.gerrit.pair_mode.pair_mode_bot.username %>@localhost gerrit "$@"
+<% end %>
+}
+
+# need to pass in project name
+trigger_ci() {
+<% if properties.gerrit.pair_mode %>
+  local host_url=http://<%= properties.jenkins.external_domain %>/git/notifyCommit?url=ssh%3A%2F%2F<%= properties.jenkins_slave.gerrit_user.username %>%40<%= properties.gerrit.address %>%3A<%= properties.gerrit.ssh_port %>%2F$PROJ_NAME.git
+<% end %>
+  trace "CURL $host_url"
+  local result
+  result=$(curl $host_url 2>&1)
+  trace "RESPONSE: $result"
+}
+
+change_id_in_patch_set() {
+  local change_id="$1" row_count
+  row_count=$(call_gerrit query --patch-sets "$change_id" | grep -E '^rowCount:' \
+                | sed -r 's/^rowCount: ([[:digit:]]+)$/\1/')
+  [ -z "$row_count" ] && row_count=0
+  [ $row_count -eq 0 ] && return 1
+  return 0
+}
+
+find_one_commit() {
+  trace "find_one_commit: hash=$1, change=$2"
+  local commit="$1" change_id="$2"
+  [ -z "$commit" ] && return 0
+  [ -n "$change_id" ] && change_id_in_patch_set "$change_id" && return 0
+  return 1
+}
+
+filter_commits() {
+  local commit="" change_id="" r_hash r_id tr_count=0
+  while read; do
+    r_hash=$(echo "$REPLY" | grep -E '^commit[[:space:]]' \
+                                       | sed -r 's/^commit ([[:xdigit:]]+)$/\1/')
+    r_id=$(echo "$REPLY" | grep -E '[[:space:]]*Change-Id:[[:space:]]+I[[:xdigit:]]+' \
+                                     | sed -r 's/^[[:space:]]*Change-Id:[[:space:]]+(I[[:xdigit:]]+).*$/\1/')
+    if [ -n "$r_hash" ]; then
+      find_one_commit "$commit" "$change_id" || tr_count=$((tr_count+1))
+      commit="$r_hash"
+      change_id=""
+    elif [ -n "$r_id" ]; then
+      change_id="$r_id"
+    fi
+  done
+  find_one_commit "$commit" "$change_id" || tr_count=$((tr_count+1))
+  [ $tr_count -eq 0 ] || trigger_ci
+}
+
+OLDREV=$2
+NEWREV=$4
+REFNAME=$6
+PROJ_NAME=$8
+<% if properties.gerrit.pair_mode %>
+PAIR_MODE_PROJ=":<%= properties.gerrit.pair_mode.pair_mode_enabled_project.join(":") %>:"
+UNMATCHED=${PAIR_MODE_PROJ/:$PROJ_NAME:}
+if [ ${#PAIR_MODE_PROJ} -ne ${#UNMATCHED} ]; then
+  git log ${OLDREV}..${NEWREV} | filter_commits
+fi
+return 0
+<% end %>
