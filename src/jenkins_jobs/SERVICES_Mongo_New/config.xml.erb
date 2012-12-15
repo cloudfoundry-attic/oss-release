@@ -66,19 +66,27 @@
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
-MONGODB_REALPATH=`readlink -nf $VCAP_MONGODB`
+MONGODB18_REALPATH=`readlink -nf $VCAP_MONGODB18`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
 WARDEN_DEPOT=$WARDEN_INSTANCES
 
 MONGODB_SVC=$PWD/mongodb
 
+echo &quot;creating the warden container for unit-test&quot;
+HANDLE=`$WARDEN_REPL_V2 -- create \
+--bind_mounts[0].src_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].dst_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].mode RO \
+--bind_mounts[1].src_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].dst_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].mode RO \
+--bind_mounts[2].src_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].dst_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].mode RO \
+--bind_mounts[3].src_path &quot;$MONGODB18_REALPATH&quot; --bind_mounts[3].dst_path &quot;$VCAP_MONGODB18&quot; --bind_mounts[3].mode RO \
+| cut -d &quot; &quot; -f 3`
+
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 #!/bin/bash
 set -x
 set -o errexit
-export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$MONGODB_REALPATH/bin:$PATH
+export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_MONGODB18/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 export CI_ENV=&apos;jenkins&apos;
@@ -91,12 +99,9 @@ cd /tmp/mon_source/mongodb
 rm -rf .bundle
 rm -rf vendor/bundle
 
-bundle install --deployment --without development production
-bundle exec nats-server --daemonize --pid /tmp/nats.pid
+bundle install --deployment
 bundle exec rake spec:ci
 EOT
-
-HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $GIT_REALPATH $SQLITE_REALPATH $MONGODB_REALPATH`
 
 echo &quot;enable vcap could execute sudo without password within warden&quot;
 sudo ls $WARDEN_DEPOT/$HANDLE/ssh/ssh_config

@@ -63,22 +63,29 @@
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
+# readlink the path that needs to be bind-mounted into warden
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
-SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
-WARDEN_SRV_REALPATH=`readlink -nf $VCAP_WARDEN_SERVICE`
-WARDEN_PKG=/var/vcap/packages/warden/warden
+SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
+MEMCACHED_REALPATH=`readlink -nf $VCAP_MEMCACHED`
+SERVICES_WARDEN_REALPATH=`readlink -nf $VCAP_SERVICES_WARDEN`
+SERVICES_WARDEN_ROOTFS_REALPATH=`readlink -nf $VCAP_SERVICES_WARDEN_ROOTFS`
+SERVICES_CTL_JOBS_REALPATH=`readlink -nf $VCAP_SERVICES_CTL_JOB`
 
+WARDEN_PACKAGE=/var/vcap/packages/warden/warden
 MEMCACHED_SVC=$PWD/ng/memcached
 rm -rf MEMCACHED_SVC/spec_reports
 
 echo &quot;creating the warden container for unit-test&quot;
-HANDLE=`$WARDEN_REPL_V2 -- create --bind_mounts[0].src_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].dst_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].mode RO \
+HANDLE=`$WARDEN_REPL_V2 -- create \
+--bind_mounts[0].src_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].dst_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].mode RO \
 --bind_mounts[1].src_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].dst_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].mode RO \
---bind_mounts[2].src_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].dst_path $SQLITE_REALPATH --bind_mounts[2].mode RO \
---bind_mounts[3].src_path &quot;$VCAP_WARDEN_SERVICE&quot; --bind_mounts[3].dst_path &quot;$WARDEN_PKG&quot; --bind_mounts[3].mode RO \
---bind_mounts[4].src_path &quot;$WARDEN_SRV_REALPATH/root/linux/base/rootfs&quot; --bind_mounts[4].dst_path &quot;/var/vcap/data/warden/rootfs&quot; --bind_mounts[4].mode RO \
---bind_mounts[5].src_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[5].dst_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[5].mode RW \
+--bind_mounts[2].src_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].dst_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].mode RO \
+--bind_mounts[3].src_path &quot;$SERVICES_WARDEN_REALPATH&quot; --bind_mounts[3].dst_path &quot;$/var/vcap/packages/warden&quot; --bind_mounts[3].mode RO \
+--bind_mounts[4].src_path &quot;$SERVICES_WARDEN_ROOTFS_REALPATH&quot; --bind_mounts[4].dst_path &quot;/var/vcap/data/warden/rootfs&quot; --bind_mounts[4].mode RO \
+--bind_mounts[5].src_path &quot;$SERVICES_CTL_JOBS_REALPATH&quot; --bind_mounts[5].dst_path &quot;/var/vcap/jobs&quot; --bind_mounts[5].mode RO \
+--bind_mounts[6].src_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[6].dst_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[6].mode RW \
+--bind_mounts[7].src_path &quot;$MEMCACHED_REALPATH&quot; --bind_mounts[7].dst_path &quot;$VCAP_MEMCACHED&quot; --bind_mounts[7].mode RO \
 | cut -d &quot; &quot; -f 3`
 
 TEST_RUNNER=`mktemp`
@@ -98,6 +105,10 @@ sudo chown -R vcap:vcap /var/vcap/sys/run
 
 # prepare the log dir for warden
 mkdir -p /var/vcap/sys/log/warden
+
+# prepare the common services utils
+mkdir -p /var/vcap/packages/common
+cp -r /var/vcap/jobs/common/utils.sh /var/vcap/packages/common
 
 # echo the address of github into the /etc/hosts in case warden cannot find it
 sudo echo &quot;207.97.227.239 github.com&quot; &gt;&gt; /etc/hosts
@@ -131,13 +142,14 @@ user:
 EOF
 
 # start the warden server
-cd $WARDEN_PKG
+cd $WARDEN_PACKAGE
 nohup bundle exec rake warden:start[/tmp/warden_server.yml] &gt;&gt; /var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
 sleep 5
 
 cd /tmp/memcached_source/memcached
 rm -rf .bundle
 rm -rf vendor/bundle
+rm -rf spec_*
 
 bundle install --deployment
 bundle exec rake spec:ci

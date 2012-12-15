@@ -66,36 +66,46 @@
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
-MYSQL_REALPATH=`readlink -nf $VCAP_MYSQLSEV`
-MYSQLCLI_REALPATH=`readlink -nf $VCAP_MYSQLCLIENT`
-ERLANG_REALPATH=`readlink -nf $VCAP_ERLANG`
+MYSQL51_REALPATH=`readlink -nf $VCAP_MYSQL51`
 SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
 WARDEN_DEPOT=$WARDEN_INSTANCES
 
 MYSQL_SVC=$PWD/mysql
 
+echo &quot;creating the warden container for unit-test&quot;
+HANDLE=`$WARDEN_REPL_V2 -- create \
+--bind_mounts[0].src_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].dst_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].mode RO \
+--bind_mounts[1].src_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].dst_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].mode RO \
+--bind_mounts[2].src_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].dst_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].mode RO \
+--bind_mounts[3].src_path &quot;$MYSQL51_REALPATH&quot; --bind_mounts[3].dst_path &quot;/var/vcap/packages/mysql&quot; --bind_mounts[3].mode RO \
+| cut -d &quot; &quot; -f 3`
+
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
-#!/bin/bash 
+#!/bin/bash
 set -x
 set -o errexit
-export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_MYSQL/bin:$VCAP_MYSQLCLIENT/sbin:$PATH
-export LIBRARY_PATH=$SQLITE_REALPATH/lib:$VCAP_MYSQLCLIENT/lib/mysql:$VCAP_MYSQL/lib/mysql:$LIBRARY_PATH
+
+export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_MYSQL51/bin:$VCAP_MYSQL51/client/bin:$PATH
+export LIBRARY_PATH=$SQLITE_REALPATH/lib:$VCAP_MYSQL51/client/lib/mysql:$VCAP_MYSQL51/lib/mysql:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
-export LD_LIBRARY_PATH=$VCAP_MYSQLCLIENT/lib/mysql:$VCAP_MYSQL/lib/mysql:$LD_LIBRARY_PATH
+export LD_LIBRARY_PATH=$VCAP_MYSQL51/client/lib/mysql:$VCAP_MYSQL51/lib/mysql:$LD_LIBRARY_PATH
 export CI_ENV=&apos;jenkins&apos;
 
 # nats expects to write in /var/vcap/sys/run
 sudo mkdir -p /var/vcap/sys/run
 sudo chown -R vcap:vcap /var/vcap/sys/run
 
+# make a copy of mysql server for mysql unit test
+cp -r /var/vcap/packages/mysql /var/vcap/packages/mysql51
+mkdir -p /tmp/var/vcap/sys/log/mysql
+
+# start the mysql process outside the warden container
 mkdir -p /tmp/var/vcap/packages/mysql
 cp -r /var/vcap/packages/mysql/* /tmp/var/vcap/packages/mysql/
-
-/tmp/var/vcap/packages/mysql/libexec/mysql.server start /tmp/var/vcap/packages/mysql/my.cnf 
-/tmp/var/vcap/packages/mysql/bin/mysqladmin -u root password root -S /tmp/mysql.sock
-ls -al /tmp/var/vcap/store/mysql
+/tmp/var/vcap/packages/mysql/libexec/mysql.server start /tmp/var/vcap/packages/mysql/my.cnf
+/tmp/var/vcap/packages/mysql/bin/mysqladmin -u root password root -S /var/lib/mysql/mysql.sock
 
 cd /tmp/mysql_source/mysql
 rm -rf .bundle
@@ -111,19 +121,17 @@ bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci
 EOT
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$MYSQL_REALPATH,$VCAP_MYSQL,ro bind_mount:$MYSQLCLI_REALPATH,$VCAP_MYSQLCLIENT,ro&quot;`
-
 echo &quot;enable vcap could execute sudo without password within warden&quot;
-sudo ls $WARDEN_DEPOT/$HANDLE/ssh/ssh_config
+sudo ls $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config
 set +e
 vcap_sudo_line=&quot;vcap ALL=(ALL) NOPASSWD:ALL&quot;
-vcap_chk_ret=`sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
+vcap_chk_ret=`sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
 if test -z &quot;$vcap_chk_ret&quot;
 then
-  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
-  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
-  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
-  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
 fi
 set -e
 
@@ -131,7 +139,7 @@ $WARDEN_REPL -e -x -c &quot;
 copy $HANDLE in $MYSQL_SVC /tmp/mysql_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
-run $HANDLE $TEST_RUNNER
+run $HANDLE sudo /bin/bash $TEST_RUNNER
 copy $HANDLE out /tmp/mysql_source/mysql/spec_reports $MYSQL_SVC vcap:vcap
 copy $HANDLE out /tmp/mysql_source/mysql/spec_coverage $MYSQL_SVC vcap:vcap
 destroy $HANDLE

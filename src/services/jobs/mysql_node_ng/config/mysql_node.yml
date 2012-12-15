@@ -1,0 +1,65 @@
+---
+
+capacity: 40
+plan: '200'
+local_db: sqlite3:/var/vcap/store/mysql_node.db
+base_dir: /var/vcap/store/mysql
+mbus: nats://nats:z2b3ij3122@10.42.244.11:4222
+index: 0
+logging:
+  level: debug
+  file: /var/vcap/sys/log/mysql_node/mysql_node.log
+  
+  syslog: vcap.mysql_node
+  
+pid: /var/vcap/sys/run/mysql_node/mysql_node.pid
+node_id: mysql_node_200_0
+supported_versions: ['5.5']
+default_version: '5.5'
+
+max_db_size: 2560
+max_long_query: 4
+max_long_tx: 40
+kill_long_tx: false
+max_user_conns: 30
+mysql:
+
+  '5.5':
+    host: localhost
+    port: 3307
+    socket: /var/vcap/sys/run/mysqld/mysqld55.sock
+    user: root
+    pass: root
+    mysqldump_bin:  /var/vcap/packages/mysql55/bin/mysqldump
+    mysql_bin:  /var/vcap/packages/mysql55/bin/mysql
+
+connection_pool_size:
+  min: 1
+  max: 5
+migration_nfs: /var/vcap/services_migration
+gzip_bin: /bin/gzip
+
+z_interval: 30
+max_nats_payload: 1048576
+fqdn_hosts: false
+op_time_limit: 6
+
+max_disk: 128
+use_warden: true
+warden:
+  service_log_dir: /var/vcap/sys/service-log/mysql
+  service_script_dir: /var/vcap/jobs/mysql_node_ng/bin
+  service_conf_dir: /var/vcap/jobs/mysql_node_ng/config
+  service_bin_dir:
+  
+    '5.5': /var/vcap/packages/mysql55
+  
+  image_dir: /var/vcap/store/mysql_image
+  service_start_timeout: 3
+  filesystem_quota: false
+  port_range:
+    first: 15000
+    last: 25000
+
+m_interval: 10
+

@@ -1,0 +1,17 @@
+# abort script on any command that exit with a non zero value
+set -o errexit
+
+cp -a * ${BOSH_INSTALL_TARGET}
+
+(
+  set -o errexit
+
+  export PATH=/var/vcap/packages/ruby/bin:$PATH
+
+  cd ${BOSH_INSTALL_TARGET}/warden
+
+  bundle --local install --deployment --without=development test
+
+  # Compile binaries
+  bundle exec rake setup:bin
+)

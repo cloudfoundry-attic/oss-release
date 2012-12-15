@@ -1,0 +1,27 @@
+#!/bin/bash
+
+JOB_DIR=/var/vcap/jobs/mysql_node_ng
+PKG_DIR=/var/vcap/packages/mysql_node_ng
+MYSQL_DIR=/var/vcap/packages/mysql
+MYSQL55_DIR=/var/vcap/packages/mysql55
+
+source /var/vcap/packages/mysql_node_ng/common/services/utils.sh
+
+case $1 in
+
+  start)
+    echo "Setup warden."
+    setup_warden
+    echo "Starting warden."
+    start_warden
+    ;;
+
+  stop)
+    kill_and_wait $PIDFILE
+    ;;
+
+  *)
+    echo "Usage: warden_ctl {start|stop}"
+    ;;
+
+esac

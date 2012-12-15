@@ -1,0 +1,44 @@
+---
+
+
+
+service_name: postgresql
+snapshots_base_dir: /var/vcap/service_lifecycle
+serialization_base_dir: /var/vcap/service_lifecycle
+local_db: sqlite3:/var/vcap/store/postgresql_node.db
+tmp_dir: /var/vcap/service_lifecycle/tmp_dir
+resque:
+  host: 10.42.246.82
+  port: 3456
+  password: bt3FXngo
+  expire: 
+logging:
+  level: debug
+  file: /var/vcap/sys/log/postgresql_node/postgresql_worker.log
+  
+  syslog: vcap.postgresql_worker
+  
+index: 0
+node_id: postgresql_node_200_0
+download_url_template: "http://service-serialization.cf176.dev.las01.vcsops.com/serialized/%{service}/%{name}/snapshots/%{snapshot_id}?token=%{token}"
+snapshot_quota: 2
+# optional download tuning
+serialization:
+  max_download_size_mb: 10
+# addtional options
+postgresql:
+
+  '9.1':
+   host: 127.0.0.1
+   user: vcap
+   pass: vcap
+   port: 5433
+   database: postgres
+   dump_bin: /var/vcap/packages/postgresql91/bin/pg_dump
+   restore_bin: /var/vcap/packages/postgresql91/bin/pg_restore
+
+
+
+use_warden: true
+
+

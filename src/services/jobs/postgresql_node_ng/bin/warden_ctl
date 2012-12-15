@@ -1,0 +1,64 @@
+#!/bin/bash
+
+JOB_DIR=/var/vcap/jobs/postgresql_node_ng
+PKG_DIR=/var/vcap/packages/postgresql_node_ng
+PG_DIR=/var/vcap/packages/postgresql
+
+source $PKG_DIR/common/services/utils.sh
+
+case $1 in
+
+  start)
+    echo "Setup warden."
+    setup_warden
+
+    
+    sysctl -w 'kernel.shmmax=268435456'
+    
+
+    
+
+    for version in "9.0" "9.1"
+    do
+      case "$version" in
+        "9.0")
+          PG_DIR=/var/vcap/packages/postgresql
+          SRC_CONF_FILE=$JOB_DIR/config/postgresql.conf
+
+          ;;
+        "9.1")
+          PG_DIR=/var/vcap/packages/postgresql91
+          SRC_CONF_FILE=$JOB_DIR/config/postgresql91.conf
+
+          ;;
+      esac
+
+      INITDB_DIR=$PG_DIR/initdb
+
+      if test ! -d $INITDB_DIR/base
+      then
+        echo "Fail to initialize the postgresql $version database cluster, check the error log."
+        exit 1
+      fi
+
+      mkdir -p $INITDB_DIR/pg_log
+
+      # update postgresql.conf in initdb
+      rsync -arl $SRC_CONF_FILE $INITDB_DIR/postgresql.conf
+      # initdb direcotry cloud not be modified by non-root users.
+      chmod -R 755 $INITDB_DIR
+    done
+
+    echo "Starting warden."
+    start_warden
+    ;;
+
+  stop)
+    kill_and_wait $PIDFILE
+    ;;
+
+  *)
+    echo "Usage: warden_ctl {start|stop}"
+    ;;
+
+esac

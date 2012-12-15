@@ -20,69 +20,86 @@
               <default>
                 <comparator class="hudson.util.CaseInsensitiveComparator"/>
               </default>
-              <int>31</int>
+              <int>39</int>
               <string>CREATE_CONTAINER</string>
               <string>/var/vcap/jobs/jenkins_slave/bin/create_container</string>
-              <string>DEA_RUBY19</string>
-              <string>/var/vcap/packages/dea_ruby19</string>
-              <string>DEA_RUBY18</string>
-              <string>/var/vcap/packages/dea_ruby18</string>
+              <string>DEA_JAVA</string>
+              <string>/var/vcap/packages/java</string>
               <string>DEA_NODE04</string>
               <string>/var/vcap/packages/dea_node04</string>
               <string>DEA_NODE06</string>
               <string>/var/vcap/packages/dea_node06</string>
-              <string>DEA_JAVA</string>
-              <string>/var/vcap/packages/java</string>
-              <string>VCAP_SQLITE</string>
-              <string>/var/vcap/packages/sqlite</string>
-              <string>VCAP_RUBY19</string>
-              <string>/var/vcap/packages/ruby</string>
-              <string>WARDEN_REPL</string>
-              <string>/var/vcap/packages/warden/warden/bin/warden-repl</string>
-              <string>WARDEN_REPL_V2</string>
-              <string>/var/vcap/packages/warden/warden/bin/warden</string>
-              <string>WARDEN_INSTANCES</string>
-              <string>/var/vcap/data/warden/depot</string>
+              <string>DEA_RUBY18</string>
+              <string>/var/vcap/packages/dea_ruby18</string>
+              <string>DEA_RUBY19</string>
+              <string>/var/vcap/packages/dea_ruby19</string>
+              <string>VCAP_COUCHDB</string>
+              <string>/var/vcap/packages/couchdb</string>
+              <string>VCAP_ELASTIC</string>
+              <string>/var/vcap/packages/elasticsearch</string>
+              <string>VCAP_ERLANG</string>
+              <string>/var/vcap/packages/erlang</string>
               <string>VCAP_GIT</string>
               <string>/var/vcap/packages/git</string>
-              <string>VCAP_REDIS22</string>
-              <string>/var/vcap/packages/redis</string>
-              <string>VCAP_MYSQLCLIENT</string>
-              <string>/var/vcap/packages/mysqlclient</string>
+              <string>VCAP_GOLANG</string>
+              <string>/var/vcap/packages/golang</string>
               <string>VCAP_LIBPQ</string>
               <string>/var/vcap/packages/libpq</string>
-              <string>VCAP_POSTGRES</string>
-              <string>/var/vcap/packages/postgres</string>
               <string>VCAP_MAVEN22</string>
               <string>/var/vcap/packages/maven22</string>
+              <string>VCAP_MEMCACHED</string>
+              <string>/var/vcap/packages/memcached</string>
+              <string>VCAP_MONGODB18</string>
+              <string>/var/vcap/packages/mongodb18</string>
+              <string>VCAP_MONGODB20</string>
+              <string>/var/vcap/packages/mongodb20</string>
+              <string>VCAP_MONGODB22</string>
+              <string>/var/vcap/packages/mongodb22</string>
               <string>VCAP_MYSQL</string>
               <string>/var/vcap/packages/mysql</string>
-              <string>VCAP_MONGODB</string>
-              <string>/var/vcap/packages/mongodb</string>
+              <string>VCAP_MYSQL51</string>
+              <string>/var/vcap/packages/mysql51</string>
+              <string>VCAP_MYSQL55</string>
+              <string>/var/vcap/packages/mysql55</string>
+              <string>VCAP_MYSQLCLIENT</string>
+              <string>/var/vcap/packages/mysqlclient</string>
+              <string>VCAP_NEO4J</string>
+              <string>/var/vcap/packages/neo4j</string>
+              <string>VCAP_POSTGRES</string>
+              <string>/var/vcap/packages/postgres</string>
+              <string>VCAP_POSTGRESQL90</string>
+              <string>/var/vcap/packages/postgresql90</string>
+              <string>VCAP_POSTGRESQL91</string>
+              <string>/var/vcap/packages/postgresql91</string>
               <string>VCAP_RABBITMQ24</string>
               <string>/var/vcap/packages/rabbitmq24</string>
               <string>VCAP_RABBITMQ28</string>
               <string>/var/vcap/packages/rabbitmq28</string>
-              <string>VCAP_ERLANG</string>
-              <string>/var/vcap/packages/erlang</string>
-              <string>VCAP_NEO4J</string>
-              <string>/var/vcap/packages/neo4j</string>
+              <string>VCAP_REDIS22</string>
+              <string>/var/vcap/packages/redis22</string>
+              <string>VCAP_REDIS24</string>
+              <string>/var/vcap/packages/redis24</string>
+              <string>VCAP_REDIS26</string>
+              <string>/var/vcap/packages/redis26</string>
+              <string>VCAP_RUBY19</string>
+              <string>/var/vcap/packages/ruby</string>
+              <string>VCAP_SERVICES_CTL_JOB</string>
+              <string>/var/vcap/packages/services_jobs</string>
+              <string>VCAP_SERVICES_WARDEN</string>
+bs
+              <string>/var/vcap/packages/services_warden</string>
+              <string>VCAP_SERVICES_WARDEN_ROOTFS</string>
+              <string>/var/vcap/packages/services_warden_rootfs</string>
+              <string>VCAP_SQLITE</string>
+              <string>/var/vcap/packages/sqlite</string>
               <string>VCAP_VBLOB</string>
               <string>/var/vcap/packages/vblob</string>
-              <string>VCAP_MYSQLSEV</string>
-              <string>/var/vcap/packages/mysql-service</string>
-              <string>VCAP_VPOSTGRES</string>
-              <string>/var/vcap/packages/vpostgres</string>
-              <string>VCAP_GOLANG</string>
-              <string>/var/vcap/packages/golang</string>
-              <string>VCAP_MEMCACHED</string>
-              <string>/var/vcap/packages/memcached</string>
-              <string>VCAP_WARDEN_SERVICE</string>
-              <string>/var/vcap/packages/wardenized_services</string>
-              <string>VCAP_ELASTIC</string>
-              <string>/var/vcap/packages/elasticsearch</string>
-              <string>VCAP_COUCHDB</string>
-              <string>/var/vcap/packages/couchdb</string>
+              <string>WARDEN_INSTANCES</string>
+              <string>/var/vcap/data/warden/depot</string>
+              <string>WARDEN_REPL</string>
+              <string>/var/vcap/packages/warden/warden/bin/warden-repl</string>
+              <string>WARDEN_REPL_V2</string>
+              <string>/var/vcap/packages/warden/warden/bin/warden</string>
             </tree-map>
           </envVars>
         </hudson.slaves.EnvironmentVariablesNodeProperty>
