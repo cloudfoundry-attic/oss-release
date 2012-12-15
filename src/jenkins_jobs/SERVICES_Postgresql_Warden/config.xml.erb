@@ -65,24 +65,31 @@
     <hudson.tasks.Shell>
       <command>export PATH=$VCAP_RUBY19/bin:$PATH
 
+# readlink the path that needs to be bind-mounted into warden
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
-SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
-POSTGRES_REALPATH=`readlink -nf $VCAP_VPOSTGRES`
-WARDEN_SRV_REALPATH=`readlink -nf $VCAP_WARDEN_SERVICE`
-WARDEN_PKG=/var/vcap/packages/warden/warden
+SQLITE_REALPATH=`readlink -nf $VCAP_SQLITE`
+SERVICES_WARDEN_REALPATH=`readlink -nf $VCAP_SERVICES_WARDEN`
+SERVICES_WARDEN_ROOTFS_REALPATH=`readlink -nf $VCAP_SERVICES_WARDEN_ROOTFS`
+SERVICES_CTL_JOBS_REALPATH=`readlink -nf $VCAP_SERVICES_CTL_JOB`
+POSTGRESQL90_REALPATH=`readlink -nf $VCAP_POSTGRESQL90`
+POSTGRESQL91_REALPATH=`readlink -nf $VCAP_POSTGRESQL91`
 
+WARDEN_PACKAGE=/var/vcap/packages/warden/warden
 POSTGRES_SVC=$PWD/ng/postgresql
 rm -rf POSTGRES_SVC/spec_reports
 
 echo &quot;creating the warden container for unit-test&quot;
-HANDLE=`$WARDEN_REPL_V2 -- create --bind_mounts[0].src_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].dst_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].mode RO \
+HANDLE=`$WARDEN_REPL_V2 -- create \
+--bind_mounts[0].src_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].dst_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].mode RO \
 --bind_mounts[1].src_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].dst_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].mode RO \
---bind_mounts[2].src_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].dst_path $SQLITE_REALPATH --bind_mounts[2].mode RO \
---bind_mounts[3].src_path &quot;$VCAP_WARDEN_SERVICE&quot; --bind_mounts[3].dst_path &quot;$WARDEN_PKG&quot; --bind_mounts[3].mode RO \
---bind_mounts[4].src_path &quot;$WARDEN_SRV_REALPATH/root/linux/base/rootfs&quot; --bind_mounts[4].dst_path &quot;/var/vcap/data/warden/rootfs&quot; --bind_mounts[4].mode RO \
---bind_mounts[5].src_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[5].dst_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[5].mode RW \
---bind_mounts[6].src_path &quot;$POSTGRES_REALPATH&quot; --bind_mounts[6].dst_path &quot;$VCAP_POSTGRES&quot; --bind_mounts[6].mode RO \
+--bind_mounts[2].src_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].dst_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].mode RO \
+--bind_mounts[3].src_path &quot;$SERVICES_WARDEN_REALPATH&quot; --bind_mounts[3].dst_path &quot;/var/vcap/packages/warden&quot; --bind_mounts[3].mode RO \
+--bind_mounts[4].src_path &quot;$SERVICES_WARDEN_ROOTFS_REALPATH&quot; --bind_mounts[4].dst_path &quot;/var/vcap/data/warden/rootfs&quot; --bind_mounts[4].mode RO \
+--bind_mounts[5].src_path &quot;$SERVICES_CTL_JOBS_REALPATH&quot; --bind_mounts[5].dst_path &quot;/var/vcap/jobs&quot; --bind_mounts[5].mode RO \
+--bind_mounts[6].src_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[6].dst_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[6].mode RW \
+--bind_mounts[7].src_path &quot;$POSTGRESQL90_REALPATH&quot; --bind_mounts[7].dst_path &quot;$VCAP_POSTGRESQL90&quot; --bind_mounts[7].mode RO \
+--bind_mounts[8].src_path &quot;$POSTGRESQL91_REALPATH&quot; --bind_mounts[8].dst_path &quot;$VCAP_POSTGRESQL91&quot; --bind_mounts[8].mode RO \
 | cut -d &quot; &quot; -f 3`
 
 TEST_RUNNER=`mktemp`
@@ -91,15 +98,17 @@ cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 set -x
 set -o errexit
 
-export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_POSTGRES/bin:$PATH
-export LIBRARY_PATH=$SQLITE_REALPATH/lib:$VCAP_POSTGRES/lib:$LIBRARY_PATH
-export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$VCAP_POSTGRES/include:$C_INCLUDE_PATH
-export LD_LIBRARY_PATH=$VCAP_POSTGRES/lib:$LD_LIBRARY_PATH
+export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_POSTGRESQL90/bin:$PATH
+export LIBRARY_PATH=$SQLITE_REALPATH/lib:$VCAP_POSTGRESQL90/lib:$LIBRARY_PATH
+export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$VCAP_POSTGRESQL90/include:$C_INCLUDE_PATH
+export LD_LIBRARY_PATH=$VCAP_POSTGRESQL90/lib:$LD_LIBRARY_PATH
 export CI_ENV=&apos;jenkins&apos;
 
 # nats expects to write in /var/vcap/sys/run
 mkdir -p /var/vcap/sys/run
 chown vcap:vcap -R /var/vcap/sys/run
+
+cp -r $VCAP_POSTGRESQL90 /var/vcap/packages/postgresql
 
 # prepare the filesystem for postgresql
 mkdir -p /tmp/var/vcap/store
@@ -108,7 +117,7 @@ mkdir -p /tmp/var/vcap/sys
 chown vcap:vcap -R /tmp/var/vcap/sys
 
 # start the postgres process outside the warden container
-su - vcap -c &quot;/var/vcap/packages/postgres/jobs/postgres_ctl start&quot;
+su - vcap -c &quot;$VCAP_POSTGRESQL90/jobs/postgres_ctl start&quot;
 
 # prepare the log dir for warden
 mkdir -p /var/vcap/sys/log/warden
@@ -145,15 +154,22 @@ user:
 EOF
 
 # start the warden server
-cd $WARDEN_PKG
+cd $WARDEN_PACKAGE
 nohup bundle exec rake warden:start[/tmp/warden_server.yml] &gt;&gt; /var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
 sleep 5
+
+# prepare the common services utils
+mkdir -p /var/vcap/packages/common
+cp -r /var/vcap/jobs/common/utils.sh /var/vcap/packages/common
 
 cd /tmp/postgresql_source/postgresql
 rm -rf .bundle
 rm -rf vendor/bundle
 sed -i &apos;s/use_warden: false/use_warden: true/g&apos; config/postgresql_node.yml
 bundle install --deployment
+
+sleep 3600
+
 bundle exec rake spec:ci
 EOT
 

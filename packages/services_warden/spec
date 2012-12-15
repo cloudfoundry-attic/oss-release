@@ -1,0 +1,7 @@
+---
+name: services_warden
+dependencies:
+- ruby
+files:
+- services_warden/warden/**/*
+- pkg_utils/*

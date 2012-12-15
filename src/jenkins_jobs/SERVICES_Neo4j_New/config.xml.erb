@@ -128,7 +128,7 @@ $WARDEN_REPL -e -x -c &quot;
 copy $HANDLE in $NEO_SVC /tmp/neo_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
-run $HANDLE $TEST_RUNNER
+run $HANDLE sudo /bin/bash $TEST_RUNNER
 copy $HANDLE out /tmp/neo_source/neo4j/spec_reports $NEO_SVC vcap:vcap
 copy $HANDLE out /tmp/neo_source/neo4j/spec_coverage $NEO_SVC vcap:vcap
 destroy $HANDLE

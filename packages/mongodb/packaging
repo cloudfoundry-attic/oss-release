@@ -1,9 +1,0 @@
-# abort script on any command that exit with a non zero value
-set -e
-
-tar zxf mongodb/mongodb-linux-x86_64-1.8.1.tgz
-
-(
-  cd mongodb-linux-x86_64-1.8.1
-  cp -af bin $BOSH_INSTALL_TARGET
-)

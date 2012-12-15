@@ -1,0 +1,11 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+mkdir unpack_rootfs
+tar zxf services_warden_rootfs/services_warden_rootfs.tgz -C unpack_rootfs
+
+(
+  cp -af unpack_rootfs/services_warden_rootfs/* ${BOSH_INSTALL_TARGET}
+  cd ${BOSH_INSTALL_TARGET}
+  chmod 0777 tmp
+)

@@ -83,7 +83,7 @@ mkdir $SCRATCHPAD
 
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
-#!/bin/bash 
+#!/bin/bash
 set -x
 set -o errexit
 
@@ -148,16 +148,16 @@ rm -f $TEST_RUNNER</command>
   </builders>
   <publishers>
     <hudson.tasks.ArtifactArchiver>
-      <artifacts>vblob/spec_reports/**</artifacts>
+      <artifacts>ng/vblob/spec_reports/**</artifacts>
       <latestOnly>false</latestOnly>
     </hudson.tasks.ArtifactArchiver>
     <hudson.tasks.junit.JUnitResultArchiver>
-      <testResults>vblob/spec_reports/*.xml</testResults>
+      <testResults>ng/vblob/spec_reports/*.xml</testResults>
       <keepLongStdio>false</keepLongStdio>
       <testDataPublishers/>
     </hudson.tasks.junit.JUnitResultArchiver>
     <hudson.plugins.rubyMetrics.rcov.RcovPublisher>
-      <reportDir>vblob/spec_coverage/rcov</reportDir>
+      <reportDir>ng/vblob/spec_coverage/rcov</reportDir>
       <targets>
         <hudson.plugins.rubyMetrics.rcov.model.MetricTarget>
           <metric>TOTAL_COVERAGE</metric>

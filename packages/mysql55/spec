@@ -1,0 +1,7 @@
+---
+name: mysql55
+files:
+- mysql/server-5.5.27-rel28.1-296.Linux.x86_64.tar.gz
+- mysql/client-5.5.27-rel28.1-296.Linux.x86_64.tar.gz
+- mysql/mysql-initdb-5.5.27-rel28.1-296.Linux.x86_64.tar.gz
+- mysql/mysql-service-5.5-patch.tgz

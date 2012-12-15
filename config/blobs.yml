@@ -51,10 +51,6 @@ misc/expect5.45.tar:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjEwMDRlNGU3ZDUxMWY4MjEwNTA1MmU1%0AZTYxYTg0MSIsInNpZyI6IjVVUkx4ZmxUK3VBaHduYzdhQnRKOG9QMGFHOD0i%0AfQ==%0A
   sha: b8f475cf06a9c018ccd5cb82729a73b024d95d6d
   size: 2498560
-mongodb/mongodb-linux-x86_64-1.8.1.tgz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjEyMDRlNGU4NmVlMzk2OTIwNTA1MmU1%0AZTdjZDQyZiIsInNpZyI6Ik9VbndKR3pxdC85MVhVSmNKZkt6U2VlRGNmMD0i%0AfQ==%0A
-  sha: aa7f025ddea8ff24a1a66b5da3128df57b1c87d8
-  size: 27911404
 memcached/memcached-linux-x86_64-1.4.13.tgz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjIwMDRlNGU4ZWM2NDZlMjEwNTA1MmU1%0AZWE3NjBhMCIsInNpZyI6Im9xVi9QMEU0WWl3dzFjdklNOGsrSSs3a21POD0i%0AfQ==%0A
   sha: 632afa4f19fc7741878ced4a239304b7be82f228
@@ -83,10 +79,6 @@ mysql/server-5.1.54-rel12.5-188-Linux-x86_64.tar.gz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjEwMDRlNGU3ZDUxOTA2Y2QwNTA1MmU1%0AZjg5ZDRmOCIsInNpZyI6IklRSTFEMlJiMG9FZlRXUEYxVlM3R3hybHFrTT0i%0AfQ==%0A
   sha: a2d4694a12289a87bfb7fcef35c7b6a4284e5fc3
   size: 33824010
-mysql/service-patch.tgz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjEyMDRlNGU4NmVlMzk2OTIwNTA1MmU1%0AZmJiZWQ3MCIsInNpZyI6IjJyT25UdndzbU5ZKzdQWkIzZlVnU2VnbFpFMD0i%0AfQ==%0A
-  sha: 7e41e2a4d2c5a62cafdf6467708d1c6e0fec67f2
-  size: 3269
 mysql/client-5.1.54-rel12.5-188-Linux-x86_64.tar.gz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjIwMDRlNGU4ZWM2ODQwNzcwNTA1MmU1%0AZmQ1YTA3ZiIsInNpZyI6ImYwZUJFT1ZTTkpuV1N4Tms1Y3JjTUpCVVNjST0i%0AfQ==%0A
   sha: 4a29cf608bcc16d7498a7ee27c88925ec52dadb8
@@ -95,10 +87,6 @@ java/jre_jdk_1.6.0_24-amd64.tar.gz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjIyMDRlNGU5ODYzZjI4ZjMwNTA1MmU1%0AZmY1ZjAzNSIsInNpZyI6IlA0SFZ2QjVTQXN6YTBUSDdKQ05QZ3Rramw1Zz0i%0AfQ==%0A
   sha: e6f0c4bd020523716dd325f391c2e5d361115715
   size: 66504097
-redis/redis-2.2.4.tar.gz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEwMDRlNGU3ZDUxNzYxOGYwNTA1MmU2%0AMDM5Y2Q2MCIsInNpZyI6IjJDV0xpeWJ2S3ppUWpxTE53NUtYSk9zWnlrRT0i%0AfQ==%0A
-  sha: 063e6e9f615ceda664d0691a6ea59befb22ebc40
-  size: 447499
 maven22/apache-maven-2.2.1-bin.tar.gz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEyMDRlNGU4NmVlNTM5MjEwNTA1MmU2%0AMDUxMGVhNiIsInNpZyI6IlVGeC9pWTUxbmx4V202Q1RIejhSbXc1RkhvND0i%0AfQ==%0A
   sha: 3ac63025e5860c4d856e172ab556d14b52f9b1f1
@@ -195,19 +183,3 @@ jenkins/plugins.tgz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEwMDRlNGU3ZDUxNzYxOGYwNTBjNmE5%0AMjVhMzM2MCIsInNpZyI6ImNoSk00UURkbFJrUnFVdTZ4KzQrbGEzV2tuYz0i%0AfQ==%0A
   sha: 774981bd9c7d796d19c19faa5d88bf5658846649
   size: 37307569
-vpostgres/vpostgres.tgz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIwMDRlNGU4ZWM2NWY2N2YwNTA1MmU2%0AMzJkZDFlMyIsInNpZyI6Im0zbGUyTnQvZ3R0ZW9zZE1zckdWaDc5T0Ivaz0i%0AfQ==%0A
-  sha: adfebccef8c102d145cf00284f9b19b99087e0b4
-  size: 16459135
-wardenized_services/wardenized_services.tar.gz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIyMDRlNGU5ODYzZDA3NjMwNTBhMzA1%0AZDM1NTFmNyIsInNpZyI6IjNJMFF4eDAxdzhxUVlZd3lqT1pvVUhVT2tLRT0i%0AfQ==%0A
-  sha: f77ed63486178a3417216c13f96c6ede12431c70
-  size: 478281511
-rabbitmq/rabbitmq-2.4.tar.gz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjIyMDRlNGU5ODYzOGI3NjMwNTBiMzFj%0AMDQwOThkZSIsInNpZyI6IlB5MGJJUS9Ca3QreVdPM3VhMGRCWGR0MjV0WT0i%0AfQ==%0A
-  sha: cb9065ce70836a666f8e9937d3096ba1f142bf95
-  size: 1761954
-rabbitmq/rabbitmq-2.8.tar.gz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjEwMDRlNGU3ZDUxZDk1MGUwNTBiMzFj%0AMDY1YzU1NiIsInNpZyI6IjV1d2VsaWQrV1RYbnJzVEVUS09WY08vMHNSVT0i%0AfQ==%0A
-  sha: 204b3fcfe92e8965156aa7a24900d8f85d96970d
-  size: 2896258

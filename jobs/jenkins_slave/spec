@@ -20,7 +20,6 @@ packages:
   - dea_node06
   - postgres
   - sqlite
-  - redis
   - golang
   - go2xunit
   - git
@@ -31,15 +30,24 @@ packages:
   - memcached
   - mysqlclient
   - mysql
-  - mongodb
+  - mysql51
+  - mysql55
+  - mongodb18
+  - mongodb20
+  - mongodb22
   - rabbitmq24
   - rabbitmq28
+  - redis22
+  - redis24
+  - redis26
   - erlang
   - neo4j
   - vblob
-  - mysql-service
-  - vpostgres
-  - wardenized_services
+  - postgresql90
+  - postgresql91
+  - services_warden
+  - services_warden_rootfs
+  - services_jobs
   - elasticsearch
   - couchdb
   - zabbix_agent

@@ -78,6 +78,16 @@ WARDEN_DEPOT=$WARDEN_INSTANCES
 
 RABBIT_SVC=$PWD/rabbit
 
+echo &quot;creating the warden container for unit-test&quot;
+HANDLE=`$WARDEN_REPL_V2 -- create \
+--bind_mounts[0].src_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].dst_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].mode RO \
+--bind_mounts[1].src_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].dst_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].mode RO \
+--bind_mounts[2].src_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].dst_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].mode RO \
+--bind_mounts[3].src_path &quot;$RABBITMQ24_REALPATH&quot; --bind_mounts[3].dst_path &quot;/var/vcap/packages/rabbitmq-2.4&quot; --bind_mounts[3].mode RO \
+--bind_mounts[4].src_path &quot;$RABBITMQ28_REALPATH&quot; --bind_mounts[4].dst_path &quot;/var/vcap/packages/rabbitmq-2.8&quot; --bind_mounts[4].mode RO \
+--bind_mounts[5].src_path &quot;$ERLANG_REALPATH&quot; --bind_mounts[5].dst_path &quot;$ERLANG_REALPATH&quot; --bind_mounts[5].mode RO \
+| cut -d &quot; &quot; -f 3`
+
 TEST_RUNNER=`mktemp`
 cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 #!/bin/bash
@@ -92,6 +102,9 @@ export CI_ENV=&apos;jenkins&apos;
 sudo mkdir -p /var/vcap/sys/run
 sudo chown -R vcap:vcap /var/vcap/sys/run
 
+# make softlink for erlang
+ln -s $ERLANG_REALPATH /var/vcap/packages/erlang
+
 cd /tmp/rabbit_source/rabbit
 rm -rf .bundle
 rm -rf vendor/bundle
@@ -104,27 +117,24 @@ bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci
 EOT
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$RABBITMQ24_REALPATH,$RABBITMQ24_INNERPATH,ro bind_mount:$RABBITMQ28_REALPATH,$RABBITMQ28_INNERPATH,ro bind_mount:$ERLANG_REALPATH,$VCAP_ERLANG,ro&quot;`
-
 echo &quot;enable vcap could execute sudo without password within warden&quot;
-sudo ls $WARDEN_DEPOT/$HANDLE/ssh/ssh_config
+sudo ls $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config
 set +e
 vcap_sudo_line=&quot;vcap ALL=(ALL) NOPASSWD:ALL&quot;
-vcap_chk_ret=`sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
+vcap_chk_ret=`sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container cat /etc/sudoers | grep &quot;$vcap_sudo_line&quot;`
 if test -z &quot;$vcap_chk_ret&quot;
 then
-  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
-  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
-  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
-  sudo ssh -T -F $WARDEN_DEPOT/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container chmod 740 /etc/sudoers
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;Defaults:vcap !requiretty\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container &quot;echo \&quot;$vcap_sudo_line\&quot; &gt;&gt; /etc/sudoers&quot;
+  sudo ssh -T -F $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config root@container chmod 440 /etc/sudoers
 fi
-set -e
 
 $WARDEN_REPL -e -x -c &quot;
 copy $HANDLE in $RABBIT_SVC /tmp/rabbit_source
 copy $HANDLE in $TEST_RUNNER /tmp
 run $HANDLE chmod +x $TEST_RUNNER
-run $HANDLE $TEST_RUNNER
+run $HANDLE sudo /bin/bash $TEST_RUNNER
 copy $HANDLE out /tmp/rabbit_source/rabbit/spec_reports $RABBIT_SVC vcap:vcap
 copy $HANDLE out /tmp/rabbit_source/rabbit/spec_coverage $RABBIT_SVC vcap:vcap
 destroy $HANDLE

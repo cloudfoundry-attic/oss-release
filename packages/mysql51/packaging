@@ -1,0 +1,37 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+VERSION=5.1.62-rel13.3-435-Linux-x86_64
+
+# Percona binary Linux build
+tar zxvf mysql/server-$VERSION.tar.gz
+(
+  cd server-$VERSION
+  for x in bin include lib libexec share; do
+    cp -a ${x} ${BOSH_INSTALL_TARGET}
+  done
+)
+
+# initialized database
+tar zxvf mysql/mysql-initdb-$VERSION.tar.gz
+(
+  cp -a initdb ${BOSH_INSTALL_TARGET}
+)
+
+# extract the mysql client
+tar zxvf mysql/client-$VERSION.tar.gz
+(
+  cd client-$VERSION
+  mkdir ${BOSH_INSTALL_TARGET}/client
+  for x in bin include lib; do
+    cp -a ${x} ${BOSH_INSTALL_TARGET}/client
+  done
+)
+
+tar xzvf mysql/mysql-service-5.1-patch.tgz
+(
+  cd mysql-service-5.1-patch
+  cp -a my.cnf ${BOSH_INSTALL_TARGET}
+  cp -a mysql.server ${BOSH_INSTALL_TARGET}/libexec
+  cp -a mysql_warden.server ${BOSH_INSTALL_TARGET}/libexec
+)

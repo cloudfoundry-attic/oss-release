@@ -1,0 +1,4 @@
+---
+name: services_warden_rootfs
+files:
+- services_warden_rootfs/services_warden_rootfs.tgz

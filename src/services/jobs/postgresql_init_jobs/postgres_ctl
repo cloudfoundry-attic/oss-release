@@ -1,0 +1,111 @@
+#!/bin/bash -e
+
+PACKAGE_DIR=/var/vcap/packages/postgresql90
+JOB_DIR=${PACKAGE_DIR}/jobs
+
+STORE_DIR=/tmp/var/vcap/store
+DATA_DIR=$STORE_DIR/postgres
+
+RUN_DIR=/tmp/var/vcap/sys/run/postgres
+LOG_DIR=/tmp/var/vcap/sys/log/postgres
+
+PIDFILE=$RUN_DIR/postgres.pid
+
+HOST="127.0.0.1"
+PORT=5432
+LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH
+
+source /var/vcap/packages/postgresql90/jobs/utils.sh
+
+case "$1" in
+  start)
+
+    echo "start to run the pid file"
+    pid_guard $PIDFILE "PostgreSQL"
+
+    mkdir -p $RUN_DIR
+    chown vcap:vcap $RUN_DIR
+
+    echo $$ > $PIDFILE
+    chown vcap:vcap $PIDFILE
+
+#    sysctl -w "kernel.shmmax=284934144"
+
+    if [ ! -d $STORE_DIR ]; then
+      mkdir -p $STORE_DIR
+    fi
+
+    if [ ! -d $LOG_DIR ]; then
+      mkdir -p $LOG_DIR
+      chown vcap:vcap $LOG_DIR
+    fi
+
+    if [ ! -d $DATA_DIR -o ! -f $DATA_DIR/postgresql.conf ]; then
+      mkdir -p $DATA_DIR
+
+      # initdb creates data directories
+#      $PACKAGE_DIR/bin/initdb -E utf8 -D $DATA_DIR
+      rsync -arl $PACKAGE_DIR/initdb/* $DATA_DIR
+      chown vcap:vcap $DATA_DIR
+      chmod 0700 $DATA_DIR
+
+      mkdir -p $DATA_DIR/pg_log
+      chown vcap:vcap $DATA_DIR/pg_log
+    fi
+
+    cp $JOB_DIR/config/{postgresql,pg_hba}.conf $DATA_DIR
+    chown vcap:vcap $DATA_DIR/{postgresql,pg_hba}.conf
+
+    echo "Starting PostgreSQL: "
+    echo "$PACKAGE_DIR/bin/pg_ctl -h $HOST -p $PORT -w start -D $DATA_DIR -l \"$DATA_DIR/pg_log/startup.log\""
+    LD_LIBRARY_PATH=$PACKAGE_DIR/lib:$LD_LIBRARY_PATH
+    $PACKAGE_DIR/bin/pg_ctl -w start -D $DATA_DIR -l \"$DATA_DIR/pg_log/startup.log\"
+#    $PACKAGE_DIR/bin/postgres -h $HOST -p $PORT -D $DATA_DIR
+    if [ $? == 0 ]; then
+      echo "PostgreSQL started successfully"
+    else
+      echo "PG startup failed"
+    fi
+
+    ps aux | grep postgres
+
+    cat $DATA_DIR/pg_log/startup.log
+
+    echo "Creating roles..."
+    echo "Trying to create role vcap..."
+    set +e
+
+#    $PACKAGE_DIR/bin/psql -U vcap -d postgres -h $HOST -p $PORT -c "CREATE ROLE \"vcap\""
+    set -e
+
+    echo "Setting password for role vcap"
+    $PACKAGE_DIR/bin/psql -U vcap -d postgres -h $HOST -p $PORT -c "ALTER ROLE \"vcap\" WITH LOGIN PASSWORD 'vcap' SUPERUSER CREATEDB"
+
+    echo "Creating databases..."
+    echo "Trying to create database postgres..."
+
+#    $PACKAGE_DIR/bin/createdb \"vcap\" -p $PORT
+    set +e
+    set -e
+
+    ;;
+
+  stop)
+    echo "Stopping PostgreSQL: "
+    su - vcap -c "$PACKAGE_DIR/bin/pg_ctl stop -m fast -w -D $DATA_DIR"
+    wait_pidfile $PIDFILE
+
+    ;;
+
+  status)
+    su - vcap -c "$PACKAGE_DIR/bin/pg_ctl status -D $DATA_DIR"
+
+    ;;
+
+  *)
+    echo "Usage: $0 {start|stop|status}"
+    exit 1
+
+    ;;
+
+esac
