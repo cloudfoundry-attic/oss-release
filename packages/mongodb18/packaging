@@ -1,0 +1,14 @@
+# abort script on any command that exit with a non zero value
+set -e
+
+version="1.8.5"
+
+if [[ `uname -a` =~ "x86_64" ]] ; then
+  name="mongodb-linux-x86_64-$version"
+else
+  name="mongodb-linux-i686-$version"
+fi
+
+tar xzf mongodb/$name.tgz
+
+cp -a $name/* ${BOSH_INSTALL_TARGET}

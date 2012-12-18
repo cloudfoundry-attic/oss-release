@@ -1,0 +1,31 @@
+#!/bin/bash
+
+
+
+
+
+MOUNT_POINT=/var/vcap/services_migration
+
+case $1 in
+
+  start)
+    if [ ! -d $MOUNT_POINT ]; then
+      mkdir -p $MOUNT_POINT
+    fi
+
+    mount -t nfs 10.42.244.20:/var/vcap/store/shared $MOUNT_POINT
+
+    ;;
+
+  stop)
+    umount $MOUNT_POINT
+
+    ;;
+
+  *)
+    echo "Usage: mysql_migration_util {start|stop}"
+
+    ;;
+
+esac
+

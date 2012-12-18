@@ -1,4 +1,4 @@
 ---
 name: rabbitmq28
 files:
-- rabbitmq/rabbitmq-2.8.tar.gz
+- rabbitmq/rabbitmq-server-with-plugins-generic-unix-2.8.7.tar.gz

@@ -80,7 +80,7 @@ cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 set -x
 set -o errexit
 
-export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_MYSQL/bin:$VCAP_MYSQLCLIENT/sbin:$PATH
+export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$VCAP_MYSQLCLIENT/lib/mysql:$VCAP_MYSQL/lib/mysql:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 export LD_LIBRARY_PATH=$VCAP_MYSQLCLIENT/lib/mysql:$VCAP_MYSQL/lib/mysql:$LD_LIBRARY_PATH
@@ -89,9 +89,13 @@ export LD_LIBRARY_PATH=$VCAP_MYSQLCLIENT/lib/mysql:$VCAP_MYSQL/lib/mysql:$LD_LIB
 mkdir -p /var/vcap/sys/run
 chown -R vcap:vcap /var/vcap/sys/run
 
+# make softlink for erlang
+mkdir -p /var/vcap/packages
+ln -s $ERLANG_REALPATH /var/vcap/packages/erlang
+cp -r $ERLANG_REALPATH/* /usr/
+
 mkdir -p /var/vcap/packages/couchdb
 mkdir -p /tmp/log
-cp -r /var/vcap/packages/erlang/* /usr/
 cp -r /tmp/couchdb_bin/*/* /var/vcap/packages/couchdb/
 sudo apt-get update
 ln -s /usr/lib/insserv/insserv /sbin/insserv
@@ -127,7 +131,7 @@ bundle exec nats-server --daemonize --pid /tmp/nats.pid
 bundle exec rake spec:ci
 EOT
 
-HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$VCAP_ERLANG,$VCAP_ERLANG,ro disk_size_mb:4096 &quot;`
+HANDLE=`$WARDEN_REPL -e -c &quot;create bind_mount:$RUBY19_REALPATH,$RUBY19_REALPATH,ro bind_mount:$GIT_REALPATH,$GIT_REALPATH,ro bind_mount:$SQLITE_REALPATH,$SQLITE_REALPATH,ro bind_mount:$ERLANG_REALPATH,$ERLANG_REALPATH,ro disk_size_mb:4096 &quot;`
 
 # use root here because we need to copy something into the /usr/bin directory
 echo &quot;enable vcap could execute sudo without password within warden&quot;

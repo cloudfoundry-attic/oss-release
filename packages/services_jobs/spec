@@ -1,0 +1,4 @@
+---
+name: services_jobs
+files:
+- services/jobs/**/*

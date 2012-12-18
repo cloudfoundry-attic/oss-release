@@ -1,0 +1,7 @@
+---
+name: mysql51
+files:
+- mysql/server-5.1.62-rel13.3-435-Linux-x86_64.tar.gz
+- mysql/client-5.1.62-rel13.3-435-Linux-x86_64.tar.gz
+- mysql/mysql-initdb-5.1.62-rel13.3-435-Linux-x86_64.tar.gz
+- mysql/mysql-service-5.1-patch.tgz

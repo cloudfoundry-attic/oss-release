@@ -51,10 +51,6 @@ misc/expect5.45.tar:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjEwMDRlNGU3ZDUxMWY4MjEwNTA1MmU1%0AZTYxYTg0MSIsInNpZyI6IjVVUkx4ZmxUK3VBaHduYzdhQnRKOG9QMGFHOD0i%0AfQ==%0A
   sha: b8f475cf06a9c018ccd5cb82729a73b024d95d6d
   size: 2498560
-mongodb/mongodb-linux-x86_64-1.8.1.tgz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjEyMDRlNGU4NmVlMzk2OTIwNTA1MmU1%0AZTdjZDQyZiIsInNpZyI6Ik9VbndKR3pxdC85MVhVSmNKZkt6U2VlRGNmMD0i%0AfQ==%0A
-  sha: aa7f025ddea8ff24a1a66b5da3128df57b1c87d8
-  size: 27911404
 memcached/memcached-linux-x86_64-1.4.13.tgz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjIwMDRlNGU4ZWM2NDZlMjEwNTA1MmU1%0AZWE3NjBhMCIsInNpZyI6Im9xVi9QMEU0WWl3dzFjdklNOGsrSSs3a21POD0i%0AfQ==%0A
   sha: 632afa4f19fc7741878ced4a239304b7be82f228
@@ -83,10 +79,6 @@ mysql/server-5.1.54-rel12.5-188-Linux-x86_64.tar.gz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjEwMDRlNGU3ZDUxOTA2Y2QwNTA1MmU1%0AZjg5ZDRmOCIsInNpZyI6IklRSTFEMlJiMG9FZlRXUEYxVlM3R3hybHFrTT0i%0AfQ==%0A
   sha: a2d4694a12289a87bfb7fcef35c7b6a4284e5fc3
   size: 33824010
-mysql/service-patch.tgz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjEyMDRlNGU4NmVlMzk2OTIwNTA1MmU1%0AZmJiZWQ3MCIsInNpZyI6IjJyT25UdndzbU5ZKzdQWkIzZlVnU2VnbFpFMD0i%0AfQ==%0A
-  sha: 7e41e2a4d2c5a62cafdf6467708d1c6e0fec67f2
-  size: 3269
 mysql/client-5.1.54-rel12.5-188-Linux-x86_64.tar.gz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjIwMDRlNGU4ZWM2ODQwNzcwNTA1MmU1%0AZmQ1YTA3ZiIsInNpZyI6ImYwZUJFT1ZTTkpuV1N4Tms1Y3JjTUpCVVNjST0i%0AfQ==%0A
   sha: 4a29cf608bcc16d7498a7ee27c88925ec52dadb8
@@ -95,10 +87,6 @@ java/jre_jdk_1.6.0_24-amd64.tar.gz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjIyMDRlNGU5ODYzZjI4ZjMwNTA1MmU1%0AZmY1ZjAzNSIsInNpZyI6IlA0SFZ2QjVTQXN6YTBUSDdKQ05QZ3Rramw1Zz0i%0AfQ==%0A
   sha: e6f0c4bd020523716dd325f391c2e5d361115715
   size: 66504097
-redis/redis-2.2.4.tar.gz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEwMDRlNGU3ZDUxNzYxOGYwNTA1MmU2%0AMDM5Y2Q2MCIsInNpZyI6IjJDV0xpeWJ2S3ppUWpxTE53NUtYSk9zWnlrRT0i%0AfQ==%0A
-  sha: 063e6e9f615ceda664d0691a6ea59befb22ebc40
-  size: 447499
 maven22/apache-maven-2.2.1-bin.tar.gz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEyMDRlNGU4NmVlNTM5MjEwNTA1MmU2%0AMDUxMGVhNiIsInNpZyI6IlVGeC9pWTUxbmx4V202Q1RIejhSbXc1RkhvND0i%0AfQ==%0A
   sha: 3ac63025e5860c4d856e172ab556d14b52f9b1f1
@@ -195,19 +183,107 @@ jenkins/plugins.tgz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEwMDRlNGU3ZDUxNzYxOGYwNTBjNmE5%0AMjVhMzM2MCIsInNpZyI6ImNoSk00UURkbFJrUnFVdTZ4KzQrbGEzV2tuYz0i%0AfQ==%0A
   sha: 774981bd9c7d796d19c19faa5d88bf5658846649
   size: 37307569
-vpostgres/vpostgres.tgz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIwMDRlNGU4ZWM2NWY2N2YwNTA1MmU2%0AMzJkZDFlMyIsInNpZyI6Im0zbGUyTnQvZ3R0ZW9zZE1zckdWaDc5T0Ivaz0i%0AfQ==%0A
-  sha: adfebccef8c102d145cf00284f9b19b99087e0b4
-  size: 16459135
-wardenized_services/wardenized_services.tar.gz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIyMDRlNGU5ODYzZDA3NjMwNTBhMzA1%0AZDM1NTFmNyIsInNpZyI6IjNJMFF4eDAxdzhxUVlZd3lqT1pvVUhVT2tLRT0i%0AfQ==%0A
-  sha: f77ed63486178a3417216c13f96c6ede12431c70
-  size: 478281511
-rabbitmq/rabbitmq-2.4.tar.gz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjIyMDRlNGU5ODYzOGI3NjMwNTBiMzFj%0AMDQwOThkZSIsInNpZyI6IlB5MGJJUS9Ca3QreVdPM3VhMGRCWGR0MjV0WT0i%0AfQ==%0A
-  sha: cb9065ce70836a666f8e9937d3096ba1f142bf95
-  size: 1761954
-rabbitmq/rabbitmq-2.8.tar.gz:
-  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjEwMDRlNGU3ZDUxZDk1MGUwNTBiMzFj%0AMDY1YzU1NiIsInNpZyI6IjV1d2VsaWQrV1RYbnJzVEVUS09WY08vMHNSVT0i%0AfQ==%0A
-  sha: 204b3fcfe92e8965156aa7a24900d8f85d96970d
-  size: 2896258
+redis/redis-2.6.2.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjEwMDRlNGU3ZDUxMWY1NTMwNTBjZjBm%0AMmNjYzJkOSIsInNpZyI6InRRTUdNQlJXSGRaQjlzN1hTQS9ZYjRXVUkzST0i%0AfQ==%0A
+  sha: 93e632ce88de07a9845aa5bcab67bdc16a7b574a
+  size: 1000600
+redis/redis-2.2.15.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjEyMDRlNGU4NmVlMTUxYmMwNTBjZjBm%0AMmVkZDU4MiIsInNpZyI6ImFQZTMvTVJRSXcvRlN6QkZoUHhJYUt6bnEyOD0i%0AfQ==%0A
+  sha: aa6758590363556e73f8d36bdfccb429011da331
+  size: 456185
+redis/redis-2.4.17.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjIwMDRlNGU4ZWM2NDdhNTQwNTBjZjBm%0AMzBiMDVmZiIsInNpZyI6IjdTZFJ1V1lwNSs1YXJUNm9lVHRZUkNFOVlDcz0i%0AfQ==%0A
+  sha: 3d540531b3d7103a511d29661c2ae666dac60522
+  size: 656155
+services_jobs/services_ctl_jobs.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIyMDRlNGU5ODYzZDA3NjMwNTBjZjBm%0AMzIyMWFhYiIsInNpZyI6InhGOFMyaDNOSzZ4Vmg2UURnMzB4ZklLL0hsOD0i%0AfQ==%0A
+  sha: 1a1cc01846a309a7221d1d15e187760c2cbfc372
+  size: 22820
+rabbitmq/rabbitmq-server-with-plugins-generic-unix-2.8.7.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjEwMDRlNGU3ZDUxOTA2Y2QwNTBjZjBm%0AMzM0YzAyNyIsInNpZyI6IjN5bWlieVMxQ0hoTHgvY29QVXNueWZJdGRVST0i%0AfQ==%0A
+  sha: 23db4c0fb8a43a0131f8e909c2821aaf85ea410b
+  size: 2894762
+rabbitmq/rabbitmq-server-with-plugins-generic-unix-2.4.1.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjEyMDRlNGU4NmVlMTUyOTQwNTBjZjBm%0AMzRjYjhmYiIsInNpZyI6Ii9BNEhOUDBwUEw2clU5REJPYVNkUGFuVXMwaz0i%0AfQ==%0A
+  sha: dfdfcf988a780af034c1568cae96e6a84e0c3668
+  size: 1780598
+services_warden_rootfs/services_warden_rootfs.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjIwMDRlNGU4ZWM2NDZlMjEwNTBjZjBm%0AMzhiMzJiZiIsInNpZyI6IjZ3N3lUMEkvVmpJUk1SOGttK2s2UTF1UEZnMD0i%0AfQ==%0A
+  sha: 40fc23021a6b0a218c9d9122a564a304c08d5981
+  size: 245594964
+mysql/mysql-service-5.1-patch.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjIyMDRlNGU5ODYzYjFiNzQwNTBjZjBm%0ANDU3ODI5ZCIsInNpZyI6IlU4VVFQVGJJakgvaHdIeGYxSGQ0bEpyRmExWT0i%0AfQ==%0A
+  sha: 7b29fe2bcaee542079301fa8e7b25b3e15f28a98
+  size: 3391
+mysql/client-5.5.27-rel28.1-296.Linux.x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EyMWUxMjEwMDRlNGU3ZDUxMWY1NTMwNTBjZjBm%0ANDZkOGE5ZCIsInNpZyI6Im92SUh3Y3poNmhTWUY1K3FkNTNieStCWWJSTT0i%0AfQ==%0A
+  sha: e24b89fec6b9bb5380d8171e5fcad03dc86ca970
+  size: 4556418
+mysql/mysql-initdb-5.5.27-rel28.1-296.Linux.x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjEyMDRlNGU4NmVlYmU1OTEwNTBjZjBm%0ANDg2NzA5MCIsInNpZyI6ImpwRGxDbzJJMGJ0SDQvOWNYd2lvU2ZJYWtDUT0i%0AfQ==%0A
+  sha: 13b525536fb903414691d470a5cae89dad64b004
+  size: 422353
+mysql/mysql-initdb-5.1.62-rel13.3-435-Linux-x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjIwMDRlNGU4ZWM2YjQ0YjYwNTBjZjBm%0ANDljZjBjMyIsInNpZyI6ImZRUlk0WStra2c1aFkrTnI1TXhNMXlvVDliND0i%0AfQ==%0A
+  sha: 8122bcd96c3fa251ce6a4317570d01b4bf2b8420
+  size: 53356
+mysql/mysql-service-5.5-patch.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjIyMDRlNGU5ODY0M2Q5YWUwNTBjZjBm%0ANGIyYmU3NCIsInNpZyI6InEvb3JmejBUaWUzUS90WEZ0amZkbk1tc3F3bz0i%0AfQ==%0A
+  sha: 098815a425dc13dda2072130c7ccb7506629a590
+  size: 3349
+mysql/client-5.1.62-rel13.3-435-Linux-x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjEwMDRlNGU3ZDUxOTA2Y2QwNTBjZjBm%0ANGNhNWQ0MSIsInNpZyI6Ikk4OTQyc2g0MGl1TWJyL2tlQUdlUzNLdnBKST0i%0AfQ==%0A
+  sha: 6e5a17195831688a5f14f20aa5d9cd5d5f4164db
+  size: 4105211
+mysql/server-5.1.62-rel13.3-435-Linux-x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjEyMDRlNGU4NmVlOGUyYzkwNTBjZjBm%0ANGU1M2NlOSIsInNpZyI6ImhYN09EVjd1Y0duVmtrRWdwRXhiZU04T2t1RT0i%0AfQ==%0A
+  sha: 2bfd575545fe78729c56bb832aa69d8d9fc8630d
+  size: 34179263
+mysql/server-5.5.27-rel28.1-296.Linux.x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjIwMDRlNGU4ZWM2NDZlMjEwNTBjZjBm%0ANTIyNWY3YyIsInNpZyI6IkxqRzBDL0VSVTZaY2xtZHRzL1NSR2Y0TSt1TT0i%0AfQ==%0A
+  sha: 2509e80864c20c381ad263ccc085e0794ef8307e
+  size: 59482086
+postgresql/postgresql-9.0-x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjIyMDRlNGU5ODYzZjI4ZjMwNTBjZjBm%0ANTY1OGViNiIsInNpZyI6InBOcHdwQTRNa1BCQURZYW1UOFl6RTdDQ3NpST0i%0AfQ==%0A
+  sha: 1c777413ce355ebf79c5786e7dbc5a060883986f
+  size: 17345516
+postgresql/postgresql-initdb-9.1-x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjEyMDRlNGU4NmVlYmU1OTEwNTBjZjBm%0ANTg0NjBjYSIsInNpZyI6IkQvRi9QbnlRa042S1hpWVQyNjRYMXhyd1VQUT0i%0AfQ==%0A
+  sha: c51a45f5a6011a6bb22407c164ea9b77f77cddad
+  size: 3911161
+postgresql/postgresql-initdb-9.0-x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIwMDRlNGU4ZWM2NWY2N2YwNTBjZjBm%0ANTlhYTU5YyIsInNpZyI6Imd3QTlkeFg4N3dJSXJBWnVRcXpPMXBvczVnYz0i%0AfQ==%0A
+  sha: 181900c6346f718ccd7cfbb8813e7c00f760bc55
+  size: 3467921
+postgresql/postgresql-9.1-x86_64.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIyMDRlNGU5ODYzZDA3NjMwNTBjZjBm%0ANWI4MmZmYyIsInNpZyI6IndaVzNtNm1ER2ZvcjFUSjFRNEY4N1ZBcVM1OD0i%0AfQ==%0A
+  sha: d6c44760c1e5eb055b6ac4a8080b061d6d04fa3c
+  size: 26556736
+mongodb/mongodb-linux-x86_64-1.8.5.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E1MWUxMjEwMDRlNGU3ZDUxOTA2Y2QwNTBjZjBm%0ANWU2NzQ2MiIsInNpZyI6Ik5zSU5Ua1hrSS8yaG1MK2JrYnoyeWRVK2Q1UT0i%0AfQ==%0A
+  sha: 235605f306b66584d2aa00b61d45b4605f87867e
+  size: 28156593
+mongodb/mongodb-linux-i686-2.0.6.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjEyMDRlNGU4NmVlMTUyOTQwNTBjZjBm%0ANjE1ZjYyZSIsInNpZyI6IjUzMWtVYVpJZlVNUFFDK2c2OFNYYmZEUnV1MD0i%0AfQ==%0A
+  sha: b46ea3927388532ad1d5027fdaed1d37d6c00fa6
+  size: 38296132
+mongodb/mongodb-linux-x86_64-2.0.6.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjIwMDRlNGU4ZWM2NDZlMjEwNTBjZjBm%0ANjQzYjBlMyIsInNpZyI6IjhTd0lSNk13T0ZBSmFnOWdxeVdlQ0NtTG41VT0i%0AfQ==%0A
+  sha: 4ba3f2849653cb8f63410f9d901a3388b291d879
+  size: 38572579
+mongodb/mongodb-linux-i686-2.2.1.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2EzMWUxMjIyMDRlNGU5ODYzYjFiNzQwNTBjZjBm%0ANjcyZmJjMCIsInNpZyI6ImFhcU1rYXRONWZqZVkzRUZ2cFhqY3NPdWxmdz0i%0AfQ==%0A
+  sha: f06a37c29504f6f92d8a59acf49d86512bc5a2ae
+  size: 54552128
+mongodb/mongodb-linux-x86_64-2.2.1.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjEwMDRlNGU3ZDUxNzYxOGYwNTBjZjBm%0ANmFlOTQ5MyIsInNpZyI6Im05dFRYWlh2b3VUZHJtZ1RoRnYrZVZGZnp5VT0i%0AfQ==%0A
+  sha: 118dd2b5b049b10df2c6cdc9e92ec8f90cf508c0
+  size: 55748872
+mongodb/mongodb-linux-i686-1.8.5.tgz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjEyMDRlNGU4NmVlYmU1OTEwNTBjZjBm%0ANmVjMDQ3MyIsInNpZyI6IkVVM3BpZWovMCtZSVNqc0Q0MkhGMm10T0l2bz0i%0AfQ==%0A
+  sha: f75d2fd7a4e0a7116ea612bb62b710a1ba0fa2b2
+  size: 27749757
+erlang/otp_src_R14B01.tar.gz:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E0MWUxMjIwMDRlNGU4ZWM2NWY2N2YwNTBjZjBm%0ANzIzYmY0ZSIsInNpZyI6IktQVVpFbXlEdHAzUzQwWlFPcWdwOGFwcjNUWT0i%0AfQ==%0A
+  sha: f0e0529ed73587c2c4aaeb3f3a01555bd6cfe05c
+  size: 64846537

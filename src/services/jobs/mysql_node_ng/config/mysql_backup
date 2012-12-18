@@ -1,0 +1,33 @@
+#!/bin/bash
+
+
+
+PIDFILE=/var/vcap/sys/run/mysql_node/mysql_backup.pid
+MOUNT_POINT=/var/vcap/services_backup
+MT_OPTS="-t nfs"
+MT_EXPORT=10.42.244.20:/var/vcap/store/shared
+
+source /var/vcap/packages/common/utils.sh
+
+case $1 in
+  start)
+    mkdir -p $MOUNT_POINT
+    check_mount "$MT_OPTS" "$MT_EXPORT" "$MOUNT_POINT"
+    (crontab -l | sed /mysql_backup/d; cat /var/vcap/jobs/mysql_node_ng/config/mysql_backup.cron) | sed /^$/d | crontab
+
+    ;;
+
+  stop)
+    crontab -l | sed /mysql_backup/d | crontab
+    kill_and_wait $PIDFILE
+    umount $MOUNT_POINT
+
+    ;;
+
+  *)
+    echo "Usage: mysql_backup {start|stop}"
+
+    ;;
+
+esac
+
