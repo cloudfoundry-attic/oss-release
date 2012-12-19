@@ -119,7 +119,7 @@ cat .gitmodules
 cat .git/config
 set +e
 $GIT_REALPATH/bin/git submodule update --init --recursive
-cat vendor/buildpacks/ruby/.git/config 
+cat vendor/buildpacks/ruby/.git/config
 set -e
 
 
@@ -140,7 +140,7 @@ export VCAP_RUNTIME_NODE06=$DEA_NODE06_BD/node
 
 export PATH=$GIT_REALPATH/bin:$DEA_RUBY19_BD:$PATH
 cd /tmp/staging
-bundle install --deployment --without development production
+bundle install --deployment --without production
 bundle exec rake ci:spec
 EOT
 
