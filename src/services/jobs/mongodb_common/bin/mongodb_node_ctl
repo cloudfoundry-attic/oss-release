@@ -1,0 +1,90 @@
+#!/bin/bash
+
+export PATH=/var/vcap/packages/ruby/bin:$PATH
+
+COMMON_DIR=/var/vcap/store/mongodb_common
+RUN_DIR=/var/vcap/sys/run/mongodb_node
+LOG_DIR=/var/vcap/sys/log/mongodb_node
+SERV_LOG_DIR=/var/vcap/sys/service-log/mongodb
+PIDFILE=$RUN_DIR/mongodb_node.pid
+JOB_DIR=/var/vcap/jobs/mongodb_node_ng
+MIG_DIR=/var/vcap/services_migration
+
+SNAPSHOT_DIR=/var/vcap/service_lifecycle
+MT_OPTS="-t nfs"
+MT_EXPORT=10.42.148.20:/var/vcap/store/shared
+
+
+source /var/vcap/packages/common/utils.sh
+
+case $1 in
+
+  start)
+    sysctl -w net.ipv4.ip_local_port_range="45001 61000"
+    pid_guard $PIDFILE "MongoDB node"
+
+    mkdir -p $RUN_DIR
+    mkdir -p $LOG_DIR
+    mkdir -p $SERV_LOG_DIR
+
+    echo $$ > $PIDFILE
+
+    
+    /var/vcap/packages/syslog_aggregator/setup_syslog_forwarder.sh $JOB_DIR/config
+    
+
+    mkdir -p $MIG_DIR
+    
+    mkdir -p $SNAPSHOT_DIR
+    check_mount "$MT_OPTS" "$MT_EXPORT" "$SNAPSHOT_DIR"
+    
+
+    chmod +x $JOB_DIR/config/mongodb_backup
+    $JOB_DIR/config/mongodb_backup start
+
+    /var/vcap/jobs/mongodb_node_ng/bin/create_mongodb_tmp_dir
+    return_value=$?
+    if [ $return_value -ne 0 ]; then
+      echo "Failed to create mongodb tmp directory"
+      exit $return_value
+    fi
+
+    (crontab -l | sed /mongodb_logrotate/d; cat /var/vcap/jobs/mongodb_node_ng/config/mongodb_logrotate.cron) | sed /^$/d | crontab
+
+    mkdir -p $COMMON_DIR/bin
+    mkdir -p $COMMON_DIR/config
+    rsync -arl $JOB_DIR/bin/* $COMMON_DIR/bin
+    rsync -arl /var/vcap/packages/common/utils.sh $COMMON_DIR/bin
+    chmod -R 755 $COMMON_DIR/bin
+    rsync $JOB_DIR/config/mongodb.conf $COMMON_DIR/config
+    rsync $JOB_DIR/config/mongodb_proxy.yml $COMMON_DIR/config
+    chmod 755 $COMMON_DIR/config
+    chmod 644 $COMMON_DIR/config/*
+
+    exec /var/vcap/packages/mongodb_node_ng/services/ng/mongodb/bin/mongodb_node \
+         -c $JOB_DIR/config/mongodb_node.yml \
+         >>$LOG_DIR/mongodb_node.stdout.log \
+         2>>$LOG_DIR/mongodb_node.stderr.log
+
+    ;;
+
+  stop)
+    kill_and_wait $PIDFILE 400 0
+
+    crontab -l | sed /mongodb_logrotate/d | crontab
+    /var/vcap/jobs/mongodb_node_ng/bin/remove_mongodb_tmp_dir
+
+    chmod +x $JOB_DIR/config/mongodb_backup
+    $JOB_DIR/config/mongodb_backup stop
+    
+    umount $SNAPSHOT_DIR
+    
+
+    ;;
+
+  *)
+    echo "Usage: mongodb_node_ctl {start|stop}"
+
+    ;;
+
+esac

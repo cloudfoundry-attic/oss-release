@@ -1,0 +1,85 @@
+#!/bin/bash
+
+VBLOB_ADMIN_USER=vblob_admin
+VBLOB_ADMIN_GROUP=admin
+VBLOB_ADMIN_PASSWD_HASH=
+
+if [ -n "$VBLOB_ADMIN_PASSWD_HASH" ]; then
+    # do a mod in addition to the add in order to support password changes
+    USER_ARGS="-g $VBLOB_ADMIN_GROUP -p $VBLOB_ADMIN_PASSWD_HASH $VBLOB_ADMIN_USER"
+    /usr/sbin/useradd -m -s /bin/bash $USER_ARGS
+    /usr/sbin/usermod $USER_ARGS
+fi
+
+export PATH=/var/vcap/packages/ruby/bin:$PATH
+
+COMMON_DIR=/var/vcap/store/vblob_common
+JOB_DIR=/var/vcap/jobs/vblob_node_ng
+RUN_DIR=/var/vcap/sys/run/vblob_node
+LOG_DIR=/var/vcap/sys/log/vblob_node
+PIDFILE=$RUN_DIR/vblob_node.pid
+CONF_DIR=/var/vcap/jobs/vblob_node_ng/config
+SERV_LOG_DIR=/var/vcap/sys/service-log/vblob
+
+
+NFS_DIR=/var/vcap/vblob_nfs_mount
+MT_OPTS="-t nfs"
+MT_EXPORT=10.42.148.20:/var/vcap/store/shared
+
+
+source /var/vcap/packages/common/utils.sh
+
+case $1 in
+
+  start)
+    pid_guard $PIDFILE "vBlob node"
+
+    sysctl -w net.ipv4.ip_local_port_range="30000 45000"
+
+    mkdir -p $RUN_DIR
+    mkdir -p $LOG_DIR
+    mkdir -p $SERV_LOG_DIR
+
+    echo $$ > $PIDFILE
+
+    /var/vcap/jobs/vblob_node_ng/bin/create_vblob_tmp_dir
+    if [ $? -ne 0 ]; then
+      echo "failed to create vblob tmp directory"
+      exit 1
+    fi
+
+    # Enable log aggregation
+    
+    /var/vcap/packages/syslog_aggregator/setup_syslog_forwarder.sh $CONF_DIR
+    
+
+    
+    mkdir -p $NFS_DIR
+    check_mount "$MT_OPTS" "$MT_EXPORT" "$NFS_DIR"
+    
+
+    (crontab -l | sed /vblob_logrotate/d; cat /var/vcap/jobs/vblob_node_ng/config/vblob_logrotate.cron) | sed /^$/d | crontab
+
+    mkdir -p $COMMON_DIR/bin
+    rsync -arl $JOB_DIR/bin/* $COMMON_DIR/bin
+    rsync -arl /var/vcap/packages/common/utils.sh $COMMON_DIR/bin
+    chmod -R 755 $COMMON_DIR/bin
+
+    exec /var/vcap/packages/vblob_node_ng/services/ng/vblob/bin/vblob_node -c /var/vcap/jobs/vblob_node_ng/config/vblob_node.yml >>$LOG_DIR/vblob_node.stdout.log 2>>$LOG_DIR/vblob_node.stderr.log
+    ;;
+
+  stop)
+    kill_and_wait $PIDFILE 400 0
+
+    crontab -l | sed /vblob_logrotate/d | crontab
+
+    
+    umount $NFS_DIR
+    
+
+    ;;
+
+  *)
+  echo "Usage: vblob_node_ctl {start|stop}" ;;
+esac
+exit 0

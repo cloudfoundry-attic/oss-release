@@ -109,7 +109,7 @@ mkdir -p /var/vcap/sys/run
 chown vcap:vcap -R /var/vcap/sys/run
 
 cp -r $VCAP_POSTGRESQL90 /var/vcap/packages/postgresql
-cp /var/vcap/jobs/postgresql_node_ng/config/postgresql.conf /var/vcap/packages/postgresql/initdb
+cp /var/vcap/jobs/postgresql_common/config/postgresql.conf /var/vcap/packages/postgresql/initdb
 
 # prepare the filesystem for postgresql
 mkdir -p /tmp/var/vcap/store
@@ -159,15 +159,20 @@ cd $WARDEN_PACKAGE
 nohup bundle exec rake warden:start[/tmp/warden_server.yml] &gt;&gt; /var/vcap/sys/log/warden/warden.stdout.log 2&gt;&gt;/var/vcap/sys/log/warden/warden.stderr.log &amp;
 sleep 5
 
-# prepare the common services utils
-mkdir -p /var/vcap/packages/common
-cp -r /var/vcap/jobs/common/utils.sh /var/vcap/packages/common
+# create the config and bin for the start of wardenized postgresql
+mkdir -p /var/vcap/store
+cp -r /var/vcap/jobs/postgresql_common /var/vcap/store
 
 cd /tmp/postgresql_source/postgresql
 rm -rf .bundle
 rm -rf vendor/bundle
 sed -i &apos;s/use_warden: false/use_warden: true/g&apos; config/postgresql_node.yml
-bundle install --deployment
+
+# do the bundle install with the correct config
+bundle config build.pg --with-pg-dir=$VCAP_POSTGRESQL91
+bundle config build.do_sqlite3 --with-sqlite3-dir=$SQLITE_REALPATH
+
+bundle install --deployment --without development production
 bundle exec rake spec:ci
 EOT
 

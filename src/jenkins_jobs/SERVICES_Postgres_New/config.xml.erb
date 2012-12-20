@@ -80,6 +80,7 @@ HANDLE=`$WARDEN_REPL_V2 -- create \
 --bind_mounts[1].src_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].dst_path &quot;$GIT_REALPATH&quot; --bind_mounts[1].mode RO \
 --bind_mounts[2].src_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].dst_path &quot;$SQLITE_REALPATH&quot; --bind_mounts[2].mode RO \
 --bind_mounts[3].src_path &quot;$POSTGRESQL90_REALPATH&quot; --bind_mounts[3].dst_path &quot;$VCAP_POSTGRESQL90&quot; --bind_mounts[3].mode RO \
+--bind_mounts[4].src_path &quot;$POSTGRESQL91_REALPATH&quot; --bind_mounts[4].dst_path &quot;$VCAP_POSTGRESQL91&quot; --bind_mounts[4].mode RO \
 | cut -d &quot; &quot; -f 3`
 
 TEST_RUNNER=`mktemp`
@@ -121,7 +122,7 @@ sed -i &apos;s/\/var\/vcap\/sys\/run\/postgresql_node.pid/\/tmp\/var\/vcap\/sys\
 sed -i &apos;s/\/var\/vcap\/sys\/run\/postgresql_service.pid/\/tmp\/var\/vcap\/sys\/run\/postgres_service.pid/g&apos; config/postgresql_gateway.yml
 sed -i &apos;s/local_db: sqlite3:\/var\/vcap\/services\/postgresql\/postgresql_node.db/local_db: sqlite3:postgresql_node.db/g&apos; config/postgresql_node.yml
 
-bundle config build.pg --with-pg-dir=$VCAP_POSTGRESQL90
+bundle config build.pg --with-pg-dir=$VCAP_POSTGRESQL91
 bundle config build.do_sqlite3 --with-sqlite3-dir=$SQLITE_REALPATH
 
 bundle install --deployment --without development production

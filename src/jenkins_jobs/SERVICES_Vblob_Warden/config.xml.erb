@@ -88,7 +88,7 @@ HANDLE=`$WARDEN_REPL_V2 -- create \
 --bind_mounts[4].src_path &quot;$VBLOB_REALPATH&quot; --bind_mounts[4].dst_path &quot;/var/vcap/packages/vblob&quot; --bind_mounts[4].mode RO \
 --bind_mounts[5].src_path &quot;$SERVICES_WARDEN_REALPATH&quot; --bind_mounts[5].dst_path &quot;$/var/vcap/packages/warden&quot; --bind_mounts[5].mode RO \
 --bind_mounts[6].src_path &quot;$SERVICES_WARDEN_ROOTFS_REALPATH&quot; --bind_mounts[6].dst_path &quot;/var/vcap/data/warden/rootfs&quot; --bind_mounts[6].mode RO \
---bind_mounts[7].src_path &quot;$SERVICES_CTL_JOBS_REALPATH&quot; --bind_mounts[7].dst_path &quot;/var/vcap/jobs&quot; --bind_mounts[7].mode RO \
+--bind_mounts[7].src_path &quot;$SERVICES_CTL_JOBS_REALPATH&quot; --bind_mounts[7].dst_path &quot;/var/vcap/store&quot; --bind_mounts[7].mode RO \
 --bind_mounts[8].src_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[8].dst_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[8].mode RW \
 | cut -d &quot; &quot; -f 3`
 
@@ -140,10 +140,6 @@ user:
   pool_start_uid: 10000
   pool_size: 256
 EOF
-
-# prepare the common services utils
-mkdir -p /var/vcap/packages/common
-cp -r /var/vcap/jobs/common/utils.sh /var/vcap/packages/common
 
 # start the warden server
 cd $WARDEN_PACKAGE
