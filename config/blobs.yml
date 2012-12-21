@@ -287,3 +287,11 @@ services_warden_rootfs/services_warden_rootfs.tgz:
   object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjEyMDRlNGU4NmVlYmU1OTEwNTBkODI3%0AYjY3YTU3ZSIsInNpZyI6IlRjMDczajUvK0RqN1pCMEU3Rkp3WWRqY0ZKZz0i%0AfQ==%0A
   sha: b2654612b19995a751c6ae31034adbbcd34bbfd6
   size: 245593923
+gerrit/gerrit-2.5.1.war:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjIwMDRlNGU4ZWM2NDg0MzEwNTBkNDE4%0AZTU4ZjZhNSIsInNpZyI6IjRIUUN2M2YvS3ZzS0pYb3BGTWhZWlRWT1ZtND0i%0AfQ==%0A
+  sha: 3c72518c2b1d5d64d45b116135c4a0f507fa3cd1
+  size: 24674492
+gerrit/replication-1.0.jar:
+  object_id: eyJvaWQiOiI0ZTRlNzhiY2E2MWUxMjEyMDRlNGU4NmVlYmU1OTEwNTBkNDE4%0AZWMzNzA5NiIsInNpZyI6InVCYjhZOFVPb0dLWjhRNFdZOFFScTRzaTZjaz0i%0AfQ==%0A
+  sha: d0c74090168d5c8c4f5c68a8a92d69015523ce44
+  size: 47824
