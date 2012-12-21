@@ -221,3 +221,9 @@ else
     dpkg -P bds-zabbix
   fi
 fi
+
+# set up replication plugin if version is 2.5.1
+if [ "$VERSION" = '2.5.1' ]; then
+  mkdir -p $DATA_DIR/review_site/$dbname/plugins/
+  cp -f $PACKAGE_DIR/replication-1.0.jar $DATA_DIR/review_site/$dbname/plugins/
+fi
