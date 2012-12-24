@@ -32,6 +32,6 @@ tar xzvf mysql/mysql-service-5.5-patch.tgz
 (
   cd mysql-service-5.5-patch
   cp -a my55.cnf ${BOSH_INSTALL_TARGET}
-  cp -a mysql55.server ${BOSH_INSTALL_TARGET}/libexec
-  cp -a mysql55_warden.server ${BOSH_INSTALL_TARGET}/libexec
+  cp -a mysql55.server ${BOSH_INSTALL_TARGET}/libexec/mysql.server
+  cp -a mysql55_warden.server ${BOSH_INSTALL_TARGET}/libexec/mysql_warden.server
 )

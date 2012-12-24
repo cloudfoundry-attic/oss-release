@@ -1,5 +1,7 @@
 ---
 name: postgresql91
+dependencies:
+- services_jobs
 files:
 - postgresql/postgresql-9.1-x86_64.tar.gz
 - postgresql/postgresql-initdb-9.1-x86_64.tar.gz
