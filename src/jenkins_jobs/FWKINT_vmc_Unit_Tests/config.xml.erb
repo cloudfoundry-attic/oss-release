@@ -63,7 +63,10 @@
   <concurrentBuild>true</concurrentBuild>
   <builders>
     <hudson.tasks.Shell>
-      <command>export PATH=$VCAP_RUBY19/bin:$PATH
+      <command>echo &quot;Tests are running in Travis-CI at http://travis-ci.org/cloudfoundry/vmc&quot;
+exit 0
+
+export PATH=$VCAP_RUBY19/bin:$PATH
 
 RUBY19_REALPATH=`readlink -nf $VCAP_RUBY19`
 GIT_REALPATH=`readlink -nf $VCAP_GIT`
@@ -76,12 +79,11 @@ cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 set -o errexit
 export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$MVN_REALPATH/bin:$PATH
 export JAVA_HOME=$JAVA_REALPATH
-cp -rf $WORKSPACE /tmp/
-WORKSPACE_NAME=`basename $WORKSPACE`
-cd /tmp/$WORKSPACE_NAME
-rm -rf vendor/bundle
-bundle install --no-color --path vendor/bundle
-bundle exec rake spec
+# cp -rf $WORKSPACE /tmp/
+# WORKSPACE_NAME=`basename $WORKSPACE`
+# cd /tmp/$WORKSPACE_NAME
+cd $WORKSPACE
+rake spec
 EOT
 
 HANDLE=`$CREATE_CONTAINER $RUBY19_REALPATH $GIT_REALPATH $JAVA_REALPATH $MVN_REALPATH $WORKSPACE`
