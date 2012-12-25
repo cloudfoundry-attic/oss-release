@@ -14,3 +14,4 @@ cp -a initdb ${BOSH_INSTALL_TARGET}
 rm ${BOSH_INSTALL_TARGET}/packaging
 
 cp -a /var/vcap/packages/services_jobs/postgresql90_init_jobs ${BOSH_INSTALL_TARGET}/jobs
+cp -a /var/vcap/packages/services_jobs/postgresql90_init_jobs/postgresql.conf ${BOSH_INSTALL_TARGET}/initdb

@@ -12,3 +12,5 @@ tar xzf postgresql/postgresql-initdb-9.1-x86_64.tar.gz
 cp -a initdb ${BOSH_INSTALL_TARGET}
 
 rm ${BOSH_INSTALL_TARGET}/packaging
+
+cp -a /var/vcap/packages/services_jobs/postgresql91_init_jobs/postgresql.conf ${BOSH_INSTALL_TARGET}/initdb

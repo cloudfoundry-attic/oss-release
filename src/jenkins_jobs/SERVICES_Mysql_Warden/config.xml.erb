@@ -78,6 +78,8 @@ SERVICES_CTL_JOBS_REALPATH=`readlink -nf $VCAP_SERVICES_CTL_JOB`
 WARDEN_PACKAGE=/var/vcap/packages/warden/warden
 MYSQL_SVC=$PWD/ng/mysql
 
+rm -rf $MYSQL_SVC/spec_*
+
 echo &quot;creating the warden container for unit-test&quot;
 HANDLE=`$WARDEN_REPL_V2 -- create \
 --bind_mounts[0].src_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].dst_path &quot;$RUBY19_REALPATH&quot; --bind_mounts[0].mode RO \
@@ -88,6 +90,7 @@ HANDLE=`$WARDEN_REPL_V2 -- create \
 --bind_mounts[5].src_path &quot;$SERVICES_CTL_JOBS_REALPATH&quot; --bind_mounts[5].dst_path &quot;/var/vcap/jobs&quot; --bind_mounts[5].mode RO \
 --bind_mounts[6].src_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[6].dst_path &quot;$WARDEN_INSTANCES&quot; --bind_mounts[6].mode RW \
 --bind_mounts[7].src_path &quot;$MYSQL51_REALPATH&quot; --bind_mounts[7].dst_path &quot;/var/vcap/packages/mysql&quot; --bind_mounts[7].mode RO \
+--bind_mounts[8].src_path &quot;$MYSQL55_REALPATH&quot; --bind_mounts[8].dst_path &quot;/var/vcap/packages/mysql55&quot; --bind_mounts[8].mode RO \
 | cut -d &quot; &quot; -f 3`
 
 TEST_RUNNER=`mktemp`
@@ -163,7 +166,11 @@ cd /tmp/mysql_source/mysql
 rm -rf .bundle
 rm -rf vendor/bundle
 
+# force to use warden and force version to be current
+sed -i &quot;s/supported_versions: \[&apos;5.1&apos;, &apos;5.5&apos;\]/supported_versions: \[&apos;5.5&apos;\]/g&quot; config/mysql_node.yml
 sed -i &apos;s/use_warden: false/use_warden: true/g&apos; config/mysql_node.yml
+cat config/mysql_node.yml
+
 bundle install --deployment
 bundle exec rake spec:ci
 EOT

@@ -18,6 +18,7 @@ basedir		              = /var/vcap/packages/mysql55
 datadir                 = /var/vcap/store/mysql55
 tmpdir                  = /var/vcap/data/mysql_tmp
 lc-messages-dir         = /var/vcap/packages/mysql55/share
+skip-name-resolve
 skip-external-locking
 
 
