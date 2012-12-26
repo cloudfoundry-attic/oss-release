@@ -20,14 +20,11 @@ tar xf misc/expect5.45.tar
 
 cp -v gerrit/gerrit-*.war ${BOSH_INSTALL_TARGET}
 cp -v misc/review* ${BOSH_INSTALL_TARGET}
-
-tar xf gerrit/hooks.tgz
-(
-  cp -rf hooks ${BOSH_INSTALL_TARGET}
-  cd ${BOSH_INSTALL_TARGET}/hooks/patchset_notification
-  /var/vcap/packages/ruby/bin/bundle --local install --deployment
-)
-
 cp -v gerrit/bcpg-jdk16-146.jar ${BOSH_INSTALL_TARGET}
-
 cp -vrf gerrit/gitweb ${BOSH_INSTALL_TARGET}
+
+(
+  cp -rf gerrit_hooks ${BOSH_INSTALL_TARGET}
+  cd ${BOSH_INSTALL_TARGET}/gerrit_hooks/patchset_notification
+  /var/vcap/packages/ruby/bin/bundle install --deployment
+)
