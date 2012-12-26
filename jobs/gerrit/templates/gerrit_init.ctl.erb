@@ -73,7 +73,7 @@ cp -pf $JOB_DIR/config/replication.config $CONFIG_DIR/
 
 # Gerrit Hooks setup
 rm -rf $HOOKS_DIR
-cp -r $PACKAGE_DIR/hooks $HOOKS_DIR
+cp -r $PACKAGE_DIR/gerrit_hooks $HOOKS_DIR
 cp -pf $JOB_DIR/config/gerrit_hooks.yml $HOOKS_DIR/patchset_notification/config/
 cp -pf $JOB_DIR/config/notification_config.yml $HOOKS_DIR/patchset_notification/config/
 <% if properties.gerrit.pair_mode %>

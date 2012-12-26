@@ -1,0 +1,4 @@
+source :rubygems
+
+gem "pony"
+gem "net-ssh"

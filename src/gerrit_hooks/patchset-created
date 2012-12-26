@@ -1,0 +1,5 @@
+#!/bin/bash
+export PATH=/var/vcap/packages/ruby/bin:$PATH
+
+DIR=`dirname $0`
+$DIR/patchset_notification/patchset_notification.rb $@ >> patchcreated.log 2>&1

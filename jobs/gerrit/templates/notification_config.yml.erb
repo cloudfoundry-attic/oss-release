@@ -1,62 +1,7 @@
 ---
-"Identity Team":
-- acm
-- uaa
-"VCD and Platform":
-- bosh
-"Platforms Team":
-- bat-release
-- bosh-release
-- bosh-sample-release
-- gonats
-- gonit
-- gosigar
-"Core Team":
-- benchmarks
-- cloud_controller
-- cloud_controller_ng
-- common
-- dea
-- dea_ng
-- gobundle
-- gometrics
-- gorouter
-- gosteno
-- health_manager
-- membrane
-- router
-- stager
-- stager-client
-- stager_client
-- steno
-- vcap
-- vcap-common
-- vcap-concurrency
-- warden
-"SRE Team":
-- cf-release
-- Cloud Foundry release
-"Services Team":
-- vblob
-- vcap-services
-- vcap-services-base
-- vcap-services-sample-release
-"Docs_Team":
-- cf-docs
-- oss-docs
-"vcap_yeti_commiters":
-- vcap-yeti
-- vcap-test-assets
-"oss_release_commiters":
-- oss-release
-"Framework_Team":
-- caldecott
-- micro
-- vcap-java
-- vcap-java-client
-- vcap-node
-- vcap-ruby
-- vmc
-- vmc-glue
-- vmc-lib
-- vmc-plugins
+<% for entry in properties.gerrit.auto_reviewer %>
+<%= entry.team %>:
+<% for project in entry.projects %>
+  - <%= project %>
+<% end %>
+<% end %>
