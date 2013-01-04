@@ -1,7 +1,9 @@
 ---
+<% if !properties.gerrit.auto_reviewer.nil? %>
 <% for entry in properties.gerrit.auto_reviewer %>
 <%= entry.team %>:
 <% for project in entry.projects %>
   - <%= project %>
+<% end %>
 <% end %>
 <% end %>

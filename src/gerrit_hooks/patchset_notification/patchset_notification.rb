@@ -13,9 +13,11 @@ require "net/ssh"
 
 def get_reviewer(notification, project)
   reviewers = Array.new
-  notification.each_key do |team|
-    if notification[team].include? project
-      reviewers.push team
+  if !notification.nil?
+    notification.each_key do |team|
+      if notification[team].include? project
+        reviewers.push team
+      end
     end
   end
   return reviewers

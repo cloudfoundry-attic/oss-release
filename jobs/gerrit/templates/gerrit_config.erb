@@ -21,7 +21,7 @@
 <% if (properties.gerrit.version =~ /^2\.2\./) %>
   allowGoogleAccountUpgrade = true
 <% end %>
-<% if (properties.gerrit.version =~ /^2\.2\./) && !properties.gerrit.clas.nil?  %>
+<% if !properties.gerrit.clas.nil? && (properties.gerrit.version =~ /^2\.2\./) || (properties.gerrit.version =~ /^2\.5\./) %>
   contributorAgreements = true
 <% end %>
 
