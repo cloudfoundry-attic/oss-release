@@ -3,12 +3,12 @@
   <actions/>
   <description></description>
   <displayName>Mongodb Warden Unit Test</displayName>
-  <logRotator>
-    <daysToKeep>30</daysToKeep>
-    <numToKeep>-1</numToKeep>
-    <artifactDaysToKeep>-1</artifactDaysToKeep>
-    <artifactNumToKeep>-1</artifactNumToKeep>
-  </logRotator>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -33,7 +33,7 @@
       </hudson.plugins.git.BranchSpec>
     </branches>
     <disableSubmodules>false</disableSubmodules>
-    <recursiveSubmodules>false</recursiveSubmodules>
+    <recursiveSubmodules>true</recursiveSubmodules>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
     <authorOrCommitter>false</authorOrCommitter>
     <clean>false</clean>
@@ -80,6 +80,7 @@ GO_REALPATH=`readlink -nf $VCAP_GOLANG`
 WARDEN_PACKAGE=/var/vcap/packages/warden/warden
 MONGO_SVC=$PWD/ng/mongodb
 TOOLS=$PWD/tools
+GOVENDOR=$PWD/govendor
 
 echo &quot;creating the warden container for unit-test&quot;
 HANDLE=`$WARDEN_REPL_V2 -- create \
@@ -126,7 +127,7 @@ git clone git://github.com/moovweb/log4go.git github.com/moovweb/log4go/
 
 # install the mongo proxy
 cd /tmp/tools/mongodb_proxy
-go install proxyctl
+./build.sh
 cp -r /tmp/tools/mongodb_proxy /var/vcap/packages
 
 # nats expects to write in /var/vcap/sys/run
@@ -195,6 +196,7 @@ $WARDEN_REPL -e -x -c &quot;
 copy $HANDLE in $MONGO_SVC /tmp/mongo_source
 copy $HANDLE in $TEST_RUNNER /tmp
 copy $HANDLE in $TOOLS /tmp
+copy $HANDLE in $GOVENDOR /tmp
 run $HANDLE chmod +x $TEST_RUNNER
 run $HANDLE sudo /bin/bash $TEST_RUNNER
 copy $HANDLE out /tmp/mongo_source/mongodb/spec_reports $MONGO_SVC vcap:vcap
@@ -233,5 +235,14 @@ rm -f $TEST_RUNNER</command>
       </targets>
     </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
   </publishers>
-  <buildWrappers/>
+  <buildWrappers>
+    <hudson.plugins.build__timeout.BuildTimeoutWrapper>
+      <timeoutMinutes>30</timeoutMinutes>
+      <failBuild>false</failBuild>
+      <writingDescription>false</writingDescription>
+      <timeoutPercentage>0</timeoutPercentage>
+      <timeoutType>absolute</timeoutType>
+      <timeoutMinutesElasticDefault>3</timeoutMinutesElasticDefault>
+    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
+  </buildWrappers>
 </project>

@@ -3,12 +3,12 @@
   <actions/>
   <description></description>
   <displayName>Rabbit Warden Unit Test</displayName>
-  <logRotator>
-    <daysToKeep>30</daysToKeep>
-    <numToKeep>-1</numToKeep>
-    <artifactDaysToKeep>-1</artifactDaysToKeep>
-    <artifactNumToKeep>-1</artifactNumToKeep>
-  </logRotator>
+  <logRotator>
+    <daysToKeep>30</daysToKeep>
+    <numToKeep>-1</numToKeep>
+    <artifactDaysToKeep>-1</artifactDaysToKeep>
+    <artifactNumToKeep>-1</artifactNumToKeep>
+  </logRotator>
   <keepDependencies>false</keepDependencies>
   <properties>
     <hudson.plugins.throttleconcurrents.ThrottleJobProperty>
@@ -33,7 +33,7 @@
       </hudson.plugins.git.BranchSpec>
     </branches>
     <disableSubmodules>false</disableSubmodules>
-    <recursiveSubmodules>false</recursiveSubmodules>
+    <recursiveSubmodules>true</recursiveSubmodules>
     <doGenerateSubmoduleConfigurations>false</doGenerateSubmoduleConfigurations>
     <authorOrCommitter>false</authorOrCommitter>
     <clean>false</clean>
@@ -102,10 +102,15 @@ cat &lt;&lt;-EOT &gt; $TEST_RUNNER
 set -x
 set -o errexit
 
+losetup -a
+
 export PATH=$RUBY19_REALPATH/bin:$GIT_REALPATH/bin:$VCAP_GOLANG/bin:$PATH
 export LIBRARY_PATH=$SQLITE_REALPATH/lib:$LIBRARY_PATH
 export C_INCLUDE_PATH=$SQLITE_REALPATH/include:$C_INCLUDE_PATH
 export CI_ENV=&apos;jenkins&apos;
+
+# echo the address of github into the /etc/hosts in case warden cannot find it
+sudo echo &quot;207.97.227.239 github.com&quot; &gt;&gt; /etc/hosts
 
 # prepare the bandwidth proxy for rabbitmq
 export GOROOT=$VCAP_GOLANG
@@ -124,8 +129,6 @@ sudo chown -R vcap:vcap /var/vcap/sys/run
 # prepare the log directory for warden
 mkdir -p /var/vcap/sys/log/warden
 
-# echo the address of github into the /etc/hosts in case warden cannot find it
-sudo echo &quot;207.97.227.239 github.com&quot; &gt;&gt; /etc/hosts
 
 # dynamically generate the config for the warden server
 cat &gt; /tmp/warden_server.yml &lt;&lt;-EOF
@@ -170,6 +173,19 @@ bundle exec rake spec:ci
 
 EOT
 
+CREATE_LOOP=`mktemp`
+cat &lt;&lt;-EOT &gt; $CREATE_LOOP
+#!/bin/bash
+loop_device_count=128
+for i in \$(seq 0 \$(expr \$loop_device_count - 1)); do
+  file=/dev/loop\${i}
+  if [ ! -b \${file} ]; then
+    mknod -m0660 \${file} b 7 \${i}
+    chown root.disk \${file}
+  fi
+done
+EOT
+
 echo &quot;enable vcap could execute sudo without password within warden&quot;
 sudo ls $WARDEN_INSTANCES/$HANDLE/ssh/ssh_config
 set +e
@@ -189,6 +205,9 @@ copy $HANDLE in $RABBITMQ_SVC /tmp/rabbitmq_source
 copy $HANDLE in $TEST_RUNNER /tmp
 copy $HANDLE in $TOOLS /tmp
 run $HANDLE chmod +x $TEST_RUNNER
+copy $HANDLE in $CREATE_LOOP /tmp
+run $HANDLE chmod +x $CREATE_LOOP
+run $HANDLE sudo /bin/bash $CREATE_LOOP
 run $HANDLE sudo /bin/bash $TEST_RUNNER
 copy $HANDLE out /tmp/rabbitmq_source/rabbit/spec_reports $RABBITMQ_SVC vcap:vcap
 copy $HANDLE out /tmp/rabbitmq_source/rabbit/spec_coverage $RABBITMQ_SVC vcap:vcap
@@ -226,5 +245,14 @@ rm -f $TEST_RUNNER</command>
       </targets>
     </hudson.plugins.rubyMetrics.rcov.RcovPublisher>
   </publishers>
-  <buildWrappers/>
+  <buildWrappers>
+    <hudson.plugins.build__timeout.BuildTimeoutWrapper>
+      <timeoutMinutes>30</timeoutMinutes>
+      <failBuild>false</failBuild>
+      <writingDescription>false</writingDescription>
+      <timeoutPercentage>0</timeoutPercentage>
+      <timeoutType>absolute</timeoutType>
+      <timeoutMinutesElasticDefault>3</timeoutMinutesElasticDefault>
+    </hudson.plugins.build__timeout.BuildTimeoutWrapper>
+  </buildWrappers>
 </project>

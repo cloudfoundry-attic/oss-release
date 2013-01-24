@@ -35,26 +35,6 @@
               <compareType>PLAIN</compareType>
               <pattern>master</pattern>
             </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-              <compareType>PLAIN</compareType>
-              <pattern>sversions</pattern>
-            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-              <compareType>PLAIN</compareType>
-              <pattern>echo_service</pattern>
-            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-              <compareType>PLAIN</compareType>
-              <pattern>fileservice</pattern>
-            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-              <compareType>PLAIN</compareType>
-              <pattern>memcache</pattern>
-            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-            <com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
-              <compareType>PLAIN</compareType>
-              <pattern>sqlfire</pattern>
-            </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.Branch>
           </branches>
         </com.sonyericsson.hudson.plugins.gerrit.trigger.hudsontrigger.data.GerritProject>
       </gerritProjects>
@@ -76,7 +56,7 @@
           <configs>
             <hudson.plugins.parameterizedtrigger.CurrentBuildParameters/>
           </configs>
-          <projects>SERVICES_ElasticSearch_New, SERVICES_Redis_New, SERVICES_Postgres_New, SERVICES_Neo4j_New, SERVICES_Mysql_New, SERVICES_Mongo_New, SERVICES_Backup_Manager_Unit_Test, SERVICES_Filesystem_Unit_Test, SERVICES_Serialization_Unit_Test, SERVICES_Service_Broker_Unit_Test, SERVICES_Vblob_Unit_Test, SERVICES_Memcached_New, SERVICES_Echo_New, SERVICES_Couchdb_New</projects>
+          <projects>SERVICES_Mysql_Warden, SERVICES_Mongo_Warden, SERVICES_Rabbit_Warden, SERVICES_Memcached_Warden, SERVICES_Postgresql_Warden, SERVICES_Vblob_Warden, SERVICES_Redis_Warden, SERVICES_ElasticSearch_New, SERVICES_Redis_New, SERVICES_Postgres_New, SERVICES_Neo4j_New, SERVICES_Mysql_New, SERVICES_Mongo_New, SERVICES_Backup_Manager_Unit_Test, SERVICES_Filesystem_Unit_Test, SERVICES_Serialization_Unit_Test, SERVICES_Service_Broker_Unit_Test, SERVICES_Vblob_Unit_Test, SERVICES_Memcached_New, SERVICES_Echo_New, SERVICES_Couchdb_New, SERVICES_Rabbit_New, SERVICES_Marketplace_Unit_Test</projects>
           <condition>ALWAYS</condition>
           <triggerWithNoParameters>false</triggerWithNoParameters>
           <block>
