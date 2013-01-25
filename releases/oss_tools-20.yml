@@ -1,0 +1,293 @@
+--- 
+packages: 
+- name: cla_notice
+  version: 1
+  sha1: d0f9589c9cb6d8c6e614552d6d76b6b41e8d6b1c
+  dependencies: 
+  - ruby
+- name: create_batch_gerrit_account
+  version: 1
+  sha1: d4a5351d7bbe7b92db26e88ff5243234ec11ec3b
+  dependencies: 
+  - ruby
+  - mysqlclient
+- name: dea_node04
+  version: 1
+  sha1: a579c63c5ee49f60f2ed9252ddef52cfdc761cc8
+  dependencies: []
+
+- name: dea_node06
+  version: 1
+  sha1: 90289b161a0097ecc0c657701bafe785221e8f77
+  dependencies: []
+
+- name: dea_ruby18
+  version: 2
+  sha1: 7154c40212f49c8f424274d7a6f7a62b61dd8d8b
+  dependencies: []
+
+- name: dea_ruby19
+  version: 3
+  sha1: d423a1d105ca914f530bdc9b01be7d8c7ea0eb8a
+  dependencies: []
+
+- name: debian_nfs_server
+  version: 2
+  sha1: a7cec665d0ac6bac9586db46c72ba35a2238e834
+  dependencies: []
+
+- name: erlang
+  version: 2
+  sha1: d931ebadd79e2fde201c82e8918e9a862d3d82a3
+  dependencies: []
+
+- name: gerrit
+  version: 6
+  sha1: 4cffc8e18cb81217150e92d4a309be7b720da8bb
+  dependencies: 
+  - ruby
+- name: gerrit_cla_updater
+  version: 2
+  sha1: e7afabe535aec11746a9f0aa24e55b8efa7fd12f
+  dependencies: 
+  - ruby
+  - mysqlclient
+- name: git
+  version: 2
+  sha1: f3072da8a7a9f4d60c7ceeec4e7dda697bae1f7e
+  dependencies: []
+
+- name: go2xunit
+  version: 1
+  sha1: 8ae4ce3ebea2f70c00cdb38bdac8ac8dafc65885
+  dependencies: []
+
+- name: golang
+  version: 1
+  sha1: 2d355e82127e7e86f11ff15e863d4b63793573e3
+  dependencies: []
+
+- name: java
+  version: 2
+  sha1: ecbaec3ea1cbd3a55caa551420257962c8a72728
+  dependencies: []
+
+- name: jenkins
+  version: 3
+  sha1: 36372660bddd915505b271b100d5ebb24a5891bf
+  dependencies: []
+
+- name: jenkins_jobs
+  version: 15
+  sha1: ee8e8b2790e0484fb1d1814a227d773197966b29
+  dependencies: []
+
+- name: libpq
+  version: 2
+  sha1: 546453198a97e7ac5fbd1ce3fac61f45dd59d72b
+  dependencies: []
+
+- name: maven22
+  version: 1
+  sha1: c00065717d2d5cd12aadbc4705202435809353bf
+  dependencies: []
+
+- name: mongodb20
+  version: 1
+  sha1: c65e9fcecc90c08a9348e8d13d89f5c05ac87b6a
+  dependencies: []
+
+- name: mysql51
+  version: 1
+  sha1: 2dfaf0541e72e8989ac80d058fc3aba9bd5834ef
+  dependencies: []
+
+- name: mysql
+  version: 1
+  sha1: b2ec4389a067ff9e1fb11235c9b1798c2cd899e5
+  dependencies: []
+
+- name: mysqlclient
+  version: 1
+  sha1: f86fa06c7bccaba49a17d4be60f47a4a368c1554
+  dependencies: []
+
+- name: neo4j
+  version: 1
+  sha1: 35691552b04822366d22568c51f551a8292c95b0
+  dependencies: []
+
+- name: new_user_notifier
+  version: 1
+  sha1: 421b5f9ad5ee8776da114f22279effcb2a7f4d3d
+  dependencies: 
+  - ruby
+  - mysqlclient
+- name: nginx
+  version: 2
+  sha1: 61d1999079cd6739c1ce7898e834a187dd78d095
+  dependencies: []
+
+- name: ovftool
+  version: 1
+  sha1: be82a637d25a04ab509b162296bd384adb710dfb
+  dependencies: []
+
+- name: postgres
+  version: 2
+  sha1: 1fff53dcfad4dae5343b339ea084185393b3ab0a
+  dependencies: []
+
+- name: pr_bounce
+  version: 4
+  sha1: 1ff335c053efdf6cdc88c51b054778f4d5e715a8
+  dependencies: 
+  - ruby
+- name: mongodb18
+  version: 1
+  sha1: a95ac10a503a33104c0254e20e160102f15458d6
+  dependencies: []
+
+- name: ruby
+  version: 3
+  sha1: 5dc3d67cb73eaef09558258e8c2c06530b6307fa
+  dependencies: []
+
+- name: sqlite
+  version: 1
+  sha1: 3de5bac4548c7088107901de302022c8b95afe57
+  dependencies: []
+
+- name: ttf_dejavu
+  version: 1
+  sha1: 52b4b77059f7bd2014256c123bff1d8a3ec84a40
+  dependencies: []
+
+- name: vblob
+  version: 1
+  sha1: 1c58d8a8c61ade560e466c5b58f32128c6b1fd22
+  dependencies: []
+
+- name: mysql55
+  version: 2
+  sha1: 924b8df7bf6592aa09823e706c9eda0afd0a8344
+  dependencies: []
+
+- name: warden
+  version: 6
+  sha1: 0536b95e37d80df3e0f97236c8c286c8395ebcdc
+  dependencies: 
+  - ruby
+- name: memcached
+  version: 1
+  sha1: 2347285279b1938c0522e987e904f9a4a7711cdd
+  dependencies: []
+
+- name: rabbitmq24
+  version: 2
+  sha1: 2745449ecd90089995086bfe1f9e722e408eb23e
+  dependencies: []
+
+- name: zabbix_agent
+  version: 1
+  sha1: ab42885aae4775792899aae867b4ac5f033e694a
+  dependencies: []
+
+- name: couchdb
+  version: 1
+  sha1: fa2369f4faebe24e66c97f3db874caa5c23c0b89
+  dependencies: []
+
+- name: elasticsearch
+  version: 1
+  sha1: 661d4631bfc5bc851e6c35c4f50095e131e8184c
+  dependencies: []
+
+- name: gdb
+  version: 1
+  sha1: e8c60bb7561e7249ab0680df437a0b8dbbf75cc9
+  dependencies: []
+
+- name: rabbitmq28
+  version: 2
+  sha1: 6a23b314764a816b733f564b298563b47a1e0ec0
+  dependencies: []
+
+- name: mongodb22
+  version: 1
+  sha1: 85b90fcef272a2bc234959423145948cc567b1c0
+  dependencies: []
+
+- name: postgresql90
+  version: 2
+  sha1: 03c37c5548c7451d7d31eba66892c3714f5f2b74
+  dependencies: 
+  - services_jobs
+- name: postgresql91
+  version: 2
+  sha1: 6cdeabc118b6d4959d691c5ea01c4e54982f8743
+  dependencies: 
+  - services_jobs
+- name: redis22
+  version: 1
+  sha1: e98e4e847ab3e766b373eb7ca5cb241e9a4a9a17
+  dependencies: []
+
+- name: redis24
+  version: 1
+  sha1: 80ef0c48444b9b5a120e3c14a5ca4978077aa012
+  dependencies: []
+
+- name: redis26
+  version: 1
+  sha1: 981dce8455b6b224e6e99638402fbbcbbe0a3b23
+  dependencies: []
+
+- name: services_jobs
+  version: 3
+  sha1: 312c38c9b8963a5ee5c04cc4bb45529b7dce18ca
+  dependencies: []
+
+- name: services_warden
+  version: 1
+  sha1: c25ac334d17e971f68164ce940681fda2458110b
+  dependencies: 
+  - ruby
+- name: services_warden_rootfs
+  version: 2
+  sha1: 1c60f63a6601f3dc4da7b4e0944a2bd351a538fb
+  dependencies: []
+
+jobs: 
+- name: debian_nfs_server
+  version: 1
+  sha1: b72909c66ed166ff2e5519168f8221e979b4babe
+- name: gerrit
+  version: 13
+  sha1: 1eaa26f782ab0d8548813ca940fc3ea354215a9c
+- name: gerrit_mysql
+  version: 3
+  sha1: 7441d89f155c540f7f368529f9b249bc47a452dd
+- name: gerrit_postgres
+  version: 1
+  sha1: a08b16f548ef8fdc45f92729f6f2d1f01af445c3
+- name: gerrit_replication
+  version: 1
+  sha1: fb49a35b6552c71b6a6def2d9daabd49c55a3107
+- name: jenkins
+  version: 16
+  sha1: 4483b9e973722d087c1129343258a95d7d623cdb
+- name: jenkins_slave
+  version: 13
+  sha1: 050827fd60902d7996584fbe2ff44b5ed1d0a3f8
+- name: nginx
+  version: 2
+  sha1: 559c3f8e58fa439a03ee4ea4921ea1d589d2fbaf
+- name: gerrit_backup
+  version: 1
+  sha1: 317bb7637866af2d98c128966baa98513db6eefb
+- name: gerrit_mysql_slave
+  version: 2
+  sha1: e643c5bab5880b47823b17936d2300229a2503dd
+name: oss_tools
+version: 20
