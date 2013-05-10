@@ -1,6 +1,6 @@
---- 
-builds: 
-  cb73d6655226544e7404eddd659c78d1e68c54a6: 
-    blobstore_id: eyJvaWQiOiI0ZTRlNzhiY2ExMWUxMjIwMDRlNGU4ZWM2NDg0MzEwNGY4Mzdh%0AZjU4MTU1OCIsInNpZyI6IlZKRitXOGRuT25XQmZ2TEk0N1hYWkwyTjloVT0i%0AfQ==%0A
+---
+builds:
+  cb73d6655226544e7404eddd659c78d1e68c54a6:
+    blobstore_id: rest/objects/4e4e78bca11e122004e4e8ec64843104f837af581558
     version: 1
     sha1: 5657746e578adf9bd786163337970d63a5654c05
